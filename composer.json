@@ -1,15 +1,18 @@
 {
     "name": "incloudsistemas/dig.incloudcodile14",
     "type": "project",
-    "description": "InCloudCodile14 - i2C | Marketing Automation, CMS and CRM.",
+    "description": "InCloudCodile14 - i2C | Marketing Automation, CMS, CRM and Finance.",
     "keywords": [
         "framework",
         "laravel",
+        "filament",
+        "tall stack",
         "incloud",
         "incloudcodile",
         "marketing automation",
         "cms",
-        "crm"
+        "crm",
+        "finance"
     ],
     "license": "MIT",
     "require": {
