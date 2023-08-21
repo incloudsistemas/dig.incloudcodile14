@@ -1,0 +1,1 @@
+<img src="{{ asset('images/filament/i2c-logo.png') }}" alt="InCloudCodile 14" />

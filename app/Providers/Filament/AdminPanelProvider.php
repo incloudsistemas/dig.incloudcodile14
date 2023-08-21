@@ -2,9 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\AvatarProviders\BoringAvatarsProvider;
+use App\Filament\Pages\Auth\EditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -24,13 +27,26 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('admin')
-            ->path('admin')
+            ->id('i2c-admin')
+            ->path('i2c-admin')
             ->login()
             ->passwordReset()
-            ->colors([
-                'primary' => Color::Amber,
+            ->profile(EditProfile::class)
+            ->userMenuItems([
+                'profile' => MenuItem::make()->label('Meu Perfil'),
+                MenuItem::make()
+                ->label('Website')
+                ->url('/')
+                ->icon('heroicon-o-globe-alt'),
+                'logout' => MenuItem::make()->label('Sair'),
             ])
+            // ->defaultAvatarProvider(BoringAvatarsProvider::class)
+            ->colors([
+                // 'primary' => Color::Amber,
+                'primary' => Color::Purple,
+            ])
+            ->favicon(url: asset('images/filament/favicon.ico'))
+            ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
