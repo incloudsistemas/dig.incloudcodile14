@@ -23,15 +23,15 @@ class PermissionResource extends Resource
 
     protected static ?string $slug = 'permissions';
 
-    // protected static ?string $recordTitleAttribute = 'name';
+    // protected static ?string $recordTitleAttribute = 'name';    
+
+    protected static ?string $modelLabel = 'Permissão';
+
+    protected static ?string $pluralModelLabel = 'Permissões';
 
     protected static ?string $navigationGroup = 'Sistema';
 
     protected static ?int $navigationSort = 3;
-
-    protected static ?string $modelLabel = 'permissão';
-
-    protected static ?string $pluralModelLabel = 'permissões';
 
     protected static ?string $navigationIcon = 'heroicon-o-key';
 

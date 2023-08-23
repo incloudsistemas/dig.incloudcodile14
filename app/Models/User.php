@@ -74,13 +74,6 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     /**
-     * The attributes that are timestamps.
-     *
-     * @var array
-     */
-    protected $dates = ['birth_date'];
-
-    /**
      * Get the user's addresses.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
@@ -126,23 +119,31 @@ class User extends Authenticatable implements FilamentUser
 
     public function getDisplayGenderAttribute(): ?string
     {
-        return isset($this->gender) ? Gender::getDescription($this->gender) : null;
+        return isset($this->gender) 
+            ? Gender::getDescription($this->gender) 
+            : null;
     }
 
     public function getDisplayBirthDateAttribute(): ?string
     {
         // return $this->birth_date?->format('d/m/Y');
-        return isset($this->birth_date) ? ConvertEnToPtBrDate($this->birth_date) : null;
+        return isset($this->birth_date) 
+            ? ConvertEnToPtBrDate($this->birth_date) 
+            : null;
     }
 
     public function getDisplayMaritalStatusAttribute(): ?string
     {
-        return isset($this->marital_status) ? MaritalStatus::getDescription((int) $this->marital_status) : null;
+        return isset($this->marital_status) 
+            ? MaritalStatus::getDescription((int) $this->marital_status) 
+            : null;
     }
 
     public function getDisplayEducationalLevelAttribute(): ?string
     {
-        return isset($this->educational_level) ? EducationalLevel::getDescription((int) $this->educational_level) : null;
+        return isset($this->educational_level) 
+            ? EducationalLevel::getDescription((int) $this->educational_level) 
+            : null;
     }
 
     public function getDisplayStatusAttribute(): string

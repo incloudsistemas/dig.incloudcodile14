@@ -10,6 +10,7 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\Auth\EditProfile as BaseEditProfile;
+use Filament\Support\RawJs;
 
 class EditProfile extends BaseEditProfile
 {    
@@ -71,10 +72,10 @@ class EditProfile extends BaseEditProfile
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos')),
+                                fn (Action $action) => $action->label(__('Minimizar todos'))
                             )
                             // ->deleteAction(
-                            //     fn (Action $action) => $action->requiresConfirmation(),
+                            //     fn (Action $action) => $action->requiresConfirmation()
                             // )
                             ->columnSpanFull()
                             ->columns(2),
@@ -83,7 +84,9 @@ class EditProfile extends BaseEditProfile
                             ->schema([
                                 Forms\Components\TextInput::make('number')
                                     ->label(__('Nº do telefone'))
-                                    ->mask('(99) 99999-9999')
+                                    ->mask(RawJs::make(<<<'JS'
+                                        $input.length === 14 ? '(99) 9999-9999' : '(99) 99999-9999'
+                                    JS))
                                     // ->required()
                                     ->live(debounce: 500)
                                     ->maxLength(255),
@@ -107,10 +110,10 @@ class EditProfile extends BaseEditProfile
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos')),
+                                fn (Action $action) => $action->label(__('Minimizar todos'))
                             )
                             // ->deleteAction(
-                            //     fn (Action $action) => $action->requiresConfirmation(),
+                            //     fn (Action $action) => $action->requiresConfirmation()
                             // )
                             ->columnSpanFull()
                             ->columns(2),

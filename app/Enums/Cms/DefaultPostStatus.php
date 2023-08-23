@@ -1,20 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace App\Enums;
+namespace App\Enums\Cms;
 
 use BenSampo\Enum\Enum;
 
-final class UserStatus extends Enum
+final class DefaultPostStatus extends Enum
 {
-    const Ativo = 1;
-    const Pendente = 2;
+    const Publicado = 1;
+    const Rascunho = 2;
     const Inativo = 0;
 
     public static function getStatusColors(): array
     {
         return [
-            self::Ativo => 'success',
-            self::Pendente => 'warning',
+            self::Publicado => 'success',
+            self::Rascunho => 'warning',
             self::Inativo => 'danger',
         ];
     }

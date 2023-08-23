@@ -39,6 +39,15 @@ class Address extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_main' => 'boolean',
+    ];
+
+    /**
      * Get all of the owning addressable models.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo

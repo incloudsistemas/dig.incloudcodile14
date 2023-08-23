@@ -4,6 +4,8 @@ namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use App\Enums\ProfileInfos\Uf;
 use App\Models\Address;
+use App\Models\User;
+use App\Services\AddressService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -19,11 +21,11 @@ class AddressesRelationManager extends RelationManager
 {
     protected static string $relationship = 'addresses';
 
-    protected static ?string $modelLabel = 'endereço';
+    protected static ?string $title = 'Lista de Endereços';
+
+    protected static ?string $modelLabel = 'Endereço';
 
     // protected static ?string $pluralModelLabel = 'endereços';
-
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public function form(Form $form): Form
     {
@@ -76,14 +78,17 @@ class AddressesRelationManager extends RelationManager
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\Checkbox::make('is_main')
-                    ->label(__('Utilizar como endereço principal')),
+                    ->label(__('Utilizar como endereço principal'))
+                    ->disabled(fn (Address $address): bool => $address->is_main === true)
+                    ->dehydrated()
+                    ->accepted(fn (RelationManager $livewire): bool => $livewire->ownerRecord->addresses->count() === 0),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitle(fn (Address $record): string => "{$record->display_full_address}")
+            ->recordTitle(fn (Address $address): string => "{$address->display_full_address}")
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Tipo'))
@@ -94,8 +99,7 @@ class AddressesRelationManager extends RelationManager
                     ->label(__('CEP')),
                 Tables\Columns\TextColumn::make('city')
                     ->label(__('Cidade/Uf'))
-                    ->formatStateUsing(fn (Address $record): string => "{$record->city}-{$record->uf}")
-                    ->sortable(),
+                    ->formatStateUsing(fn (Address $address): string => "{$address->city}-{$address->uf}"),
                 Tables\Columns\IconColumn::make('is_main')
                     ->label(__('Principal'))
                     ->icon(fn (bool $state): string => match ($state) {
@@ -111,9 +115,11 @@ class AddressesRelationManager extends RelationManager
                 //     ->sortable(),                    
             ])
             // ->reorderable('order')
-            ->filters([
-                //
-            ])
+            ->defaultSort(function (Builder $query): Builder {
+                return $query
+                    ->orderBy('is_main', 'desc')
+                    ->orderBy('created_at', 'desc');
+            })
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
             ])
@@ -121,7 +127,10 @@ class AddressesRelationManager extends RelationManager
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ActionGroup::make([
                         Tables\Actions\ViewAction::make(),
-                        Tables\Actions\EditAction::make(),
+                        Tables\Actions\EditAction::make()
+                            ->before(function (AddressService $service, array $data, Address $address, RelationManager $livewire): void {
+                                $service->ensureOnlyOneMainAddress($data, $address, $livewire);
+                            }),
                     ])
                         ->dropdown(false),
                     Tables\Actions\DeleteAction::make(),
@@ -139,7 +148,10 @@ class AddressesRelationManager extends RelationManager
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->before(function (AddressService $service, array $data, Address $address, RelationManager $livewire): void {
+                        $service->ensureOnlyOneMainAddress($data, $address, $livewire);
+                    }),
             ]);
     }
 
@@ -153,7 +165,7 @@ class AddressesRelationManager extends RelationManager
                     ->label(__('CEP')),
                 Infolists\Components\TextEntry::make('city')
                     ->label(__('Cidade/Uf'))
-                    ->formatStateUsing(fn (Address $record): string => "{$record->city}-{$record->uf}"),
+                    ->formatStateUsing(fn (Address $address): string => "{$address->city}-{$address->uf}"),
                 Infolists\Components\TextEntry::make('district')
                     ->label(__('Bairro')),
                 Infolists\Components\TextEntry::make('address_line')
@@ -164,7 +176,7 @@ class AddressesRelationManager extends RelationManager
                     ->label(__('Complemento')),
                 Infolists\Components\TextEntry::make('reference')
                     ->label(__('Ponto de referência'))
-                    ->columnSpanFull(),
+                    ->columnSpan(2),
                 Infolists\Components\TextEntry::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i'),

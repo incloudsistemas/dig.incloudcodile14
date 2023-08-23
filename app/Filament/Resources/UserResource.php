@@ -12,16 +12,16 @@ use App\Models\Permissions\Role;
 use App\Models\User;
 use App\Services\Permissions\RoleService;
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Support\Enums\ActionSize;
+use Filament\Support\RawJs;
 
 class UserResource extends Resource
 {
@@ -29,13 +29,11 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    protected static ?string $modelLabel = 'Usuário';
+
     protected static ?string $navigationGroup = 'Sistema';
 
     protected static ?int $navigationSort = 1;
-
-    protected static ?string $modelLabel = 'usuário';
-
-    // protected static ?string $pluralModelLabel = 'usuários';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
@@ -88,10 +86,10 @@ class UserResource extends Resource
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos')),
+                                fn (Action $action) => $action->label(__('Minimizar todos'))
                             )
                             ->deleteAction(
-                                fn (Action $action) => $action->requiresConfirmation(),
+                                fn (Action $action) => $action->requiresConfirmation()
                             )
                             ->columnSpanFull()
                             ->columns(2),
@@ -100,8 +98,9 @@ class UserResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('number')
                                     ->label(__('Nº do telefone'))
-                                    ->mask('(99) 99999-9999')
-                                    // ->required()
+                                    ->mask(RawJs::make(<<<'JS'
+                                        $input.length === 14 ? '(99) 9999-9999' : '(99) 99999-9999'
+                                    JS))
                                     ->live(debounce: 500)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('name')
@@ -117,17 +116,16 @@ class UserResource extends Resource
                                         'Outros'
                                     ])
                                     ->autocomplete(false),
-
                             ])
                             ->itemLabel(fn (array $state): ?string => $state['number'] ?? null)
                             ->addActionLabel(__('Adicionar telefone'))
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos')),
+                                fn (Action $action) => $action->label(__('Minimizar todos'))
                             )
                             ->deleteAction(
-                                fn (Action $action) => $action->requiresConfirmation(),
+                                fn (Action $action) => $action->requiresConfirmation()
                             )
                             ->columnSpanFull()
                             ->columns(2),
@@ -157,7 +155,13 @@ class UserResource extends Resource
                             )
                             // ->multiple()
                             ->searchable()
-                            ->getSearchResultsUsing(fn (string $search): array => Role::where('name', 'like', "%{$search}%")->limit(50)->pluck('name', 'id')->toArray())
+                            ->getSearchResultsUsing(
+                                fn (string $search): array =>
+                                Role::where('name', 'like', "%{$search}%")
+                                    ->limit(50)
+                                    ->pluck('name', 'id')
+                                    ->toArray()
+                            )
                             ->getOptionLabelUsing(fn ($value): ?string => Role::find($value)?->name)
                             ->preload()
                             ->required()
@@ -252,17 +256,18 @@ class UserResource extends Resource
                     ->label(__('Nível de acesso'))
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->label(__('Email'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('cpf')
                     ->label(__('CPF'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('email')
-                    ->label(__('Email'))
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('phones.0.number')
-                    ->label(__('Telefone')),
-                // ->searchable(),
+                    ->label(__('Telefone'))
+                    // ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('display_status')
                     ->label(__('Status'))
                     // ->formatStateUsing(fn (int $state): string => UserStatus::getDescription($state))
@@ -379,7 +384,8 @@ class UserResource extends Resource
                 Infolists\Components\TextEntry::make('complement')
                     ->label(__('Complemento'))
                     ->columnSpanFull(),
-                Infolists\Components\TextEntry::make('display_status'),
+                Infolists\Components\TextEntry::make('display_status')
+                    ->label(__('Status')),
                 Infolists\Components\TextEntry::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i'),

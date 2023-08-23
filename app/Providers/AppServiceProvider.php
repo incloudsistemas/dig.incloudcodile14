@@ -25,7 +25,21 @@ class AppServiceProvider extends ServiceProvider
             'permissions' => 'App\Models\Permissions\Permission',
             'roles' => 'App\Models\Permissions\Role',            
             'users' => 'App\Models\User',
-            'addresses' => 'App\Models\Address',
+            'addresses' => 'App\Models\Address',            
+            'cms-posts' => 'App\Models\Cms\Post',
+            'cms-pages' => 'App\Models\Cms\Page',
+            'cms-blog-posts' => 'App\Models\Cms\BlogPost',
+            // 'cms-services' => 'App\Models\Cms\Services',
+            // 'cms-products' => 'App\Models\Cms\Products',            
+            // 'cms-rich-contents' => 'App\Models\Cms\RichContent',
+            // 'cms-courses' => 'App\Models\Cms\Course',
+            // 'cms-calendar-events' => 'App\Models\Cms\CalendarEvent',
+            // 'cms-userful-external-links' => 'App\Models\Cms\UsefulExternalLink',
+            // 'cms-portfolio-posts' => 'App\Models\Cms\PortfolioPost',
+            // 'cms-testimonial' => 'App\Models\Cms\Testimonial',
+            // 'cms-partner' => 'App\Models\Cms\Partner',
+            // 'cms-team-members' => 'App\Models\Cms\TeamMember',
+            'cms-post-categories' => 'App\Models\Cms\PostCategory',
         ]);
     }
 }

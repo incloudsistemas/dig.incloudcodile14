@@ -14,7 +14,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Notifications;
 use Filament\Support\Enums\ActionSize;
+use Filament\Tables\Actions\DeleteAction;
 
 class RoleResource extends Resource
 {
@@ -22,15 +24,17 @@ class RoleResource extends Resource
 
     protected static ?string $slug = 'roles';
 
-    // protected static ?string $recordTitleAttribute = 'name';
+    // protected static ?string $recordTitleAttribute = 'name';    
+
+    protected static ?string $modelLabel = 'Nível de Acesso';
+
+    protected static ?string $pluralModelLabel = 'Níveis de Acessos';
 
     protected static ?string $navigationGroup = 'Sistema';
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $modelLabel = 'nível de acesso';
-
-    protected static ?string $pluralModelLabel = 'níveis de acessos';
+    protected static ?string $navigationLabel = 'Níveis de Acessos';
 
     protected static ?string $navigationIcon = 'heroicon-o-lock-closed';
 
@@ -100,7 +104,20 @@ class RoleResource extends Resource
                         Tables\Actions\EditAction::make(),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function (DeleteAction $action, Role $role): void {
+                            if ($role->users->count() > 0) {
+
+                                Notifications\Notification::make()
+                                    ->title('Este nível de acesso possui usuários relacionados.')
+                                    ->warning()
+                                    ->body('Para excluir, você deve primeiro desvincular todos os usuários deste nível de acesso.')
+                                    ->send();
+
+                                // $action->cancel();
+                                $action->halt();                                
+                            }
+                        }),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')

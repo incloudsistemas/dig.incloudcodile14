@@ -4,10 +4,15 @@ namespace App\Providers\Filament;
 
 use App\Filament\AvatarProviders\BoringAvatarsProvider;
 use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Resources\Categories\CategoryResource;
+use App\Filament\Resources\Categories\CmsPostCategoryResource;
+use App\Models\Category;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationBuilder;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -46,6 +51,12 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Purple,
             ])
             ->favicon(url: asset('images/filament/favicon.ico'))
+            ->navigationGroups([
+                NavigationGroup::make()
+                     ->label('CMS & Marketing'),
+                NavigationGroup::make()
+                     ->label('Sistema'),                
+            ])
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
