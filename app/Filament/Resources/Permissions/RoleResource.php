@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Permissions;
 use App\Filament\Resources\Permissions\RoleResource\Pages;
 use App\Filament\Resources\Permissions\RoleResource\RelationManagers;
 use App\Models\Permissions\Role;
+use App\Services\Permissions\RoleService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,9 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
-use Filament\Notifications;
-use Filament\Support\Enums\ActionSize;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Support;
 
 class RoleResource extends Resource
 {
@@ -62,7 +61,9 @@ class RoleResource extends Resource
                             ->relationship(
                                 name: 'permissions',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('id', 'asc'),
+                                modifyQueryUsing: 
+                                    fn (Builder $query): Builder => 
+                                    $query->orderBy('id', 'asc')
                             )
                             ->searchable()
                             ->bulkToggleable()
@@ -105,23 +106,15 @@ class RoleResource extends Resource
                     ])
                         ->dropdown(false),
                     Tables\Actions\DeleteAction::make()
-                        ->before(function (DeleteAction $action, Role $role): void {
-                            if ($role->users->count() > 0) {
-
-                                Notifications\Notification::make()
-                                    ->title('Este nível de acesso possui usuários relacionados.')
-                                    ->warning()
-                                    ->body('Para excluir, você deve primeiro desvincular todos os usuários deste nível de acesso.')
-                                    ->send();
-
-                                // $action->cancel();
-                                $action->halt();                                
+                        ->before(
+                            function (RoleService $service, Tables\Actions\DeleteAction $action, Role $role): void {
+                                $service->preventRoleDeleteWithRelations($action, $role);
                             }
-                        }),
+                        ),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')
-                    ->size(ActionSize::ExtraSmall)
+                    ->size(Support\Enums\ActionSize::ExtraSmall)
                     ->color('gray')
                     ->button()
             ])
@@ -171,6 +164,8 @@ class RoleResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = auth()->user();
-        return parent::getEloquentQuery()->byAuthUserRoles($user);
+                
+        return parent::getEloquentQuery()
+            ->byAuthUserRoles($user);
     }
 }

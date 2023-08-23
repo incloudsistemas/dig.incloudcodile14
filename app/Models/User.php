@@ -100,8 +100,8 @@ class User extends Authenticatable implements FilamentUser
 
     public function scopeByAuthUserRoles(Builder $query, User $user): Builder
     {
-        $rolesToAvoid = RoleService::getListOfRolesToAvoidByAuthUserRoles($user);
-
+        $rolesToAvoid = RoleService::getArrayOfRolesToAvoidByAuthUserRoles($user);
+        
         return $query->whereHas('roles', function ($query) use ($rolesToAvoid) {
             $query->whereNotIn('id', $rolesToAvoid);
         });

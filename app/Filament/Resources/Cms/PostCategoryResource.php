@@ -10,11 +10,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
-use Filament\Notifications;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\ActionSize;
+use Filament\Support;
 use Filament\Tables;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -127,33 +125,11 @@ class PostCategoryResource extends Resource
                         Tables\Actions\EditAction::make(),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make()
-                        ->before(function (DeleteAction $action, PostCategory $category) {
-                            if ($category->cmsPosts->count() > 0) {
-
-                                Notifications\Notification::make()
-                                    ->title('Esta categoria possui postagens relacionadas.')
-                                    ->warning()
-                                    ->body('Deseja mesmo excluir este registro?')
-                                    ->actions([
-                                        Notifications\Actions\Action::make('view')
-                                            ->button(),
-                                        Notifications\Actions\Action::make('undo')
-                                            ->color('gray'),
-                                    ])
-                                    ->send();
-                            
-                                $action->halt();
-                            }
-                        }),
-                        // ->after(function (DeleteAction $action, Category $category) {
-                        //     $category->slug = $category->slug . '//deleted_' . md5(uniqid());
-                        //     $category->save();
-                        // }),
+                    Tables\Actions\DeleteAction::make(),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')
-                    ->size(ActionSize::ExtraSmall)
+                    ->size(Support\Enums\ActionSize::ExtraSmall)
                     ->color('gray')
                     ->button()
             ])

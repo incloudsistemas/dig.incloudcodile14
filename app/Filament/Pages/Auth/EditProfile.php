@@ -5,7 +5,6 @@ namespace App\Filament\Pages\Auth;
 use App\Enums\ProfileInfos\EducationalLevel;
 use App\Enums\ProfileInfos\Gender;
 use App\Enums\ProfileInfos\MaritalStatus;
-use App\Models\User;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,7 +12,7 @@ use Filament\Pages\Auth\EditProfile as BaseEditProfile;
 use Filament\Support\RawJs;
 
 class EditProfile extends BaseEditProfile
-{    
+{
     protected static string $view = 'filament.pages.auth.edit-profile';
 
     protected static string $layout = 'filament-panels::components.layout.index';
@@ -44,7 +43,10 @@ class EditProfile extends BaseEditProfile
                             ->confirmed()
                             ->maxLength(255)
                             ->live(debounce: 500)
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('email_confirmation', $state))
+                            ->afterStateUpdated(
+                                fn ($state, callable $set) =>
+                                $set('email_confirmation', $state)
+                            )
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('additional_emails')
                             ->label(__('Email(s) adicionais'))
@@ -66,16 +68,21 @@ class EditProfile extends BaseEditProfile
                                     ])
                                     ->autocomplete(false),
                             ])
-                            ->itemLabel(fn (array $state): ?string => $state['email'] ?? null)
+                            ->itemLabel(
+                                fn (array $state): ?string =>
+                                $state['email'] ?? null
+                            )
                             ->addActionLabel(__('Adicionar email'))
                             ->defaultItems(0)
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos'))
+                                fn (Action $action) =>
+                                $action->label(__('Minimizar todos'))
                             )
                             // ->deleteAction(
-                            //     fn (Action $action) => $action->requiresConfirmation()
+                            //     fn (Action $action) => 
+                            //     $action->requiresConfirmation()
                             // )
                             ->columnSpanFull()
                             ->columns(2),
@@ -84,9 +91,11 @@ class EditProfile extends BaseEditProfile
                             ->schema([
                                 Forms\Components\TextInput::make('number')
                                     ->label(__('Nº do telefone'))
-                                    ->mask(RawJs::make(<<<'JS'
-                                        $input.length === 14 ? '(99) 9999-9999' : '(99) 99999-9999'
-                                    JS))
+                                    ->mask(
+                                        RawJs::make(<<<'JS'
+                                            $input.length === 14 ? '(99) 9999-9999' : '(99) 99999-9999'
+                                        JS)
+                                    )
                                     // ->required()
                                     ->live(debounce: 500)
                                     ->maxLength(255),
@@ -105,15 +114,20 @@ class EditProfile extends BaseEditProfile
                                     ->autocomplete(false),
 
                             ])
-                            ->itemLabel(fn (array $state): ?string => $state['number'] ?? null)
+                            ->itemLabel(
+                                fn (array $state): ?string =>
+                                $state['number'] ?? null
+                            )
                             ->addActionLabel(__('Adicionar telefone'))
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos'))
+                                fn (Action $action) =>
+                                $action->label(__('Minimizar todos'))
                             )
                             // ->deleteAction(
-                            //     fn (Action $action) => $action->requiresConfirmation()
+                            //     fn (Action $action) => 
+                            //     $action->requiresConfirmation()
                             // )
                             ->columnSpanFull()
                             ->columns(2),
@@ -189,7 +203,6 @@ class EditProfile extends BaseEditProfile
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['email_confirmation'] = $data['email'];
-    
         return $data;
     }
 }

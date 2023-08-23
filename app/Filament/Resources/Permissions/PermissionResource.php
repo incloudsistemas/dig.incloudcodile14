@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Permissions;
 use App\Filament\Resources\Permissions\PermissionResource\Pages;
 use App\Filament\Resources\Permissions\PermissionResource\RelationManagers;
 use App\Models\Permissions\Permission;
-use App\Services\Permissions\RoleService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
-use Filament\Support\Enums\ActionSize;
+use Filament\Support;
 
 class PermissionResource extends Resource
 {
@@ -51,10 +50,8 @@ class PermissionResource extends Resource
                     ->relationship(
                         name: 'roles',
                         titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query): Builder {
-                            // Always avoid 1-Superadmin and 2-Client
-                            return $query->whereNotIn('id', [1, 2]);
-                        }
+                        modifyQueryUsing: fn (Builder $query): Builder =>
+                        $query->whereNotIn('id', [1, 2]) // Always avoid 1-Superadmin and 2-Client
                     )
                     ->preload()
                     ->columnSpanFull(),
@@ -91,10 +88,8 @@ class PermissionResource extends Resource
                     ->relationship(
                         name: 'roles',
                         titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query): Builder {
-                            // Always avoid 1-Superadmin and 2-Client
-                            return $query->whereNotIn('id', [1, 2]);
-                        }
+                        modifyQueryUsing: fn (Builder $query): Builder =>
+                        $query->whereNotIn('id', [1, 2]) // Always avoid 1-Superadmin and 2-Client
                     )
                     ->multiple()
                     ->preload(),
@@ -110,7 +105,7 @@ class PermissionResource extends Resource
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')
-                    ->size(ActionSize::ExtraSmall)
+                    ->size(Support\Enums\ActionSize::ExtraSmall)
                     ->color('gray')
                     ->button()
             ])

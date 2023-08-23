@@ -6,10 +6,11 @@ use App\Enums\ProfileInfos\Uf;
 use App\Models\Address;
 use App\Models\User;
 use App\Services\AddressService;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Support\Enums\ActionSize;
+use Filament\Support;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,9 +24,7 @@ class AddressesRelationManager extends RelationManager
 
     protected static ?string $title = 'Lista de Endereços';
 
-    protected static ?string $modelLabel = 'Endereço';
-
-    // protected static ?string $pluralModelLabel = 'endereços';
+    protected static ?string $modelLabel = 'Endereço';    
 
     public function form(Form $form): Form
     {
@@ -63,7 +62,6 @@ class AddressesRelationManager extends RelationManager
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address_line')
                     ->label(__('Endereço'))
-                    // ->helperText(__('Logradouro'))
                     ->maxLength(255),
                 Forms\Components\TextInput::make('number')
                     ->label(__('Número'))
@@ -79,16 +77,25 @@ class AddressesRelationManager extends RelationManager
                     ->columnSpanFull(),
                 Forms\Components\Checkbox::make('is_main')
                     ->label(__('Utilizar como endereço principal'))
-                    ->disabled(fn (Address $address): bool => $address->is_main === true)
-                    ->dehydrated()
-                    ->accepted(fn (RelationManager $livewire): bool => $livewire->ownerRecord->addresses->count() === 0),
+                    ->accepted(
+                        fn (RelationManager $livewire): bool =>
+                        $livewire->ownerRecord->addresses->count() === 0
+                    )
+                    ->disabled(
+                        fn (Address $address): bool =>
+                        $address->is_main === true
+                    )
+                    ->dehydrated(),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitle(fn (Address $address): string => "{$address->display_full_address}")
+            ->recordTitle(
+                fn (Address $address): string =>
+                "{$address->display_full_address}"
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Tipo'))
@@ -99,27 +106,33 @@ class AddressesRelationManager extends RelationManager
                     ->label(__('CEP')),
                 Tables\Columns\TextColumn::make('city')
                     ->label(__('Cidade/Uf'))
-                    ->formatStateUsing(fn (Address $address): string => "{$address->city}-{$address->uf}"),
+                    ->formatStateUsing(
+                        fn (Address $address): string =>
+                        "{$address->city}-{$address->uf}"
+                    ),
                 Tables\Columns\IconColumn::make('is_main')
                     ->label(__('Principal'))
-                    ->icon(fn (bool $state): string => match ($state) {
-                        false => 'heroicon-m-minus-small',
-                        true => 'heroicon-o-check-circle',
-                    })
-                    ->color(fn (bool $state): string => match ($state) {
-                        true => 'success',
-                        default => 'gray',
-                    }),
-                // Tables\Columns\TextColumn::make('uf')
-                //     ->label(__('Estado'))
-                //     ->sortable(),                    
+                    ->icon(
+                        fn (bool $state): string =>
+                        match ($state) {
+                            false => 'heroicon-m-minus-small',
+                            true => 'heroicon-o-check-circle',
+                        }
+                    )
+                    ->color(
+                        fn (bool $state): string =>
+                        match ($state) {
+                            true => 'success',
+                            default => 'gray',
+                        }
+                    ),
             ])
             // ->reorderable('order')
-            ->defaultSort(function (Builder $query): Builder {
-                return $query
-                    ->orderBy('is_main', 'desc')
-                    ->orderBy('created_at', 'desc');
-            })
+            ->defaultSort(
+                fn (Builder $query): Builder =>
+                $query->orderBy('is_main', 'desc')
+                    ->orderBy('created_at', 'desc')
+            )
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
             ])
@@ -128,16 +141,15 @@ class AddressesRelationManager extends RelationManager
                     Tables\Actions\ActionGroup::make([
                         Tables\Actions\ViewAction::make(),
                         Tables\Actions\EditAction::make()
-                            ->before(function (AddressService $service, array $data, Address $address, RelationManager $livewire): void {
-                                $service->ensureOnlyOneMainAddress($data, $address, $livewire);
-                            }),
+                            ->before($this->ensureUniqueMainAddressCallback()),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->before($this->preventMainAddressDeleteCallback()),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')
-                    ->size(ActionSize::ExtraSmall)
+                    ->size(Support\Enums\ActionSize::ExtraSmall)
                     ->color('gray')
                     ->button()
 
@@ -149,9 +161,7 @@ class AddressesRelationManager extends RelationManager
             ])
             ->emptyStateActions([
                 Tables\Actions\CreateAction::make()
-                    ->before(function (AddressService $service, array $data, Address $address, RelationManager $livewire): void {
-                        $service->ensureOnlyOneMainAddress($data, $address, $livewire);
-                    }),
+                    ->before($this->ensureUniqueMainAddressCallback()),
             ]);
     }
 
@@ -165,7 +175,10 @@ class AddressesRelationManager extends RelationManager
                     ->label(__('CEP')),
                 Infolists\Components\TextEntry::make('city')
                     ->label(__('Cidade/Uf'))
-                    ->formatStateUsing(fn (Address $address): string => "{$address->city}-{$address->uf}"),
+                    ->formatStateUsing(
+                        fn (Address $address): string =>
+                        "{$address->city}-{$address->uf}"
+                    ),
                 Infolists\Components\TextEntry::make('district')
                     ->label(__('Bairro')),
                 Infolists\Components\TextEntry::make('address_line')
@@ -185,5 +198,19 @@ class AddressesRelationManager extends RelationManager
                     ->dateTime('d/m/Y H:i'),
             ])
             ->columns(3);
+    }
+
+    private function ensureUniqueMainAddressCallback(): Closure
+    {
+        return function (AddressService $service, array $data, Address $address, RelationManager $livewire): void {
+            $service->ensureUniqueMainAddress($data, $address, $livewire);
+        };
+    }
+
+    private function preventMainAddressDeleteCallback(): Closure
+    {
+        return function (AddressService $service, Tables\Actions\DeleteAction $action, Address $address, RelationManager $livewire): void {
+            $service->preventMainAddressDeleteWhenMultiple($action, $address, $livewire);
+        };
     }
 }

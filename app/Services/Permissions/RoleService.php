@@ -2,12 +2,19 @@
 
 namespace App\Services\Permissions;
 
+use App\Models\Permissions\Role;
 use App\Models\User;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
 
 class RoleService
 {
+    public function __construct(protected Role $role)
+    {
+        $this->role = $role;
+    }
 
-    public static function getListOfRolesToAvoidByAuthUserRoles(User $user): array
+    public static function getArrayOfRolesToAvoidByAuthUserRoles(User $user): array
     {
         $userRoles = $user->roles->pluck('id')->toArray();
 
@@ -21,7 +28,32 @@ class RoleService
         } else {
             $rolesToAvoid = [1, 2, 3];
         }
-        
+
         return $rolesToAvoid;
+    }
+
+    public function forceScopeByAuthUserRoles(): Builder
+    {
+        $user = auth()->user();
+        return $this->role->byAuthUserRoles($user);
+    }
+
+    /**
+     * $action can be: 
+     * Filament\Tables\Actions\DeleteAction;
+     * Filament\Actions\DeleteAction;
+     */
+    public function preventRoleDeleteWithRelations($action, Role $role): void
+    {
+        if ($role->users->count() > 0) {
+            Notification::make()
+                ->title('Este nível de acesso possui usuários relacionados.')
+                ->warning()
+                ->body('Para excluir, você deve primeiro desvincular todos os usuários deste nível de acesso.')
+                ->send();
+
+            // $action->cancel();
+            $action->halt();
+        }
     }
 }

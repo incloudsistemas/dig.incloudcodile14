@@ -11,6 +11,7 @@ use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\Permissions\Role;
 use App\Models\User;
 use App\Services\Permissions\RoleService;
+use App\Services\UserService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
@@ -20,8 +21,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Support\Enums\ActionSize;
-use Filament\Support\RawJs;
+use Filament\Support;
 
 class UserResource extends Resource
 {
@@ -58,7 +58,10 @@ class UserResource extends Resource
                             ->confirmed()
                             ->maxLength(255)
                             ->live(debounce: 500)
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('email_confirmation', $state))
+                            ->afterStateUpdated(
+                                fn ($state, callable $set) =>
+                                $set('email_confirmation', $state)
+                            )
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('additional_emails')
                             ->label(__('Email(s) adicionais'))
@@ -80,16 +83,21 @@ class UserResource extends Resource
                                     ])
                                     ->autocomplete(false),
                             ])
-                            ->itemLabel(fn (array $state): ?string => $state['email'] ?? null)
+                            ->itemLabel(
+                                fn (array $state): ?string =>
+                                $state['email'] ?? null
+                            )
                             ->addActionLabel(__('Adicionar email'))
                             ->defaultItems(0)
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos'))
+                                fn (Forms\Components\Actions\Action $action) =>
+                                $action->label(__('Minimizar todos'))
                             )
                             ->deleteAction(
-                                fn (Action $action) => $action->requiresConfirmation()
+                                fn (Forms\Components\Actions\Action $action) =>
+                                $action->requiresConfirmation()
                             )
                             ->columnSpanFull()
                             ->columns(2),
@@ -98,9 +106,11 @@ class UserResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('number')
                                     ->label(__('Nº do telefone'))
-                                    ->mask(RawJs::make(<<<'JS'
-                                        $input.length === 14 ? '(99) 9999-9999' : '(99) 99999-9999'
-                                    JS))
+                                    ->mask(
+                                        Support\RawJs::make(<<<'JS'
+                                            $input.length === 14 ? '(99) 9999-9999' : '(99) 99999-9999'
+                                        JS)
+                                    )
                                     ->live(debounce: 500)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('name')
@@ -117,15 +127,20 @@ class UserResource extends Resource
                                     ])
                                     ->autocomplete(false),
                             ])
-                            ->itemLabel(fn (array $state): ?string => $state['number'] ?? null)
+                            ->itemLabel(
+                                fn (array $state): ?string =>
+                                $state['number'] ?? null
+                            )
                             ->addActionLabel(__('Adicionar telefone'))
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) => $action->label(__('Minimizar todos'))
+                                fn (Forms\Components\Actions\Action $action) =>
+                                $action->label(__('Minimizar todos'))
                             )
                             ->deleteAction(
-                                fn (Action $action) => $action->requiresConfirmation()
+                                fn (Forms\Components\Actions\Action $action) =>
+                                $action->requiresConfirmation()
                             )
                             ->columnSpanFull()
                             ->columns(2),
@@ -146,12 +161,8 @@ class UserResource extends Resource
                             ->relationship(
                                 name: 'roles',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: function (Builder $query): Builder {
-                                    $user = auth()->user();
-                                    $rolesToAvoid = RoleService::getListOfRolesToAvoidByAuthUserRoles($user);
-
-                                    return $query->whereNotIn('id', $rolesToAvoid);
-                                }
+                                modifyQueryUsing: fn (RoleService $servive): Builder =>
+                                $servive->forceScopeByAuthUserRoles()
                             )
                             // ->multiple()
                             ->searchable()
@@ -162,7 +173,10 @@ class UserResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray()
                             )
-                            ->getOptionLabelUsing(fn ($value): ?string => Role::find($value)?->name)
+                            ->getOptionLabelUsing(
+                                fn ($value): ?string =>
+                                Role::find($value)?->name
+                            )
                             ->preload()
                             ->required()
                             // ->native(false)
@@ -176,14 +190,20 @@ class UserResource extends Resource
                                     ? __('Senha com mín. de 8 digitos.')
                                     : __('Preencha apenas se desejar alterar a senha. Min. de 8 dígitos.')
                             )
-                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->required(
+                                fn (string $operation): bool =>
+                                $operation === 'create'
+                            )
                             ->confirmed()
                             ->minLength(8)
                             ->maxLength(255),
                         Forms\Components\TextInput::make('password_confirmation')
                             ->label(__('Confirmar senha'))
                             ->password()
-                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->required(
+                                fn (string $operation): bool =>
+                                $operation === 'create'
+                            )
                             ->maxLength(255),
                         Forms\Components\Select::make('status')
                             ->label(__('Status'))
@@ -272,7 +292,10 @@ class UserResource extends Resource
                     ->label(__('Status'))
                     // ->formatStateUsing(fn (int $state): string => UserStatus::getDescription($state))
                     ->badge()
-                    ->color(fn (string $state): string => UserStatus::getColorByDescription($state))
+                    ->color(
+                        fn (string $state): string =>
+                        UserStatus::getColorByDescription($state)
+                    )
                     ->searchable(query: function (Builder $query, string $search): Builder {
                         $statuses = UserStatus::asSelectArray();
 
@@ -318,12 +341,8 @@ class UserResource extends Resource
                     ->relationship(
                         name: 'roles',
                         titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query): Builder {
-                            $user = auth()->user();
-                            $rolesToAvoid = RoleService::getListOfRolesToAvoidByAuthUserRoles($user);
-
-                            return $query->whereNotIn('id', $rolesToAvoid);
-                        }
+                        modifyQueryUsing: fn (RoleService $servive): Builder => 
+                        $servive->forceScopeByAuthUserRoles()
                     )
                     ->multiple()
                     ->preload(),
@@ -338,11 +357,16 @@ class UserResource extends Resource
                         Tables\Actions\EditAction::make(),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->after(
+                            function (UserService $service, User $user): void {
+                                $service->anonymizeUniqueEmailWhenDeleted($user);
+                            }
+                        ),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')
-                    ->size(ActionSize::ExtraSmall)
+                    ->size(Support\Enums\ActionSize::ExtraSmall)
                     ->color('gray')
                     ->button()
             ])
@@ -415,7 +439,9 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = auth()->user();
-        return parent::getEloquentQuery()->byAuthUserRoles($user);
+
+        return parent::getEloquentQuery()
+            ->byAuthUserRoles($user);
     }
 
     public static function getGloballySearchableAttributes(): array

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use App\Models\User;
+use App\Services\UserService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +16,13 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\CreateAction::make(),
+            Actions\DeleteAction::make()
+                ->after(
+                    function (UserService $service, User $user): void {
+                        $service->anonymizeUniqueEmailWhenDeleted($user);
+                    }
+                ),
         ];
     }
 
@@ -26,7 +34,7 @@ class EditUser extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['email_confirmation'] = $data['email'];
-    
+
         return $data;
     }
 
@@ -35,7 +43,7 @@ class EditUser extends EditRecord
         if (isset($data['password']) && !empty(trim($data['password']))) {
             $data['password'] = Hash::make($data['password']);
         } else {
-            unset($data['password']);            
+            unset($data['password']);
         }
 
         unset($data['password_confirmation']);
