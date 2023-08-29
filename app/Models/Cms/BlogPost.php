@@ -3,18 +3,18 @@
 namespace App\Models\Cms;
 
 use App\Enums\Cms\BlogRole;
+use App\Traits\Cms\Postable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class BlogPost extends Model
 {
-    use HasFactory;
+    use HasFactory, Postable;
 
     protected $table = 'cms_blog_posts';
 
     public $timestamps = false;
-
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -42,16 +42,6 @@ class BlogPost extends Model
     ];
 
     /**
-     * Get the blog's post.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
-     */
-    public function cmsPost(): MorphOne
-    {
-        return $this->morphOne(Post::class, 'postable');
-    }
-
-    /**
      * SCOPES.
      *
      */
@@ -69,7 +59,7 @@ class BlogPost extends Model
     public function getDisplayRoleAttribute(): string
     {
         return isset($this->role)
-            ? BlogRole::getValue((int) $this->role)
+            ? BlogRole::getDescription((int) $this->role)
             : null;
     }
 

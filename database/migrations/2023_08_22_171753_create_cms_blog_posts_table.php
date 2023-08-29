@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('embed_video')->nullable();
             // Permitir comentário? 1 - sim, 0 - não
             $table->boolean('comment')->default(0);
+            $table->softDeletes();
         });
     }
 

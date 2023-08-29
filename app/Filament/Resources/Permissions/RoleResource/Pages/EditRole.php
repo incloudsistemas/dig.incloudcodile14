@@ -18,9 +18,8 @@ class EditRole extends EditRecord
         return [
             Actions\DeleteAction::make()
                 ->before(
-                    function (RoleService $service, DeleteAction $action, Role $role): void {
-                        $service->preventRoleDeleteWithRelations($action, $role);
-                    }
+                    fn (RoleService $service, DeleteAction $action, Role $role) =>
+                    $service->preventRoleDeleteWithRelations($action, $role)
                 ),
         ];
     }

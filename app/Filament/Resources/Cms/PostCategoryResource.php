@@ -30,7 +30,7 @@ class PostCategoryResource extends Resource
 
     protected static ?string $navigationGroup = 'CMS & Marketing';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Categorias das Postagens';
 
@@ -45,8 +45,11 @@ class PostCategoryResource extends Resource
                     ->required()
                     ->minLength(2)
                     ->maxLength(255)
-                    ->live(debounce: 500)
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                    ->live(debounce: 1000)
+                    ->afterStateUpdated(
+                        fn (callable $set, ?string $state): ?string => 
+                        $set('slug', Str::slug($state))
+                    ),
                 Forms\Components\TextInput::make('slug')
                     ->label(__('Slug'))
                     ->required()
@@ -65,6 +68,7 @@ class PostCategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nome'))
@@ -73,35 +77,42 @@ class PostCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('display_status')
                     ->label(__('Status'))
                     ->badge()
-                    ->color(fn (string $state): string => DefaultStatus::getColorByDescription($state))
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        $statuses = DefaultStatus::asSelectArray();
+                    ->color(
+                        fn (string $state): string => 
+                        DefaultStatus::getColorByDescription($state)
+                    )
+                    ->searchable(
+                        query: function (Builder $query, string $search): Builder {
+                            $statuses = DefaultStatus::asSelectArray();
 
-                        $matchingStatuses = [];
-                        foreach ($statuses as $index => $status) {
-                            if (stripos($status, $search) !== false) {
-                                $matchingStatuses[] = $index;
+                            $matchingStatuses = [];
+                            foreach ($statuses as $index => $status) {
+                                if (stripos($status, $search) !== false) {
+                                    $matchingStatuses[] = $index;
+                                }
                             }
+
+                            if ($matchingStatuses) {
+                                return $query->whereIn('status', $matchingStatuses);
+                            }
+
+                            return $query;
                         }
+                    )
+                    ->sortable(
+                        query: function (Builder $query, string $direction): Builder {
+                            $statuses = DefaultStatus::asSelectArray();
 
-                        if ($matchingStatuses) {
-                            return $query->whereIn('status', $matchingStatuses);
+                            $caseParts = [];
+                            foreach ($statuses as $key => $status) {
+                                $caseParts[] = sprintf("WHEN %d THEN '%s'", $key, $status);
+                            }
+
+                            $orderByCase = sprintf("CASE status %s END", implode(' ', $caseParts));
+
+                            return $query->orderByRaw("$orderByCase $direction");
                         }
-
-                        return $query;
-                    })
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        $statuses = DefaultStatus::asSelectArray();
-
-                        $caseParts = [];
-                        foreach ($statuses as $key => $status) {
-                            $caseParts[] = sprintf("WHEN %d THEN '%s'", $key, $status);
-                        }
-
-                        $orderByCase = sprintf("CASE status %s END", implode(' ', $caseParts));
-
-                        return $query->orderByRaw("$orderByCase $direction");
-                    }),
+                    ),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i')

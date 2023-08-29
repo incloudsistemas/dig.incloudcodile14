@@ -38,7 +38,8 @@ return new class extends Migration
             // Permitir comentário? 1 - sim, 0 - não
             $table->boolean('comment')->default(0);
             // Configurações da página
-            $table->json('settings')->nullable();
+            $table->json('settings')->nullable();            
+            $table->softDeletes();
         });
     }
 

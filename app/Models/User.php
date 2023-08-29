@@ -10,12 +10,14 @@ use App\Enums\ProfileInfos\Gender;
 use App\Enums\ProfileInfos\MaritalStatus;
 use App\Enums\UserStatus;
 use App\Models\Address;
+use App\Models\Cms\Post;
 use App\Services\Permissions\RoleService;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -74,13 +76,23 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     /**
+     * The cms posts that belong to the owner/user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cmsPosts(): HasMany
+    {
+        return $this->hasMany(related: Post::class);
+    }
+
+    /**
      * Get the user's addresses.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function addresses(): MorphMany
     {
-        return $this->morphMany(Address::class, 'addressable');
+        return $this->morphMany(related: Address::class, name: 'addressable');
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -102,9 +114,24 @@ class User extends Authenticatable implements FilamentUser
     {
         $rolesToAvoid = RoleService::getArrayOfRolesToAvoidByAuthUserRoles($user);
         
-        return $query->whereHas('roles', function ($query) use ($rolesToAvoid) {
-            $query->whereNotIn('id', $rolesToAvoid);
+        return $query->whereHas('roles', function (Builder $query) use ($rolesToAvoid): Builder {
+            return $query->whereNotIn('id', $rolesToAvoid);
         });
+    }
+
+    public function scopeWhereHasRolesAvoidingClients(Builder $query): Builder
+    {
+        $rolesToAvoid = [2,]; // Client/Cliente
+
+        return $query->whereHas('roles', function (Builder $query) use ($rolesToAvoid): Builder {
+            return $query->whereNotIn('id', $rolesToAvoid);
+        });
+    }
+
+    public function scopeByStatuses(Builder $query, array $statuses = [1,]): Builder
+    {
+        return $query->whereHasRolesAvoidingClients()
+            ->whereIn('status', $statuses);
     }
 
     /**
@@ -116,6 +143,11 @@ class User extends Authenticatable implements FilamentUser
      * CUSTOMS.
      *
      */
+
+    public function getDisplayMainPhoneAttribute(): ?string
+    {
+        return $this->phones[0]['number'] ?? null;
+    }
 
     public function getDisplayGenderAttribute(): ?string
     {

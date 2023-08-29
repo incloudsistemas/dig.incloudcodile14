@@ -2,18 +2,20 @@
 
 namespace App\Models\Cms;
 
+use App\Models\User;
+use App\Traits\Cms\Postable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Page extends Model
 {
-    use HasFactory;
+    use HasFactory, Postable;
 
     protected $table = 'cms_pages';
-
+    
     public $timestamps = false;
 
     /**
@@ -53,7 +55,7 @@ class Page extends Model
      */
     public function mainPage(): BelongsTo
     {
-        return $this->belongsTo(Self::class, 'page_id');
+        return $this->belongsTo(related: Self::class, foreignKey: 'page_id');
     }
 
     /**
@@ -63,17 +65,7 @@ class Page extends Model
      */
     public function subpages(): HasMany
     {
-        return $this->hasMany(Self::class, 'page_id');
-    }
-
-    /**
-     * Get the page's post.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
-     */
-    public function cmsPost(): MorphOne
-    {
-        return $this->morphOne(Post::class, 'postable');
+        return $this->hasMany(related: Self::class, foreignKey: 'page_id');
     }
 
     /**

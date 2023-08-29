@@ -8,7 +8,6 @@ use App\Enums\ProfileInfos\Gender;
 use App\Enums\UserStatus;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\Permissions\Role;
 use App\Models\User;
 use App\Services\Permissions\RoleService;
 use App\Services\UserService;
@@ -57,9 +56,9 @@ class UserResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->confirmed()
                             ->maxLength(255)
-                            ->live(debounce: 500)
+                            ->live(onBlur: true)
                             ->afterStateUpdated(
-                                fn ($state, callable $set) =>
+                                fn (callable $set, ?string $state): ?string =>
                                 $set('email_confirmation', $state)
                             )
                             ->columnSpanFull(),
@@ -69,7 +68,7 @@ class UserResource extends Resource
                                 Forms\Components\TextInput::make('email')
                                     ->label(__('Email'))
                                     // ->required()
-                                    ->live(debounce: 500)
+                                    ->live(onBlur: true)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('Tipo de email'))
@@ -111,7 +110,7 @@ class UserResource extends Resource
                                             $input.length === 14 ? '(99) 9999-9999' : '(99) 99999-9999'
                                         JS)
                                     )
-                                    ->live(debounce: 500)
+                                    ->live(onBlur: true)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('Tipo de contato'))
@@ -166,17 +165,6 @@ class UserResource extends Resource
                             )
                             // ->multiple()
                             ->searchable()
-                            ->getSearchResultsUsing(
-                                fn (string $search): array =>
-                                Role::where('name', 'like', "%{$search}%")
-                                    ->limit(50)
-                                    ->pluck('name', 'id')
-                                    ->toArray()
-                            )
-                            ->getOptionLabelUsing(
-                                fn ($value): ?string =>
-                                Role::find($value)?->name
-                            )
                             ->preload()
                             ->required()
                             // ->native(false)
@@ -204,7 +192,8 @@ class UserResource extends Resource
                                 fn (string $operation): bool =>
                                 $operation === 'create'
                             )
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->dehydrated(false),
                         Forms\Components\Select::make('status')
                             ->label(__('Status'))
                             ->options(UserStatus::asSelectArray())
@@ -254,8 +243,9 @@ class UserResource extends Resource
                             ->label(__('Naturalidade'))
                             ->maxLength(255),
                         Forms\Components\Textarea::make('complement')
-                            ->label(__('Complemento'))
+                            ->label(__('Sobre'))
                             ->rows(4)
+                            ->minLength(2)
                             ->maxLength(65535)
                             ->columnSpanFull(),
                     ])
@@ -267,6 +257,7 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nome'))
@@ -284,9 +275,12 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('phones.0.number')
+                Tables\Columns\TextColumn::make('display_main_phone')
                     ->label(__('Telefone'))
-                    // ->searchable()
+                    ->searchable(
+                        query: fn (UserService $service, Builder $query, string $search): Builder =>
+                        $service->tableSearchByPhone(query: $query, search: $search)
+                    )
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('display_status')
                     ->label(__('Status'))
@@ -294,36 +288,16 @@ class UserResource extends Resource
                     ->badge()
                     ->color(
                         fn (string $state): string =>
-                        UserStatus::getColorByDescription($state)
+                        UserStatus::getColorByDescription(statusDesc: $state)
                     )
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        $statuses = UserStatus::asSelectArray();
-
-                        $matchingStatuses = [];
-                        foreach ($statuses as $index => $status) {
-                            if (stripos($status, $search) !== false) {
-                                $matchingStatuses[] = $index;
-                            }
-                        }
-
-                        if ($matchingStatuses) {
-                            return $query->whereIn('status', $matchingStatuses);
-                        }
-
-                        return $query;
-                    })
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        $statuses = UserStatus::asSelectArray();
-
-                        $caseParts = [];
-                        foreach ($statuses as $key => $status) {
-                            $caseParts[] = sprintf("WHEN %d THEN '%s'", $key, $status);
-                        }
-
-                        $orderByCase = sprintf("CASE status %s END", implode(' ', $caseParts));
-
-                        return $query->orderByRaw("$orderByCase $direction");
-                    }),
+                    ->searchable(
+                        query: fn (UserService $service, Builder $query, string $search): Builder =>
+                        $service->tableSearchByStatus(query: $query, search: $search)
+                    )
+                    ->sortable(
+                        query: fn (UserService $service, Builder $query, string $direction): Builder =>
+                        $service->tableSortByStatus(query: $query, direction: $direction)
+                    ),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i')
@@ -341,7 +315,7 @@ class UserResource extends Resource
                     ->relationship(
                         name: 'roles',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn (RoleService $servive): Builder => 
+                        modifyQueryUsing: fn (RoleService $servive): Builder =>
                         $servive->forceScopeByAuthUserRoles()
                     )
                     ->multiple()
@@ -359,9 +333,8 @@ class UserResource extends Resource
                         ->dropdown(false),
                     Tables\Actions\DeleteAction::make()
                         ->after(
-                            function (UserService $service, User $user): void {
-                                $service->anonymizeUniqueEmailWhenDeleted($user);
-                            }
+                            fn (UserService $service, User $user) =>
+                            $service->anonymizeUniqueEmailWhenDeleted($user)
                         ),
                 ])
                     ->label(__('Ações'))
@@ -439,7 +412,6 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = auth()->user();
-
         return parent::getEloquentQuery()
             ->byAuthUserRoles($user);
     }

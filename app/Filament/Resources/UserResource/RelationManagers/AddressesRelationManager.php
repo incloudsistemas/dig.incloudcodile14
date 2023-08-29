@@ -4,19 +4,18 @@ namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use App\Enums\ProfileInfos\Uf;
 use App\Models\Address;
-use App\Models\User;
 use App\Services\AddressService;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
 
 class AddressesRelationManager extends RelationManager
 {
@@ -77,9 +76,13 @@ class AddressesRelationManager extends RelationManager
                     ->columnSpanFull(),
                 Forms\Components\Checkbox::make('is_main')
                     ->label(__('Utilizar como endereço principal'))
+                    ->default(
+                        fn (): bool =>
+                        $this->ownerRecord->addresses->count() === 0
+                    )
                     ->accepted(
-                        fn (RelationManager $livewire): bool =>
-                        $livewire->ownerRecord->addresses->count() === 0
+                        fn (): bool =>
+                        $this->ownerRecord->addresses->count() === 0
                     )
                     ->disabled(
                         fn (Address $address): bool =>
@@ -92,6 +95,7 @@ class AddressesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->recordTitle(
                 fn (Address $address): string =>
                 "{$address->display_full_address}"

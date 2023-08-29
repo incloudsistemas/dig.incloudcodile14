@@ -5,11 +5,11 @@ namespace App\Filament\Pages\Auth;
 use App\Enums\ProfileInfos\EducationalLevel;
 use App\Enums\ProfileInfos\Gender;
 use App\Enums\ProfileInfos\MaritalStatus;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\Auth\EditProfile as BaseEditProfile;
 use Filament\Support\RawJs;
+use App\Filament\Resources\UserResource\RelationManagers;
 
 class EditProfile extends BaseEditProfile
 {
@@ -44,7 +44,7 @@ class EditProfile extends BaseEditProfile
                             ->maxLength(255)
                             ->live(debounce: 500)
                             ->afterStateUpdated(
-                                fn ($state, callable $set) =>
+                                fn (callable $set, ?string $state): ?string =>
                                 $set('email_confirmation', $state)
                             )
                             ->columnSpanFull(),
@@ -77,11 +77,11 @@ class EditProfile extends BaseEditProfile
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) =>
+                                fn (Forms\Components\Actions\Action $action) =>
                                 $action->label(__('Minimizar todos'))
                             )
                             // ->deleteAction(
-                            //     fn (Action $action) => 
+                            //     fn (Forms\Components\Actions\Action $action) => 
                             //     $action->requiresConfirmation()
                             // )
                             ->columnSpanFull()
@@ -112,7 +112,6 @@ class EditProfile extends BaseEditProfile
                                         'Outros'
                                     ])
                                     ->autocomplete(false),
-
                             ])
                             ->itemLabel(
                                 fn (array $state): ?string =>
@@ -122,11 +121,11 @@ class EditProfile extends BaseEditProfile
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->collapseAllAction(
-                                fn (Action $action) =>
+                                fn (Forms\Components\Actions\Action $action) =>
                                 $action->label(__('Minimizar todos'))
                             )
                             // ->deleteAction(
-                            //     fn (Action $action) => 
+                            //     fn (Forms\Components\Actions\Action $action) => 
                             //     $action->requiresConfirmation()
                             // )
                             ->columnSpanFull()
@@ -190,7 +189,7 @@ class EditProfile extends BaseEditProfile
                             ->label(__('Naturalidade'))
                             ->maxLength(255),
                         Forms\Components\Textarea::make('complement')
-                            ->label(__('Complemento'))
+                            ->label(__('Sobre'))
                             ->rows(4)
                             ->maxLength(65535)
                             ->columnSpanFull(),
@@ -198,6 +197,13 @@ class EditProfile extends BaseEditProfile
                     ->columns(2)
                     ->collapsible(),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\AddressesRelationManager::class,
+        ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

@@ -25,7 +25,7 @@ return new class extends Migration
             // SEO
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
-            $table->text('meta_keywords')->nullable();
+            $table->json('meta_keywords')->nullable();
             // Em destaque? 1 - sim, 0 - não
             $table->boolean('featured')->default(0);
             // Ordem
@@ -41,7 +41,7 @@ return new class extends Migration
             // Data de expiração
             $table->timestamp('expiration_at')->nullable();
             $table->timestamps();
-            $table->softDeletes();            
+            // $table->softDeletes();
             // Permite apenas um post por registro.
             $table->unique(['postable_id', 'postable_type'], 'postable_unique');
         });

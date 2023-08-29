@@ -10,11 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'cms_posts';
 
@@ -44,6 +43,7 @@ class Post extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'meta_keywords' => 'array',
         'featured' => 'boolean',
         'custom' => 'array',
         'publish_at' => DateTimeCast::class,
@@ -57,7 +57,12 @@ class Post extends Model
      */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(PostCategory::class, 'cms_post_has_categories', 'post_id', 'category_id');
+        return $this->belongsToMany(
+            related: PostCategory::class, 
+            table: 'cms_post_has_categories', 
+            foreignPivotKey: 'post_id', 
+            relatedPivotKey: 'category_id'
+        );
     }
 
     /**
@@ -67,7 +72,7 @@ class Post extends Model
      */
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(related: User::class, foreignKey: 'user_id');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Models\Cms;
 
 use App\Enums\DefaultStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -32,13 +33,23 @@ class PostCategory extends Model
      */
     public function cmsPosts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'cms_post_has_categories', 'category_id', 'post_id');
+        return $this->belongsToMany(
+            related: Post::class, 
+            table: 'cms_post_has_categories', 
+            foreignPivotKey: 'category_id', 
+            relatedPivotKey: 'post_id'
+        );
     }
 
     /**
      * SCOPES.
      *
      */
+    
+    public function scopeByStatuses(Builder $query, array $statuses = [1,]): Builder
+    {
+        return $query->whereIn('status', $statuses);
+    }
 
     /**
      * MUTATORS.

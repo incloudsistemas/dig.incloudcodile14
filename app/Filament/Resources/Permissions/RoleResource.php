@@ -61,9 +61,8 @@ class RoleResource extends Resource
                             ->relationship(
                                 name: 'permissions',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: 
-                                    fn (Builder $query): Builder => 
-                                    $query->orderBy('id', 'asc')
+                                modifyQueryUsing: fn (Builder $query): Builder =>
+                                $query->orderBy('id', 'asc')
                             )
                             ->searchable()
                             ->bulkToggleable()
@@ -79,6 +78,7 @@ class RoleResource extends Resource
     {
         return $table
             // ->recordTitleAttribute('name')
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nome'))
@@ -107,9 +107,8 @@ class RoleResource extends Resource
                         ->dropdown(false),
                     Tables\Actions\DeleteAction::make()
                         ->before(
-                            function (RoleService $service, Tables\Actions\DeleteAction $action, Role $role): void {
-                                $service->preventRoleDeleteWithRelations($action, $role);
-                            }
+                            fn (RoleService $service, Tables\Actions\DeleteAction $action, Role $role) =>
+                            $service->preventRoleDeleteWithRelations($action, $role)
                         ),
                 ])
                     ->label(__('Ações'))
@@ -164,7 +163,6 @@ class RoleResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = auth()->user();
-                
         return parent::getEloquentQuery()
             ->byAuthUserRoles($user);
     }

@@ -16,12 +16,10 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
             Actions\DeleteAction::make()
                 ->after(
-                    function (UserService $service, User $user): void {
-                        $service->anonymizeUniqueEmailWhenDeleted($user);
-                    }
+                    fn (UserService $service, User $user) =>
+                    $service->anonymizeUniqueEmailWhenDeleted($user)
                 ),
         ];
     }

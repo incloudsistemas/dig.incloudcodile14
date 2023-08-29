@@ -62,6 +62,7 @@ class PermissionResource extends Resource
     {
         return $table
             // ->recordTitleAttribute('name')
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nome'))
