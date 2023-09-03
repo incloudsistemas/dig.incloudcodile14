@@ -25,23 +25,12 @@ return new class extends Migration
             // SEO
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
-            $table->json('meta_keywords')->nullable();
-            // Em destaque? 1 - sim, 0 - não
-            $table->boolean('featured')->default(0);
-            // Ordem
-            $table->integer('order')->unsigned()->default(1);
+            $table->json('meta_keywords')->nullable();          
             // Status
             // 0- Inativo, 1 - Ativo, 2 - Rascunho
-            // (depende do postable)
             $table->char('status', 1)->default(1);
             // Atributos personalizados
             $table->json('custom')->nullable();
-            // Data da publicação
-            $table->timestamp('publish_at')->default(date('Y-m-d H:i:s'));
-            // Data de expiração
-            $table->timestamp('expiration_at')->nullable();
-            $table->timestamps();
-            // $table->softDeletes();
             // Permite apenas um post por registro.
             $table->unique(['postable_id', 'postable_type'], 'postable_unique');
         });

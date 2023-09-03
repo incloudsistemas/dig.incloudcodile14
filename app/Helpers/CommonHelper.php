@@ -1,7 +1,6 @@
 <?php
 
 if (!function_exists('ConvertStringToFloat')) {
-
     /**
      * Transforms the string value into a float.
      *
@@ -24,7 +23,6 @@ if (!function_exists('ConvertStringToFloat')) {
 }
 
 if (!function_exists('ConvertPtBrToEnDate')) {
-
     /**
      * Convert date from pt-br format to en.
      *
@@ -38,7 +36,6 @@ if (!function_exists('ConvertPtBrToEnDate')) {
 }
 
 if (!function_exists('ConvertPtBrToEnDateTime')) {
-
     /**
      * Convert date from pt-br format to en.
      *
@@ -52,7 +49,6 @@ if (!function_exists('ConvertPtBrToEnDateTime')) {
 }
 
 if (!function_exists('ConvertPtBrToLongDate')) {
-
     /**
      * Convert date from pt-br format to long/full.
      *
@@ -62,7 +58,6 @@ if (!function_exists('ConvertPtBrToLongDate')) {
     function ConvertPtBrToLongDate($date)
     {
         $weekday = [
-
             'Sunday'    => 'Domingo',
             'Monday'    => 'Segunda-Feira',
             'Tuesday'   => 'Terça-Feira',
@@ -73,7 +68,6 @@ if (!function_exists('ConvertPtBrToLongDate')) {
         ];
 
         $month = [
-
             'January'   => 'Janeiro',
             'February'  => 'Fevereiro',
             'March'     => 'Março',
@@ -91,12 +85,10 @@ if (!function_exists('ConvertPtBrToLongDate')) {
         $dateFormat = date("l, d \d\e F \d\e Y", strtotime(str_replace('/', '-', $date)));
 
         foreach ($weekday as $en => $ptBr) {
-
             $dateFormat = str_replace($en, $ptBr, $dateFormat);
         }
 
         foreach ($month as $en => $ptBr) {
-
             $dateFormat = str_replace($en, $ptBr, $dateFormat);
         }
 
@@ -105,7 +97,6 @@ if (!function_exists('ConvertPtBrToLongDate')) {
 }
 
 if (!function_exists('ConvertEnToPtBrDate')) {
-
     /**
      * Convert date from en format to pt-br.
      *
@@ -119,7 +110,6 @@ if (!function_exists('ConvertEnToPtBrDate')) {
 }
 
 if (!function_exists('ConvertEnToPtBrDateTime')) {
-
     /**
      * Convert date from en format to pt-br.
      *
@@ -129,7 +119,6 @@ if (!function_exists('ConvertEnToPtBrDateTime')) {
     function ConvertEnToPtBrDateTime($date, $showSeconds = null)
     {
         if ($showSeconds) {
-
             return date("d/m/Y H:i:s", strtotime($date));
         }
 
@@ -138,7 +127,6 @@ if (!function_exists('ConvertEnToPtBrDateTime')) {
 }
 
 if (!function_exists('LimitCharsFromString')) {
-
     /**
      * Limita a string em relação aos caracteres.
      *
@@ -148,7 +136,6 @@ if (!function_exists('LimitCharsFromString')) {
     function LimitCharsFromString($string, $numChars = 280)
     {
         if (strlen($string) <= $numChars) {
-
             return $string;
         }
 
@@ -158,7 +145,6 @@ if (!function_exists('LimitCharsFromString')) {
 }
 
 if (!function_exists('SanitizeVar')) {
-
     /**
      * Clear the variable, removing special characters, spaces, etc...
      *
@@ -168,7 +154,6 @@ if (!function_exists('SanitizeVar')) {
     function SanitizeVar($value)
     {
         $search = [
-
             '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
             '/[^\S ]+\</s',     // strip whitespaces before tags, except space
             '/(\s)+/s',         // shorten multiple whitespace sequences
@@ -176,7 +161,6 @@ if (!function_exists('SanitizeVar')) {
         ];
 
         $replace = [
-
             '>',
             '<',
             '\\1',
@@ -184,9 +168,6 @@ if (!function_exists('SanitizeVar')) {
         ];
 
         $value = preg_replace($search, $replace, $value);
-
         return $value;
     }
 }
-
-

@@ -28,8 +28,8 @@ class Address extends Model
         'city',
         'country',
         'district',
-        'address_line',        
-        'number',        
+        'address_line',
+        'number',
         'complement',
         'custom_street',
         'custom_block',
@@ -66,7 +66,7 @@ class Address extends Model
      * MUTATORS.
      *
      */
-    
+
     protected function state(): Attribute
     {
         return Attribute::make(

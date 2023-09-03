@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class BlogPostResource extends Resource
 {
@@ -44,41 +45,6 @@ class BlogPostResource extends Resource
 
     public static function form(Form $form): Form
     {
-        function getCategories(): Forms\Components\Select
-        {
-            return Forms\Components\Select::make('categories')
-                ->label(__('Categoria(s)'))
-                ->relationship(
-                    name: 'categories',
-                    titleAttribute: 'name',
-                    modifyQueryUsing: fn (PostCategoryService $servive): Builder =>
-                    $servive->forceScopeActiveStatus()
-                )
-                ->multiple()
-                ->searchable()
-                ->preload()
-                ->createOptionForm([
-                    Forms\Components\Grid::make(['default' => 2])
-                        ->schema([
-                            Forms\Components\TextInput::make('name')
-                                ->label(__('Nome'))
-                                ->required()
-                                ->minLength(2)
-                                ->maxLength(255)
-                                ->live(debounce: 1000)
-                                ->afterStateUpdated(
-                                    fn (callable $set, ?string $state): ?string =>
-                                    $set('slug', Str::slug($state))
-                                ),
-                            Forms\Components\TextInput::make('slug')
-                                ->label(__('Slug'))
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(255),
-                        ])
-                ]);
-        }
-
         return $form
             ->schema([
                 Forms\Components\Section::make(__('Infos. Gerais'))
@@ -113,21 +79,17 @@ class BlogPostResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
-                            // ->dehydrateStateUsing(
-                            //     fn (string $state): string => 
-                            //     Str::slug($state)
-                            // )
                             ->columnSpanFull(),
                         Forms\Components\Group::make()
                             ->relationship(name: 'cmsPost')
                             ->schema([
-                                getCategories()
+                                static::getCategoriesFormField()
                             ])
                             ->visibleOn('create')
                             ->columnSpanFull(),
                         Forms\Components\Group::make()
                             ->schema([
-                                getCategories()
+                                static::getCategoriesFormField()
                             ])
                             ->visibleOn('edit')
                             ->columnSpanFull(),
@@ -188,7 +150,7 @@ class BlogPostResource extends Resource
                             ->helperText(new HtmlString('https://youtube.com/watch?v=<span class="font-bold">kJQP7kiw5Fk</span>'))
                             ->required(
                                 fn (callable $get): bool =>
-                                in_array($get('role'), [4,])
+                                in_array($get('role'), [4,]) && empty($get('video'))
                             )
                             ->maxLength(255)
                             ->hidden(
@@ -196,8 +158,86 @@ class BlogPostResource extends Resource
                                 !in_array($get('role'), [3, 4])
                             )
                             ->columnSpanFull(),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('video')
+                            ->label(__('Vídeo destaque'))
+                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 120 mb.'))
+                            ->collection('video')
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->required(
+                                fn (callable $get): bool =>
+                                in_array($get('role'), [4,]) && empty($get('embed_video'))
+                            )
+                            ->acceptedFileTypes(['video/mp4'])
+                            ->maxSize(122880)
+                            ->downloadable()
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array($get('role'), [3, 4])
+                            ),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                            ->label(__('Imagem destaque'))
+                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
+                            ->collection('image')
+                            ->image()
+                            ->responsiveImages()
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('1080')
+                            ->maxSize(5120)
+                            ->downloadable(),
                     ])
                     ->columns(2)
+                    ->collapsible(),
+                Forms\Components\Section::make(__('Galeria de Imagens e Vídeos'))
+                    ->description(__('Adicione e gerencie as imagens e vídeos da postagem.'))
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            ->label(__('Upload das imagens'))
+                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
+                            ->collection('images')
+                            ->image()
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->responsiveImages()
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('1080')
+                            ->maxSize(5120)
+                            ->downloadable(),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
+                            ->label(__('Upload dos vídeos'))
+                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
+                            ->collection('videos')
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->multiple()
+                            ->acceptedFileTypes(['video/mp4'])
+                            ->maxSize(25600)
+                            ->downloadable(),
+                    ])
+                    ->columns(2)
+                    ->hidden(
+                        fn (callable $get): bool =>
+                        !in_array($get('role'), [3,])
+                    )
                     ->collapsible(),
                 Forms\Components\Section::make(__('Infos. Complementares'))
                     ->description(__('Visão geral e informações fundamentais sobre a página.'))
@@ -248,40 +288,26 @@ class BlogPostResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\Grid::make(['default' => 3])
                             ->schema([
-                                Forms\Components\Group::make()
-                                    ->relationship(name: 'cmsPost')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('order')
-                                            ->numeric()
-                                            ->label(__('Ordem'))
-                                            ->default(1)
-                                            ->minValue(1)
-                                            ->maxValue(100),
-                                    ]),
-                                Forms\Components\Group::make()
-                                    ->relationship(name: 'cmsPost')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('featured')
-                                            ->label(__('Destaque?'))
-                                            ->default(true)
-                                            ->inline(false)
-                                            ->columnSpanFull(),
-                                    ]),
-                                Forms\Components\Group::make()
-                                    ->schema([
-                                        Forms\Components\Toggle::make('comment')
-                                            ->label(__('Comentário?'))
-                                            ->default(true)
-                                            ->inline(false)
-                                            ->columnSpanFull(),
-                                    ])
+                                Forms\Components\TextInput::make('order')
+                                    ->numeric()
+                                    ->label(__('Ordem'))
+                                    ->default(1)
+                                    ->minValue(1)
+                                    ->maxValue(100),
+                                Forms\Components\Toggle::make('featured')
+                                    ->label(__('Destaque?'))
+                                    ->default(true)
+                                    ->inline(false),
+                                Forms\Components\Toggle::make('comment')
+                                    ->label(__('Comentário?'))
+                                    ->default(true)
+                                    ->inline(false)
                                     ->hidden(
                                         fn (callable $get): bool =>
                                         !in_array($get('role'), [1, 3, 4])
                                     ),
                             ]),
                         Forms\Components\Fieldset::make(__('Datas da postagem'))
-                            ->relationship(name: 'cmsPost')
                             ->schema([
                                 Forms\Components\DateTimePicker::make('publish_at')
                                     ->label(__('Dt. publicação'))
@@ -315,11 +341,52 @@ class BlogPostResource extends Resource
             ]);
     }
 
+    public static function getCategoriesFormField(): Forms\Components\Select
+    {
+        return Forms\Components\Select::make('categories')
+            ->label(__('Categoria(s)'))
+            ->relationship(
+                name: 'categories',
+                titleAttribute: 'name',
+                modifyQueryUsing: fn (PostCategoryService $servive): Builder =>
+                $servive->forceScopeActiveStatus()
+            )
+            ->multiple()
+            ->searchable()
+            ->preload()
+            ->createOptionForm([
+                Forms\Components\Grid::make(['default' => 2])
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('Nome'))
+                            ->required()
+                            ->minLength(2)
+                            ->maxLength(255)
+                            ->live(debounce: 1000)
+                            ->afterStateUpdated(
+                                fn (callable $set, ?string $state): ?string =>
+                                $set('slug', Str::slug($state))
+                            ),
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('Slug'))
+                            ->required()
+                            ->unique(ignoreRecord: true)
+                            ->maxLength(255),
+                    ])
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->striped()
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
+                    ->label('')
+                    ->collection('image')
+                    ->conversion('thumb')
+                    ->size(45)
+                    ->circular(),
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('Título'))
                     ->searchable()
@@ -337,7 +404,7 @@ class BlogPostResource extends Resource
                 Tables\Columns\TextColumn::make('cmsPost.categories.name')
                     ->label(__('Categorias'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('cmsPost.order')
+                Tables\Columns\TextColumn::make('order')
                     ->label(__('Ordem'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('cmsPost.owner.name')
@@ -360,26 +427,26 @@ class BlogPostResource extends Resource
                         query: fn (PostService $service, Builder $query, string $direction): Builder =>
                         $service->tableSortByStatus(postableType: 'cms_blog_posts', query: $query, direction: $direction)
                     ),
-                Tables\Columns\TextColumn::make('cmsPost.publish_at')
+                Tables\Columns\TextColumn::make('publish_at')
                     ->label(__('Publicação'))
                     ->dateTime('d/m/Y H:i')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('cmsPost.created_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('cmsPost.updated_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('Últ. atualização'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            // ->defaultSort(
-            //     fn (PostService $service, Builder $query): Builder =>
-            //     $service->tableDefaultSort(postableType: 'cms_blog_posts', query: $query)
-            // )
+            ->defaultSort(
+                fn (PostService $service, Builder $query): Builder =>
+                $service->tableDefaultSort(query: $query)
+            )
             ->filters([
                 Tables\Filters\SelectFilter::make('role')
                     ->label(__('Tipos'))
@@ -423,7 +490,11 @@ class BlogPostResource extends Resource
                         Tables\Actions\EditAction::make(),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                        ->after(
+                            fn (PostService $service, BlogPost $blog) =>
+                            $service->anonymizeUniqueSlugWhenDeleted($blog)
+                        ),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')
@@ -445,16 +516,24 @@ class BlogPostResource extends Resource
     {
         return $infolist
             ->schema([
+                Infolists\Components\TextEntry::make('display_role')
+                    ->label(__('Tipo da postagem')),
                 Infolists\Components\TextEntry::make('title')
                     ->label(__('Título')),
                 Infolists\Components\TextEntry::make('slug')
                     ->label(__('Slug')),
                 Infolists\Components\TextEntry::make('cmsPost.display_status')
                     ->label(__('Status')),
-                Infolists\Components\TextEntry::make('cmsPost.created_at')
+                Infolists\Components\TextEntry::make('publish_at')
+                    ->label(__('Dt. publicação'))
+                    ->dateTime('d/m/Y H:i'),
+                // Infolists\Components\TextEntry::make('expiration_at')
+                //     ->label(__('Dt. expiração'))
+                //     ->dateTime('d/m/Y H:i'),
+                Infolists\Components\TextEntry::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i'),
-                Infolists\Components\TextEntry::make('cmsPost.updated_at')
+                Infolists\Components\TextEntry::make('updated_at')
                     ->label(__('Últ. atualização'))
                     ->dateTime('d/m/Y H:i'),
             ])

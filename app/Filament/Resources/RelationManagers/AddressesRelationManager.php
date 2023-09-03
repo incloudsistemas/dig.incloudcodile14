@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\UserResource\RelationManagers;
+namespace App\Filament\Resources\RelationManagers;
 
 use App\Enums\ProfileInfos\Uf;
 use App\Models\Address;
@@ -21,7 +21,7 @@ class AddressesRelationManager extends RelationManager
 {
     protected static string $relationship = 'addresses';
 
-    protected static ?string $title = 'Lista de Endereços';
+    protected static ?string $title = 'Endereços';
 
     protected static ?string $modelLabel = 'Endereço';    
 
@@ -94,12 +94,12 @@ class AddressesRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        return $table
-            ->striped()
+        return $table            
             ->recordTitle(
                 fn (Address $address): string =>
                 "{$address->display_full_address}"
             )
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Tipo'))
@@ -113,7 +113,8 @@ class AddressesRelationManager extends RelationManager
                     ->formatStateUsing(
                         fn (Address $address): string =>
                         "{$address->city}-{$address->uf}"
-                    ),
+                    )
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_main')
                     ->label(__('Principal'))
                     ->icon(
@@ -130,6 +131,15 @@ class AddressesRelationManager extends RelationManager
                             default => 'gray',
                         }
                     ),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Cadastro'))
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
+                // Tables\Columns\TextColumn::make('updated_at')
+                //     ->label(__('Últ. atualização'))
+                //     ->dateTime('d/m/Y H:i')
+                //     ->sortable()
+                //     ->toggleable(isToggledHiddenByDefault: true),
             ])
             // ->reorderable('order')
             ->defaultSort(
@@ -137,6 +147,9 @@ class AddressesRelationManager extends RelationManager
                 $query->orderBy('is_main', 'desc')
                     ->orderBy('created_at', 'desc')
             )
+            ->filters([
+                //
+            ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
             ])

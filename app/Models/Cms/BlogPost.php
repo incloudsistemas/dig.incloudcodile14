@@ -2,18 +2,18 @@
 
 namespace App\Models\Cms;
 
+use App\Casts\DateTimeCast;
 use App\Enums\Cms\BlogRole;
 use App\Traits\Cms\Postable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
 
-class BlogPost extends Model
+class BlogPost extends Model implements HasMedia
 {
     use HasFactory, Postable;
 
     protected $table = 'cms_blog_posts';
-
-    public $timestamps = false;
     
     /**
      * The attributes that are mass assignable.
@@ -29,7 +29,11 @@ class BlogPost extends Model
         'body',
         'url',
         'embed_video',
-        'comment'
+        'order',
+        'featured',
+        'comment',
+        'publish_at',
+        'expiration_at', 
     ];
 
     /**
@@ -37,8 +41,11 @@ class BlogPost extends Model
      *
      * @var array<string, string>
      */
-    protected $casts = [
+    protected $casts = [        
+        'featured' => 'boolean',
         'comment' => 'boolean',
+        'publish_at' => DateTimeCast::class,
+        'expiration_at' => DateTimeCast::class,
     ];
 
     /**
@@ -59,14 +66,7 @@ class BlogPost extends Model
     public function getDisplayRoleAttribute(): string
     {
         return isset($this->role)
-            ? BlogRole::getDescription((int) $this->role)
+            ? BlogRole::getDescription(value: (int) $this->role)
             : null;
-    }
-
-    public function getDisplayCommentAttribute(): string
-    {
-        return isset($this->comment) && (int) $this->comment === 1
-            ? 'Sim'
-            : 'Não';
-    }
+    }    
 }

@@ -2,21 +2,19 @@
 
 namespace App\Models\Cms;
 
-use App\Models\User;
+use App\Casts\DateTimeCast;
 use App\Traits\Cms\Postable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
 
-class Page extends Model
+class Page extends Model implements HasMedia
 {
     use HasFactory, Postable;
 
     protected $table = 'cms_pages';
-    
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -33,7 +31,11 @@ class Page extends Model
         'cta',
         'url',
         'embed_video',
+        'order',
+        'featured',
         'comment',
+        'publish_at',
+        'expiration_at',        
         'settings'
     ];
 
@@ -44,7 +46,10 @@ class Page extends Model
      */
     protected $casts = [
         'cta' => 'array',
+        'featured' => 'boolean',
         'comment' => 'boolean',
+        'publish_at' => DateTimeCast::class,
+        'expiration_at' => DateTimeCast::class,
         'settings' => 'array',
     ];
 
@@ -82,11 +87,4 @@ class Page extends Model
      * CUSTOMS.
      *
      */
-
-    public function getDisplayCommentAttribute(): string
-    {
-        return isset($this->comment) && (int) $this->comment === 1
-            ? 'Sim'
-            : 'Não';
-    }
 }

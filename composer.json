@@ -20,6 +20,7 @@
         "bensampo/laravel-enum": "^6.6",
         "browner12/helpers": "^3.5",
         "filament/filament": "^3.0-stable",
+        "filament/spatie-laravel-media-library-plugin": "^3.0-stable",
         "guzzlehttp/guzzle": "^7.5",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",

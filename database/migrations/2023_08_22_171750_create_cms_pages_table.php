@@ -29,16 +29,25 @@ return new class extends Migration
             $table->text('excerpt')->nullable();
             // Conteúdo
             $table->longText('body')->nullable();
-            // Call to action
+            // Chamada para ação (Call to action)
             $table->json('cta')->nullable();
             // Url destaque
             $table->string('url')->nullable();
             // Vídeo destaque (embed)
             $table->string('embed_video')->nullable();
+            // Ordem
+            $table->integer('order')->unsigned()->default(1);
+            // Em destaque? 1 - sim, 0 - não
+            $table->boolean('featured')->default(0);
             // Permitir comentário? 1 - sim, 0 - não
             $table->boolean('comment')->default(0);
+            // Data da publicação
+            $table->timestamp('publish_at')->default(date('Y-m-d H:i:s'));
+            // Data de expiração
+            $table->timestamp('expiration_at')->nullable();
             // Configurações da página
-            $table->json('settings')->nullable();            
+            $table->json('settings')->nullable();              
+            $table->timestamps();          
             $table->softDeletes();
         });
     }

@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cms_blog_posts', function (Blueprint $table) {
+        Schema::create('cms_post_subcontents', function (Blueprint $table) {
             $table->id();
+            // contentable_id e contentable_type.
+            $table->morphs('contentable');
             // Tipo
-            // 1 - 'Artigo', 2 - 'Link', 3 - 'Galeria de Fotos', 4 - 'Vídeo'.
+            // 1 - 'Abas', 2 - 'Acordeões', ...
             $table->char('role', 1)->default(1);
+            // $table->enum('role', ['tabs', 'accordions']);
             // Título
             $table->string('title');
             $table->string('slug')->unique();
@@ -25,24 +28,22 @@ return new class extends Migration
             $table->text('excerpt')->nullable();
             // Conteúdo
             $table->longText('body')->nullable();
-            // Url destaque
-            $table->string('url')->nullable();
+            // Chamada para ação (Call to action)
+            $table->json('cta')->nullable();
             // Vídeo destaque (embed)
-            $table->string('embed_video')->nullable();            
+            $table->string('embed_video')->nullable();
             // Ordem
             $table->integer('order')->unsigned()->default(1);
-            // Em destaque? 1 - sim, 0 - não
-            $table->boolean('featured')->default(0);
-            // Permitir comentário? 1 - sim, 0 - não
-            $table->boolean('comment')->default(0);
+            // Status
+            // 0- Inativo, 1 - Ativo, 2 - Rascunho
+            $table->char('status', 1)->default(1);
+           // Atributos personalizados
+           $table->json('custom')->nullable();
             // Data da publicação
-            $table->timestamp('publish_at')->default(date('Y-m-d H:i:s'));
+            $table->datetime('publish_at')->default(now());
             // Data de expiração
-            $table->timestamp('expiration_at')->nullable();
-            // Configurações da página
-            $table->json('settings')->nullable();              
-            $table->timestamps();          
-            $table->softDeletes();
+            $table->datetime('expiration_at')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -51,6 +52,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cms_blog_posts');
+        Schema::dropIfExists('cms_post_subcontents');
     }
 };

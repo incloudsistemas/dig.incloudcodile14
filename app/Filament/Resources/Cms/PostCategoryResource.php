@@ -6,6 +6,7 @@ use App\Enums\DefaultStatus;
 use App\Filament\Resources\Cms\PostCategoryResource\Pages;
 use App\Filament\Resources\Cms\PostCategoryResource\RelationManagers;
 use App\Models\Cms\PostCategory;
+use App\Services\Cms\PostCategoryService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
@@ -15,7 +16,6 @@ use Filament\Support;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 
 class PostCategoryResource extends Resource
@@ -47,7 +47,7 @@ class PostCategoryResource extends Resource
                     ->maxLength(255)
                     ->live(debounce: 1000)
                     ->afterStateUpdated(
-                        fn (callable $set, ?string $state): ?string => 
+                        fn (callable $set, ?string $state): ?string =>
                         $set('slug', Str::slug($state))
                     ),
                 Forms\Components\TextInput::make('slug')
@@ -78,40 +78,16 @@ class PostCategoryResource extends Resource
                     ->label(__('Status'))
                     ->badge()
                     ->color(
-                        fn (string $state): string => 
+                        fn (string $state): string =>
                         DefaultStatus::getColorByDescription($state)
                     )
                     ->searchable(
-                        query: function (Builder $query, string $search): Builder {
-                            $statuses = DefaultStatus::asSelectArray();
-
-                            $matchingStatuses = [];
-                            foreach ($statuses as $index => $status) {
-                                if (stripos($status, $search) !== false) {
-                                    $matchingStatuses[] = $index;
-                                }
-                            }
-
-                            if ($matchingStatuses) {
-                                return $query->whereIn('status', $matchingStatuses);
-                            }
-
-                            return $query;
-                        }
+                        query: fn (PostCategoryService $service, Builder $query, string $search): Builder =>
+                        $service->tableSearchByStatus(query: $query, search: $search)
                     )
                     ->sortable(
-                        query: function (Builder $query, string $direction): Builder {
-                            $statuses = DefaultStatus::asSelectArray();
-
-                            $caseParts = [];
-                            foreach ($statuses as $key => $status) {
-                                $caseParts[] = sprintf("WHEN %d THEN '%s'", $key, $status);
-                            }
-
-                            $orderByCase = sprintf("CASE status %s END", implode(' ', $caseParts));
-
-                            return $query->orderByRaw("$orderByCase $direction");
-                        }
+                        query: fn (PostCategoryService $service, Builder $query, string $direction): Builder =>
+                        $service->tableSortByStatus(query: $query, direction: $direction)
                     ),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Cadastro'))
@@ -123,7 +99,7 @@ class PostCategoryResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort(column: 'created_at', direction: 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->multiple()

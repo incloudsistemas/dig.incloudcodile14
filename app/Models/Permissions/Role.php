@@ -17,14 +17,13 @@ class Role extends ModelsRole
      * SCOPES.
      *
      */
-    
+
     public function scopeByAuthUserRoles(Builder $query, User $user): Builder
     {
         $rolesToAvoid = RoleService::getArrayOfRolesToAvoidByAuthUserRoles($user);
-
         return $query->whereNotIn('id', $rolesToAvoid);
     }
-    
+
     /**
      * MUTATORS.
      *

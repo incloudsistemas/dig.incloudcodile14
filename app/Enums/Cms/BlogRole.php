@@ -24,8 +24,8 @@ final class BlogRole extends Enum
 
     public static function getSlugByValue(int $role): string
     {
-        $colors = self::getSlug();
-        return $colors[$role] ?? 'default';
+        $slugs = self::getSlug();
+        return $slugs[$role] ?? 'default';
     }
 
     public static function getSlugByDescription(string $roleDesc): string

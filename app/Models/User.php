@@ -13,7 +13,6 @@ use App\Models\Address;
 use App\Models\Cms\Post;
 use App\Services\Permissions\RoleService;
 use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,10 +23,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Image\Manipulations;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -105,6 +108,13 @@ class User extends Authenticatable implements FilamentUser
         return true;
     }
 
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->fit(Manipulations::FIT_CROP, 150, 150)
+            ->nonQueued();
+    }
+
     /**
      * SCOPES.
      *
@@ -113,7 +123,7 @@ class User extends Authenticatable implements FilamentUser
     public function scopeByAuthUserRoles(Builder $query, User $user): Builder
     {
         $rolesToAvoid = RoleService::getArrayOfRolesToAvoidByAuthUserRoles($user);
-        
+
         return $query->whereHas('roles', function (Builder $query) use ($rolesToAvoid): Builder {
             return $query->whereNotIn('id', $rolesToAvoid);
         });
@@ -151,40 +161,40 @@ class User extends Authenticatable implements FilamentUser
 
     public function getDisplayGenderAttribute(): ?string
     {
-        return isset($this->gender) 
-            ? Gender::getDescription($this->gender) 
+        return isset($this->gender)
+            ? Gender::getDescription(value: $this->gender)
             : null;
     }
 
     public function getDisplayBirthDateAttribute(): ?string
     {
         // return $this->birth_date?->format('d/m/Y');
-        return isset($this->birth_date) 
-            ? ConvertEnToPtBrDate($this->birth_date) 
+        return isset($this->birth_date)
+            ? ConvertEnToPtBrDate(date: $this->birth_date)
             : null;
     }
 
     public function getDisplayMaritalStatusAttribute(): ?string
     {
-        return isset($this->marital_status) 
-            ? MaritalStatus::getDescription((int) $this->marital_status) 
+        return isset($this->marital_status)
+            ? MaritalStatus::getDescription(value: (int) $this->marital_status)
             : null;
     }
 
     public function getDisplayEducationalLevelAttribute(): ?string
     {
-        return isset($this->educational_level) 
-            ? EducationalLevel::getDescription((int) $this->educational_level) 
+        return isset($this->educational_level)
+            ? EducationalLevel::getDescription(value: (int) $this->educational_level)
             : null;
     }
 
     public function getDisplayStatusAttribute(): string
     {
-        return UserStatus::getDescription((int) $this->status);
+        return UserStatus::getDescription(value: (int) $this->status);
     }
 
     public function getDisplayStatusColorAttribute(): string
     {
-        return UserStatus::getColorByValue((int) $this->status);
+        return UserStatus::getColorByValue(status: (int) $this->status);
     }
 }

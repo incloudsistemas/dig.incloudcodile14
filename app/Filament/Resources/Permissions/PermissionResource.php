@@ -82,7 +82,7 @@ class PermissionResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('id', 'desc')
+            ->defaultSort(column: 'id', direction: 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('roles')
                     ->label(__('Níveis de acessos'))

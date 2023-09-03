@@ -4,7 +4,11 @@ namespace App\Filament\Resources\Cms;
 
 use App\Enums\Cms\DefaultPostStatus;
 use App\Filament\Resources\Cms\PageResource\Pages;
-use App\Filament\Resources\Cms\PageResource\RelationManagers;
+use App\Filament\Resources\Cms\PageResource\RelationManagers\SubpagesRelationManager;
+use App\Filament\Resources\Cms\RelationManagers\PostSlidersRelationManager;
+use App\Filament\Resources\Cms\RelationManagers\PostSubcontentsAccordionsRelationManager;
+use App\Filament\Resources\Cms\RelationManagers\PostSubcontentsTabsRelationManager;
+use App\Filament\Resources\RelationManagers\MediaAttachsRelationManager;
 use App\Models\Cms\Page;
 use App\Services\Cms\PageService;
 use App\Services\Cms\PostCategoryService;
@@ -22,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class PageResource extends Resource
 {
@@ -199,6 +204,42 @@ class PageResource extends Resource
                                 !in_array('embed_video', $get('settings'))
                             )
                             ->columnSpanFull(),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('video')
+                            ->label(__('Vídeo destaque'))
+                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
+                            ->collection('video')
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->acceptedFileTypes(['video/mp4'])
+                            ->maxSize(25600)
+                            ->downloadable()
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('video', $get('settings'))
+                            ),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                            ->label(__('Imagem destaque'))
+                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
+                            ->collection('image')
+                            ->image()
+                            ->responsiveImages()
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('1080')
+                            ->maxSize(5120)
+                            ->downloadable()
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('image', $get('settings'))
+                            ),
                     ])
                     ->columns(2)
                     ->collapsible(),
@@ -251,39 +292,26 @@ class PageResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\Grid::make(['default' => 3])
                             ->schema([
-                                Forms\Components\Group::make()
-                                    ->relationship(name: 'cmsPost')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('order')
-                                            ->numeric()
-                                            ->label(__('Ordem'))
-                                            ->default(1)
-                                            ->minValue(1)
-                                            ->maxValue(100),
-                                    ])
+                                Forms\Components\TextInput::make('order')
+                                    ->numeric()
+                                    ->label(__('Ordem'))
+                                    ->default(1)
+                                    ->minValue(1)
+                                    ->maxValue(100)
                                     ->hidden(
                                         fn (callable $get): bool =>
                                         !in_array('order', $get('settings'))
                                     ),
-                                Forms\Components\Group::make()
-                                    ->relationship(name: 'cmsPost')
-                                    ->schema([
-                                        Forms\Components\Toggle::make('featured')
-                                            ->label(__('Destaque?'))
-                                            ->inline(false)
-                                            ->columnSpanFull(),
-                                    ])
+                                Forms\Components\Toggle::make('featured')
+                                    ->label(__('Destaque?'))
+                                    ->inline(false)
                                     ->hidden(
                                         fn (callable $get): bool =>
                                         !in_array('featured', $get('settings'))
                                     ),
-                                Forms\Components\Group::make()
-                                    ->schema([
-                                        Forms\Components\Toggle::make('comment')
-                                            ->label(__('Comentário?'))
-                                            ->inline(false)
-                                            ->columnSpanFull(),
-                                    ])
+                                Forms\Components\Toggle::make('comment')
+                                    ->label(__('Comentário?'))
+                                    ->inline(false)
                                     ->hidden(
                                         fn (callable $get): bool =>
                                         !in_array('comment', $get('settings'))
@@ -291,17 +319,13 @@ class PageResource extends Resource
                             ])
                             ->hidden(
                                 fn (callable $get): bool =>
-                                empty(array_intersect(
-                                    [
-                                        'order',
-                                        'featured',
-                                        'comment'
-                                    ],
-                                    $get('settings') ?? []
-                                ))
+                                empty(array_intersect([
+                                    'order',
+                                    'featured',
+                                    'comment'
+                                ], $get('settings') ?? []))
                             ),
                         Forms\Components\Fieldset::make(__('Datas da postagem'))
-                            ->relationship(name: 'cmsPost')
                             ->schema([
                                 Forms\Components\DateTimePicker::make('publish_at')
                                     ->label(__('Dt. publicação'))
@@ -316,6 +340,10 @@ class PageResource extends Resource
                                     ->minDate(
                                         fn (callable $get): string =>
                                         $get('publish_at')
+                                    )
+                                    ->hidden(
+                                        fn (callable $get): bool =>
+                                        !in_array('expiration_at', $get('settings'))
                                     ),
                             ])
                             ->hidden(
@@ -340,20 +368,89 @@ class PageResource extends Resource
                     ])
                     ->hidden(
                         fn (callable $get): bool =>
-                        empty(array_intersect(
-                            [
-                                'seo',
-                                'user_id',
-                                'order',
-                                'featured',
-                                'comment',
-                                'publish_at',
-                                'status'
-                            ],
-                            $get('settings') ?? []
-                        ))
+                        empty(array_intersect([
+                            'seo',
+                            'user_id',
+                            'order',
+                            'featured',
+                            'comment',
+                            'publish_at',
+                            'status'
+                        ], $get('settings') ?? []))
                     )
                     ->columns(2)
+                    ->collapsible(),
+                Forms\Components\Section::make(
+                    function (callable $get): string {
+                        $hasImages = in_array('images', $get('settings'));
+                        $hasVideos = in_array('videos', $get('settings'));
+                        return ($hasImages && $hasVideos)
+                            ? __('Galeria de Imagens e Vídeos')
+                            : ($hasImages
+                                ? __('Galeria de Imagens')
+                                : __('Galeria de Vídeos')
+                            );
+                    }
+                )
+                    ->description(
+                        function (callable $get): string {
+                            $hasImages = in_array('images', $get('settings'));
+                            $hasVideos = in_array('videos', $get('settings'));
+                            return ($hasImages && $hasVideos)
+                                ? __('Adicione e gerencie as imagens e vídeos da página.')
+                                : ($hasImages
+                                    ? __('Adicione e gerencie as imagens da página.')
+                                    : __('Adicione e gerencie os vídeos da página.')
+                                );
+                        }
+                    )
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            ->label(__('Upload das imagens'))
+                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
+                            ->collection('images')
+                            ->image()
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->responsiveImages()
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('1080')
+                            ->maxSize(5120)
+                            ->downloadable()
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('images', $get('settings'))
+                            ),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
+                            ->label(__('Upload dos vídeos'))
+                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 120 mb.'))
+                            ->collection('videos')
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->multiple()
+                            ->acceptedFileTypes(['video/mp4'])
+                            ->maxSize(122880)
+                            ->downloadable()
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('videos', $get('settings'))
+                            ),
+                    ])
+                    ->columns(2)
+                    ->hidden(
+                        fn (callable $get): bool =>
+                        empty(array_intersect(['images', 'videos'], $get('settings') ?? []))
+                    )
                     ->collapsible(),
                 Forms\Components\Section::make(__('Configs. da página'))
                     ->description(__('Personalize a página com os campos desejados.'))
@@ -376,14 +473,14 @@ class PageResource extends Resource
                                 'featured' => 'Destaque',
                                 'comment' => 'Comentário',
                                 'publish_at' => 'Data de publicação',
-                                // 'expiration_at' => 'Data de expiração',
+                                'expiration_at' => 'Data de expiração',
                                 'status' => 'Status',
-                                'sliders' => 'Sliders',
                                 'images' => 'Galeria de Imagens',
                                 'videos' => 'Galeria de Vídeos',
+                                'sliders' => 'Sliders',
                                 'tabs' => 'Abas',
                                 'accordions' => 'Acordeões',
-                                'applications' => 'Anexos',
+                                'attachments' => 'Anexos',
                             ])
                             ->searchable()
                             ->bulkToggleable()
@@ -439,6 +536,10 @@ class PageResource extends Resource
         return $table
             ->striped()
             ->columns(static::getTableColumns())
+            ->defaultSort(
+                fn (PostService $service, Builder $query): Builder =>
+                $service->tableDefaultSort(query: $query, publishAtDirection: 'asc')
+            )
             ->filters(static::getTableFilters())
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -449,8 +550,10 @@ class PageResource extends Resource
                         ->dropdown(false),
                     Tables\Actions\DeleteAction::make()
                         ->after(
-                            fn (PageService $service, Page $page) =>
-                            $service->anonymizeUniqueSlugWhenDeleted($page)
+                            function (PageService $service, PostService $postService, Page $page)  {
+                                $service->deleteSubpagesWhenDeleted($page);
+                                $postService->anonymizeUniqueSlugWhenDeleted($page);                                
+                            }                            
                         ),
                 ])
                     ->label(__('Ações'))
@@ -476,6 +579,12 @@ class PageResource extends Resource
     public static function getTableColumns(): array
     {
         return [
+            Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
+                ->label('')
+                ->collection('image')
+                ->conversion('thumb')
+                ->size(45)
+                ->circular(),
             Tables\Columns\TextColumn::make('title')
                 ->label(__('Título'))
                 ->searchable()
@@ -483,7 +592,7 @@ class PageResource extends Resource
             Tables\Columns\TextColumn::make('cmsPost.categories.name')
                 ->label(__('Categorias'))
                 ->searchable(),
-            Tables\Columns\TextColumn::make('cmsPost.order')
+            Tables\Columns\TextColumn::make('order')
                 ->label(__('Ordem'))
                 ->sortable(),
             Tables\Columns\TextColumn::make('cmsPost.owner.name')
@@ -506,17 +615,17 @@ class PageResource extends Resource
                     query: fn (PostService $service, Builder $query, string $direction): Builder =>
                     $service->tableSortByStatus(postableType: 'cms_pages', query: $query, direction: $direction)
                 ),
-            Tables\Columns\TextColumn::make('cmsPost.publish_at')
+            Tables\Columns\TextColumn::make('publish_at')
                 ->label(__('Publicação'))
                 ->dateTime('d/m/Y H:i')
                 ->searchable()
                 ->sortable(),
-            Tables\Columns\TextColumn::make('cmsPost.created_at')
+            Tables\Columns\TextColumn::make('created_at')
                 ->label(__('Cadastro'))
                 ->dateTime('d/m/Y H:i')
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
-            Tables\Columns\TextColumn::make('cmsPost.updated_at')
+            Tables\Columns\TextColumn::make('updated_at')
                 ->label(__('Últ. atualização'))
                 ->dateTime('d/m/Y H:i')
                 ->sortable()
@@ -570,10 +679,16 @@ class PageResource extends Resource
                     ->label(__('Slug')),
                 Infolists\Components\TextEntry::make('cmsPost.display_status')
                     ->label(__('Status')),
-                Infolists\Components\TextEntry::make('cmsPost.created_at')
+                Infolists\Components\TextEntry::make('publish_at')
+                    ->label(__('Dt. publicação'))
+                    ->dateTime('d/m/Y H:i'),
+                // Infolists\Components\TextEntry::make('expiration_at')
+                //     ->label(__('Dt. expiração'))
+                //     ->dateTime('d/m/Y H:i'),
+                Infolists\Components\TextEntry::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i'),
-                Infolists\Components\TextEntry::make('cmsPost.updated_at')
+                Infolists\Components\TextEntry::make('updated_at')
                     ->label(__('Últ. atualização'))
                     ->dateTime('d/m/Y H:i'),
             ])
@@ -583,7 +698,11 @@ class PageResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\SubpagesRelationManager::class,
+            SubpagesRelationManager::class,
+            PostSlidersRelationManager::class,
+            PostSubcontentsTabsRelationManager::class,
+            PostSubcontentsAccordionsRelationManager::class,
+            MediaAttachsRelationManager::class,
         ];
     }
 
@@ -594,10 +713,5 @@ class PageResource extends Resource
             'create' => Pages\CreatePage::route('/create'),
             'edit' => Pages\EditPage::route('/{record}/edit'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();
     }
 }

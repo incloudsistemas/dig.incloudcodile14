@@ -8,6 +8,7 @@ use App\Models\Cms\Post;
 use App\Models\Cms\PostCategory;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
 
 class PostService
@@ -55,14 +56,10 @@ class PostService
             ->orderBy('display_status', $direction);
     }
 
-    public function tableDefaultSort(string $postableType, Builder $query): Builder
+    public function tableDefaultSort(Builder $query, string $orderDirection = 'desc', string $publishAtDirection = 'desc'): Builder
     {
-        return Page::join('cms_posts', function (JoinClause $join) use ($postableType): JoinClause {
-            return $join->on($postableType . '.id', '=', 'cms_posts.postable_id')
-                ->where('cms_posts.postable_type', $postableType);
-        })
-            ->orderBy('cms_posts.order', 'desc')
-            ->orderBy('cms_posts.publish_at', 'desc');
+        return $query->orderBy('order', $orderDirection)
+            ->orderBy('publish_at', $publishAtDirection);
     }
 
     public function tableFilterGetOptionsByCategories(string $postableType): array
@@ -122,5 +119,11 @@ class PostService
         return $query->whereHas('cmsPost', function (Builder $query) use ($data): Builder {
             return $query->whereIn('status', $data['values']);
         });
+    }
+
+    public function anonymizeUniqueSlugWhenDeleted(Model $record): void
+    {
+        $record->slug = $record->slug . '//deleted_' . md5(uniqid());
+        $record->save();
     }
 }

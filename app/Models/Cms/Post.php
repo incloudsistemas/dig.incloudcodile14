@@ -17,6 +17,8 @@ class Post extends Model
 
     protected $table = 'cms_posts';
 
+    public $timestamps = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -29,12 +31,8 @@ class Post extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
-        'featured',
-        'order',
         'status',
         'custom',
-        'publish_at',
-        'expiration_at'
     ];
 
     /**
@@ -44,10 +42,7 @@ class Post extends Model
      */
     protected $casts = [
         'meta_keywords' => 'array',
-        'featured' => 'boolean',
         'custom' => 'array',
-        'publish_at' => DateTimeCast::class,
-        'expiration_at' => DateTimeCast::class,
     ];
 
     /**
@@ -58,9 +53,9 @@ class Post extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(
-            related: PostCategory::class, 
-            table: 'cms_post_has_categories', 
-            foreignPivotKey: 'post_id', 
+            related: PostCategory::class,
+            table: 'cms_post_has_categories',
+            foreignPivotKey: 'post_id',
             relatedPivotKey: 'category_id'
         );
     }
@@ -100,30 +95,13 @@ class Post extends Model
      *
      */
 
-    public function getDisplayFeaturedAttribute(): string
-    {
-        return isset($this->featured) && (int) $this?->featured === 1
-            ? 'Sim'
-            : 'Não';
-    }
-
     public function getDisplayStatusAttribute(): string
     {
-        return DefaultPostStatus::getDescription((int) $this->status);
+        return DefaultPostStatus::getDescription(value: (int) $this->status);
     }
 
     public function getDisplayStatusColorAttribute(): string
     {
-        return DefaultPostStatus::getColorByValue((int) $this->status);
-    }
-
-    public function getDisplayPublishAtAttribute(): string
-    {
-        return $this->publish_at?->format('d/m/Y H:i');
-    }
-
-    public function getDisplayExpirationAtAttribute(): string
-    {
-        return $this->expiration_at?->format('d/m/Y H:i');
+        return DefaultPostStatus::getColorByValue(status: (int) $this->status);
     }
 }

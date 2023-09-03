@@ -2,9 +2,7 @@
 
 namespace App\Filament\Resources\Cms\PageResource\RelationManagers;
 
-use App\Enums\Cms\DefaultPostStatus;
 use App\Filament\Resources\Cms\PageResource;
-use App\Filament\Resources\Cms\PageResource\Pages\EditPage;
 use App\Models\Cms\Page;
 use App\Services\Cms\PageService;
 use App\Services\Cms\PostService;
@@ -24,7 +22,7 @@ class SubpagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'subpages';
 
-    protected static ?string $title = 'Lista de Subpáginas';
+    protected static ?string $title = 'Subpáginas';
 
     protected static ?string $modelLabel = 'Subpágina';
 
@@ -32,7 +30,13 @@ class SubpagesRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('title')
+            ->striped()
             ->columns(PageResource::getTableColumns())
+            ->reorderable('order')
+            ->defaultSort(
+                fn (PostService $service, Builder $query): Builder =>
+                $service->tableDefaultSort(query: $query, orderDirection: 'asc', publishAtDirection: 'asc')
+            )
             ->filters(PageResource::getTableFilters())
             ->headerActions([
                 Tables\Actions\Action::make('create')
@@ -62,7 +66,7 @@ class SubpagesRelationManager extends RelationManager
                         ->dropdown(false),
                     Tables\Actions\DeleteAction::make()
                         ->after(
-                            fn (PageService $service, Page $page) =>
+                            fn (PostService $service, Page $page) =>
                             $service->anonymizeUniqueSlugWhenDeleted($page)
                         ),
                 ])

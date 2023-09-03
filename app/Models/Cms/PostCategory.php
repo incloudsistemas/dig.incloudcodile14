@@ -63,11 +63,11 @@ class PostCategory extends Model
  
      public function getDisplayStatusAttribute(): string
      {
-         return DefaultStatus::getDescription((int) $this->status);
+         return DefaultStatus::getDescription(value: (int) $this->status);
      }
  
      public function getDisplayStatusColorAttribute(): string
      {
-         return DefaultStatus::getColorByValue((int) $this->status);
+         return DefaultStatus::getColorByValue(status: (int) $this->status);
      }
 }

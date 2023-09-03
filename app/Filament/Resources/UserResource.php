@@ -6,8 +6,9 @@ use App\Enums\ProfileInfos\MaritalStatus;
 use App\Enums\ProfileInfos\EducationalLevel;
 use App\Enums\ProfileInfos\Gender;
 use App\Enums\UserStatus;
+use App\Filament\Resources\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\RelationManagers\MediaAttachsRelationManager;
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use App\Services\Permissions\RoleService;
 use App\Services\UserService;
@@ -21,6 +22,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Illuminate\Support\Str;
 
 class UserResource extends Resource
 {
@@ -143,6 +146,21 @@ class UserResource extends Resource
                             )
                             ->columnSpanFull()
                             ->columns(2),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('avatar')
+                            ->label(__('Avatar'))
+                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 500x500px // 5 mb.'))
+                            ->collection('avatar')
+                            ->image()
+                            // ->responsiveImages()                            
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend(Str::slug($get('name'))),
+                            )
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('500')
+                            ->imageResizeTargetHeight('500')
+                            ->maxSize(5120),
                     ])
                     ->columns(2)
                     ->collapsible(),
@@ -259,6 +277,12 @@ class UserResource extends Resource
         return $table
             ->striped()
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('avatar')
+                    ->label('')
+                    ->collection('avatar')
+                    ->conversion('thumb')
+                    ->size(45)
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nome'))
                     ->searchable()
@@ -308,7 +332,7 @@ class UserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort(column: 'created_at', direction: 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('roles')
                     ->label(__('Níveis de acessos'))
@@ -321,6 +345,7 @@ class UserResource extends Resource
                     ->multiple()
                     ->preload(),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label(__('Status'))
                     ->multiple()
                     ->options(UserStatus::asSelectArray()),
             ])
@@ -396,7 +421,8 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\AddressesRelationManager::class,
+            AddressesRelationManager::class,
+            MediaAttachsRelationManager::class,
         ];
     }
 
