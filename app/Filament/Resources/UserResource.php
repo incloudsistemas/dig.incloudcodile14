@@ -151,7 +151,7 @@ class UserResource extends Resource
                             ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 500x500px // 5 mb.'))
                             ->collection('avatar')
                             ->image()
-                            // ->responsiveImages()                            
+                            // ->responsiveImages()
                             ->getUploadedFileNameForStorageUsing(
                                 fn (TemporaryUploadedFile $file, callable $get): string =>
                                 (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
@@ -429,9 +429,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
+            'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PostSubcontentsTabsRelationManager extends RelationManager
 {
     protected int $role = 1; // Tabs/Abas
-    protected static ?string $service = PostSubcontentService::class;    
+    protected static ?string $service = PostSubcontentService::class;
 
     protected static string $relationship = 'subcontents';
 

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Support;
+use Illuminate\Database\Eloquent\Model;
 
 class RoleResource extends Resource
 {
@@ -23,7 +24,7 @@ class RoleResource extends Resource
 
     protected static ?string $slug = 'roles';
 
-    // protected static ?string $recordTitleAttribute = 'name';    
+    // protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $modelLabel = 'Nível de Acesso';
 
@@ -65,6 +66,10 @@ class RoleResource extends Resource
                                 $query->orderBy('id', 'asc')
                             )
                             ->searchable()
+                            // ->getOptionLabelFromRecordUsing(
+                            //     fn (Model $record): string =>
+                            //     "{$record->id} - {$record->name}"
+                            // )
                             ->bulkToggleable()
                             ->columns(4)
                             ->gridDirection('row'),
@@ -96,7 +101,7 @@ class RoleResource extends Resource
             ])
             ->defaultSort(column: 'id', direction: 'desc')
             ->filters([
-                // 
+                //
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

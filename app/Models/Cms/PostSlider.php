@@ -5,6 +5,7 @@ namespace App\Models\Cms;
 use App\Casts\DateTimeCast;
 use App\Enums\Cms\DefaultPostStatus;
 use App\Enums\Cms\PostSliderRole;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -73,6 +74,17 @@ class PostSlider extends Model implements HasMedia
      * SCOPES.
      *
      */
+
+    public function scopeBySlideableTypes(Builder $query, array $slideableTypes): Builder
+    {
+        return $query->whereIn('slideable_type', $slideableTypes);
+    }
+
+    public function scopeBySlideableTypesAndIds(Builder $query, array $slideableTypes, array $slideableIds): Builder
+    {
+        return $query->bySlideableTypes(slideableTypes: $slideableTypes)
+            ->whereIn('slideable_id', $slideableIds);
+    }
 
     /**
      * MUTATORS.

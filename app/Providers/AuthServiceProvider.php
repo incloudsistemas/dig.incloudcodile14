@@ -16,10 +16,12 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Models\Permissions\Permission::class => Policies\Permissions\PermissionPolicy::class,
-        Models\Permissions\Role::class => Policies\Permissions\RolePolicy::class,
-        Models\User::class => Policies\UserPolicy::class,
-        Models\Cms\Page::class => Policies\Cms\PagePolicy::class,
-        Models\Cms\BlogPost::class => Policies\Cms\BlogPostPolicy::class,
+        Models\Permissions\Role::class       => Policies\Permissions\RolePolicy::class,
+        Models\User::class                   => Policies\UserPolicy::class,
+
+        Models\Cms\Page::class         => Policies\Cms\PagePolicy::class,
+        Models\Cms\BlogPost::class     => Policies\Cms\BlogPostPolicy::class,
+        Models\Cms\PostSlider::class   => Policies\Cms\MainPostSliderPolicy::class,
         Models\Cms\PostCategory::class => Policies\Cms\PostCategoryPolicy::class,
     ];
 

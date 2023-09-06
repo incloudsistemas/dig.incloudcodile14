@@ -17,6 +17,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "artesaos/seotools": "^1.2",
         "bensampo/laravel-enum": "^6.6",
         "browner12/helpers": "^3.5",
         "filament/filament": "^3.0-stable",

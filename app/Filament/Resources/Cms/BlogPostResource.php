@@ -354,26 +354,30 @@ class BlogPostResource extends Resource
             ->multiple()
             ->searchable()
             ->preload()
-            ->createOptionForm([
-                Forms\Components\Grid::make(['default' => 2])
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('Nome'))
-                            ->required()
-                            ->minLength(2)
-                            ->maxLength(255)
-                            ->live(debounce: 1000)
-                            ->afterStateUpdated(
-                                fn (callable $set, ?string $state): ?string =>
-                                $set('slug', Str::slug($state))
-                            ),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('Slug'))
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255),
-                    ])
-            ]);
+            ->when(
+                auth()->user()->can('Cadastrar [Cms] Categorias'),
+                fn (Forms\Components\Select $component): Forms\Components\Select =>
+                $component->createOptionForm([
+                    Forms\Components\Grid::make(['default' => 2])
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label(__('Nome'))
+                                ->required()
+                                ->minLength(2)
+                                ->maxLength(255)
+                                ->live(debounce: 1000)
+                                ->afterStateUpdated(
+                                    fn (callable $set, ?string $state): ?string =>
+                                    $set('slug', Str::slug($state))
+                                ),
+                            Forms\Components\TextInput::make('slug')
+                                ->label(__('Slug'))
+                                ->required()
+                                ->unique(ignoreRecord: true)
+                                ->maxLength(255),
+                        ]),
+                ])
+            );
     }
 
     public static function table(Table $table): Table
@@ -550,9 +554,9 @@ class BlogPostResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBlogPosts::route('/'),
+            'index'  => Pages\ListBlogPosts::route('/'),
             'create' => Pages\CreateBlogPost::route('/create'),
-            'edit' => Pages\EditBlogPost::route('/{record}/edit'),
+            'edit'   => Pages\EditBlogPost::route('/{record}/edit'),
         ];
     }
 }
