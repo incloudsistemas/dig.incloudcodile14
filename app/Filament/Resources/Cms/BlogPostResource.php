@@ -48,7 +48,7 @@ class BlogPostResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make(__('Infos. Gerais'))
-                    ->description(__('Visão geral e informações fundamentais sobre a página.'))
+                    ->description(__('Visão geral e informações fundamentais sobre a postagem.'))
                     ->schema([
                         Forms\Components\Select::make('role')
                             ->label(__('Tipo da postagem'))
@@ -156,11 +156,10 @@ class BlogPostResource extends Resource
                             ->hidden(
                                 fn (callable $get): bool =>
                                 !in_array($get('role'), [3, 4])
-                            )
-                            ->columnSpanFull(),
+                            ),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('video')
                             ->label(__('Vídeo destaque'))
-                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 120 mb.'))
+                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
                             ->collection('video')
                             ->getUploadedFileNameForStorageUsing(
                                 fn (TemporaryUploadedFile $file, callable $get): string =>
@@ -172,7 +171,7 @@ class BlogPostResource extends Resource
                                 in_array($get('role'), [4,]) && empty($get('embed_video'))
                             )
                             ->acceptedFileTypes(['video/mp4'])
-                            ->maxSize(122880)
+                            ->maxSize(25600)
                             ->downloadable()
                             ->hidden(
                                 fn (callable $get): bool =>
@@ -240,7 +239,7 @@ class BlogPostResource extends Resource
                     )
                     ->collapsible(),
                 Forms\Components\Section::make(__('Infos. Complementares'))
-                    ->description(__('Visão geral e informações fundamentais sobre a página.'))
+                    ->description(__('Forneça informações adicionais relevantes sobre a postagem.'))
                     ->schema([
                         Forms\Components\Fieldset::make(__('Otimização para motores de busca (SEO)'))
                             ->relationship(name: 'cmsPost')
@@ -343,10 +342,10 @@ class BlogPostResource extends Resource
 
     public static function getCategoriesFormField(): Forms\Components\Select
     {
-        return Forms\Components\Select::make('categories')
+        return Forms\Components\Select::make('postCategories')
             ->label(__('Categoria(s)'))
             ->relationship(
-                name: 'categories',
+                name: 'postCategories',
                 titleAttribute: 'name',
                 modifyQueryUsing: fn (PostCategoryService $servive): Builder =>
                 $servive->forceScopeActiveStatus()
@@ -390,6 +389,7 @@ class BlogPostResource extends Resource
                     ->collection('image')
                     ->conversion('thumb')
                     ->size(45)
+                    ->limit(1)
                     ->circular(),
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('Título'))
@@ -405,7 +405,7 @@ class BlogPostResource extends Resource
                         query: fn (BlogPostService $service, Builder $query, string $direction): Builder =>
                         $service->tableSortByRole(query: $query, direction: $direction)
                     ),
-                Tables\Columns\TextColumn::make('cmsPost.categories.name')
+                Tables\Columns\TextColumn::make('cmsPost.postCategories.name')
                     ->label(__('Categorias'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order')
@@ -456,7 +456,7 @@ class BlogPostResource extends Resource
                     ->label(__('Tipos'))
                     ->options(BlogRole::asSelectArray())
                     ->multiple(),
-                Tables\Filters\SelectFilter::make('categories')
+                Tables\Filters\SelectFilter::make('postCategories')
                     ->label(__('Categorias'))
                     ->options(
                         fn (PostService $service): array =>

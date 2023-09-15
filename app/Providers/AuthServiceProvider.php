@@ -23,6 +23,11 @@ class AuthServiceProvider extends ServiceProvider
         Models\Cms\BlogPost::class     => Policies\Cms\BlogPostPolicy::class,
         Models\Cms\PostSlider::class   => Policies\Cms\MainPostSliderPolicy::class,
         Models\Cms\PostCategory::class => Policies\Cms\PostCategoryPolicy::class,
+
+        Models\Shop\ProductCategory::class => Policies\Shop\ProductCategoryPolicy::class,
+        Models\Shop\ProductBrand::class    => Policies\Shop\ProductBrandPolicy::class,
+        Models\Shop\Product::class         => Policies\Shop\ProductPolicy::class,
+
     ];
 
     /**

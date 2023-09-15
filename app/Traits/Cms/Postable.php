@@ -43,9 +43,9 @@ trait Postable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function categories(): BelongsToMany
+    public function postCategories(): BelongsToMany
     {
-        return $this->cmsPost?->categories();
+        return $this->cmsPost?->postCategories();
     }
 
     /**

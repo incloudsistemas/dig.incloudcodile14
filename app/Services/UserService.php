@@ -71,7 +71,7 @@ class UserService
     }
 
     /**
-     * $action can be: 
+     * $action can be:
      * Filament\Tables\Actions\DeleteAction;
      * Filament\Actions\DeleteAction;
      */
@@ -85,7 +85,7 @@ class UserService
     //             ->send();
 
     //         // $action->cancel();
-    //         $action->halt();                                
+    //         $action->halt();
     //     }
     // }
 }

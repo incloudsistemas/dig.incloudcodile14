@@ -42,7 +42,13 @@ class AppServiceProvider extends ServiceProvider
             // 'cms_team_members'           => 'App\Models\Cms\TeamMember',
             'cms_post_categories'           => 'App\Models\Cms\PostCategory',
             'cms_post_sliders'              => 'App\Models\Cms\PostSlider',
-            'cms_post_subcontents'          => 'App\Models\Cms\PostSlider',
+            'cms_post_subcontents'          => 'App\Models\Cms\PostSubcontent',
+
+            'shop_product_categories'      => 'App\Models\Shop\ProductCategory',
+            'shop_product_brands'          => 'App\Models\Shop\ProductBrand',
+            'shop_products'                => 'App\Models\Shop\Product',
+            'shop_product_variant_options' => 'App\Models\Shop\ProductVariantOption',
+            'shop_product_variant_items'   => 'App\Models\Shop\ProductVariantItem',
         ]);
     }
 }

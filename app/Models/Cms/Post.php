@@ -50,7 +50,7 @@ class Post extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function categories(): BelongsToMany
+    public function postCategories(): BelongsToMany
     {
         return $this->belongsToMany(
             related: PostCategory::class,

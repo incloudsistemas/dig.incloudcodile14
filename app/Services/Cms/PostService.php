@@ -80,7 +80,7 @@ class PostService
         }
 
         return $query->whereHas('cmsPost', function (Builder $query) use ($data): Builder {
-            return $query->whereHas('categories', function (Builder $query) use ($data): Builder {
+            return $query->whereHas('postCategories', function (Builder $query) use ($data): Builder {
                 return $query->whereIn('id', $data['values']);
             });
         });

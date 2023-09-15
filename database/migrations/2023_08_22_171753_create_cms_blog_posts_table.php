@@ -28,7 +28,7 @@ return new class extends Migration
             // Url destaque
             $table->string('url')->nullable();
             // Vídeo destaque (embed)
-            $table->string('embed_video')->nullable();            
+            $table->string('embed_video')->nullable();
             // Ordem
             $table->integer('order')->unsigned()->default(1);
             // Em destaque? 1 - sim, 0 - não
@@ -36,12 +36,12 @@ return new class extends Migration
             // Permitir comentário? 1 - sim, 0 - não
             $table->boolean('comment')->default(0);
             // Data da publicação
-            $table->timestamp('publish_at')->default(date('Y-m-d H:i:s'));
+            $table->timestamp('publish_at')->default(now());
             // Data de expiração
             $table->timestamp('expiration_at')->nullable();
             // Configurações da página
-            $table->json('settings')->nullable();              
-            $table->timestamps();          
+            $table->json('settings')->nullable();
+            $table->timestamps();
             $table->softDeletes();
         });
     }

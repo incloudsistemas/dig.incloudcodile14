@@ -16,8 +16,6 @@ return new class extends Migration
             // Nome
             $table->string('name');
             $table->string('slug')->unique();
-            // Ordem
-            $table->integer('order')->unsigned()->default(1);
             // Status
             // 0- Inativo, 1 - Ativo
             $table->char('status', 1)->default(1);

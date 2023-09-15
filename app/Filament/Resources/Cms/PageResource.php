@@ -51,7 +51,7 @@ class PageResource extends Resource
                     ->description(__('Visão geral e informações fundamentais sobre a página.'))
                     ->schema([
                         Forms\Components\Select::make('page_id')
-                            ->label(__('Página pai'))
+                            ->label(__('Página parental'))
                             ->relationship(
                                 name: 'mainPage',
                                 titleAttribute: 'title',
@@ -67,7 +67,8 @@ class PageResource extends Resource
                             )
                             ->dehydrated()
                             ->hidden(
-                                fn (Page $page, ?string $state): bool => (empty($state) && !auth()->user()->can('Cadastrar [Cms] Páginas')) || $page->subpages->count() > 0
+                                fn (Page $page, ?string $state): bool =>
+                                (empty($state) && !auth()->user()->can('Cadastrar [Cms] Páginas')) || $page->subpages->count() > 0
                             )
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('title')
@@ -202,8 +203,7 @@ class PageResource extends Resource
                             ->hidden(
                                 fn (callable $get): bool =>
                                 !in_array('embed_video', $get('settings'))
-                            )
-                            ->columnSpanFull(),
+                            ),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('video')
                             ->label(__('Vídeo destaque'))
                             ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
@@ -244,7 +244,7 @@ class PageResource extends Resource
                     ->columns(2)
                     ->collapsible(),
                 Forms\Components\Section::make(__('Infos. Complementares'))
-                    ->description(__('Visão geral e informações fundamentais sobre a página.'))
+                    ->description(__('Forneça informações adicionais relevantes sobre a página.'))
                     ->schema([
                         Forms\Components\Fieldset::make(__('Otimização para motores de busca (SEO)'))
                             ->relationship(name: 'cmsPost')
@@ -430,7 +430,7 @@ class PageResource extends Resource
                             ),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
                             ->label(__('Upload dos vídeos'))
-                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 120 mb.'))
+                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
                             ->collection('videos')
                             ->getUploadedFileNameForStorageUsing(
                                 fn (TemporaryUploadedFile $file, callable $get): string =>
@@ -439,7 +439,7 @@ class PageResource extends Resource
                             )
                             ->multiple()
                             ->acceptedFileTypes(['video/mp4'])
-                            ->maxSize(122880)
+                            ->maxSize(25600)
                             ->downloadable()
                             ->hidden(
                                 fn (callable $get): bool =>
@@ -498,10 +498,10 @@ class PageResource extends Resource
 
     public static function getCategoriesFormField(): Forms\Components\Select
     {
-        return Forms\Components\Select::make('categories')
+        return Forms\Components\Select::make('postCategories')
             ->label(__('Categoria(s)'))
             ->relationship(
-                name: 'categories',
+                name: 'postCategories',
                 titleAttribute: 'name',
                 modifyQueryUsing: fn (PostCategoryService $servive): Builder =>
                 $servive->forceScopeActiveStatus()
@@ -593,7 +593,7 @@ class PageResource extends Resource
                 ->label(__('Título'))
                 ->searchable()
                 ->sortable(),
-            Tables\Columns\TextColumn::make('cmsPost.categories.name')
+            Tables\Columns\TextColumn::make('cmsPost.postCategories.name')
                 ->label(__('Categorias'))
                 ->searchable(),
             Tables\Columns\TextColumn::make('order')
@@ -640,7 +640,7 @@ class PageResource extends Resource
     public static function getTableFilters(): array
     {
         return [
-            Tables\Filters\SelectFilter::make('categories')
+            Tables\Filters\SelectFilter::make('postCategories')
                 ->label(__('Categorias'))
                 ->options(
                     fn (PostService $service): array =>

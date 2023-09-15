@@ -9,4 +9,12 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateBlogPost extends CreateRecord
 {
     protected static string $resource = BlogPostResource::class;
+
+    protected function afterCreate(): void
+    {
+        // Force post create
+        if (!$this->record->cmsPost) {
+            $this->record->cmsPost()->create(['publish_at' => now()]);
+        }
+    }
 }

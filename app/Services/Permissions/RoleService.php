@@ -19,7 +19,7 @@ class RoleService
         $userRoles = $user->roles->pluck('id')->toArray();
 
         // avoid role 2 = client/customer, ALWAYS.
-        // avoid role 1 = superadmin, if auth user role isn't superadmin.        
+        // avoid role 1 = superadmin, if auth user role isn't superadmin.
         // avoid role 3 = admin, if auth user role isn't superadmin or admin.
         if (in_array(1, $userRoles)) {
             $rolesToAvoid = [2];
@@ -32,14 +32,16 @@ class RoleService
         return $rolesToAvoid;
     }
 
-    public function forceScopeByAuthUserRoles(): Builder
+    public function getRolesbyAuthUserRoles(Builder $query): Builder
     {
         $user = auth()->user();
-        return $this->role->byAuthUserRoles($user);
+        $rolesToAvoid = static::getArrayOfRolesToAvoidByAuthUserRoles($user);
+
+        return $query->whereNotIn('id', $rolesToAvoid);
     }
 
     /**
-     * $action can be: 
+     * $action can be:
      * Filament\Tables\Actions\DeleteAction;
      * Filament\Actions\DeleteAction;
      */

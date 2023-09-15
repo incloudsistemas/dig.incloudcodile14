@@ -1,24 +1,18 @@
 <?php
 
-if (!function_exists('ConvertStringToFloat')) {
+if (!function_exists('ConvertPtBrFloatStringToInt')) {
     /**
-     * Transforms the string value into a float.
+     * Transforms the float string value into a int.
      *
      * @param
      * @return
      */
-    function ConvertNumStringToFloat($value)
+    function ConvertPtBrFloatStringToInt(mixed $value)
     {
-        // removing all chars from the var.
-        $value = trim(preg_replace("/[^0-9\s]/", "", $value));
+        $value = str_replace(".", "", $value);
+        $value = str_replace(",", ".", $value);
 
-        // Var size.
-        $size = strlen($value);
-
-        // Formatting the var with the format supported by the B.D. Float/Double.
-        $value = substr_replace($value, '.', $size - 2) . substr($value, $size - 2);
-
-        return (float) $value;
+        return round(floatval($value) * 100);
     }
 }
 

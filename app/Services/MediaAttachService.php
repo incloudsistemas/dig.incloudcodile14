@@ -13,7 +13,7 @@ class MediaAttachService
     {
         $this->media = $media;
     }
-    
+
     public function mutateFormDataToCreate(Model $ownerRecord, array $data): array
     {
         $morphMap = Relation::morphMap();

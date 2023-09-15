@@ -178,8 +178,8 @@ class UserResource extends Resource
                             ->relationship(
                                 name: 'roles',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn (RoleService $servive): Builder =>
-                                $servive->forceScopeByAuthUserRoles()
+                                modifyQueryUsing: fn (RoleService $service, Builder $query): Builder =>
+                                $service->getRolesbyAuthUserRoles(query: $query)
                             )
                             // ->multiple()
                             ->searchable()
@@ -339,8 +339,8 @@ class UserResource extends Resource
                     ->relationship(
                         name: 'roles',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn (RoleService $servive): Builder =>
-                        $servive->forceScopeByAuthUserRoles()
+                        modifyQueryUsing: fn (RoleService $service, Builder $query): Builder =>
+                            $service->getRolesbyAuthUserRoles(query: $query)
                     )
                     ->multiple()
                     ->preload(),
@@ -359,7 +359,7 @@ class UserResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->after(
                             fn (UserService $service, User $user) =>
-                            $service->anonymizeUniqueEmailWhenDeleted($user)
+                            $service->anonymizeUniqueEmailWhenDeleted(user: $user)
                         ),
                 ])
                     ->label(__('Ações'))

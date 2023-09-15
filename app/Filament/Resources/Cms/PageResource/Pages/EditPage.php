@@ -20,14 +20,14 @@ class EditPage extends EditRecord
                 ->after(
                     function (PageService $service, PostService $postService, Page $page)  {
                         $service->deleteSubpagesWhenDeleted($page);
-                        $postService->anonymizeUniqueSlugWhenDeleted($page);                                
-                    } 
+                        $postService->anonymizeUniqueSlugWhenDeleted($page);
+                    }
                 ),
         ];
     }
 
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
+    // protected function getRedirectUrl(): string
+    // {
+    //     return $this->getResource()::getUrl('index');
+    // }
 }

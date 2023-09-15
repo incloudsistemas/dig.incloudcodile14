@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('cms_pages', function (Blueprint $table) {
             $table->id();
-            // Auto relacionamento - Sub página - Ref. página pai
+            // Auto relacionamento - Sub página - Ref. página parental/pai
             $table->foreignId('page_id')->nullable()->default(null);
             $table->foreign('page_id')
                 ->references('id')
@@ -42,12 +42,12 @@ return new class extends Migration
             // Permitir comentário? 1 - sim, 0 - não
             $table->boolean('comment')->default(0);
             // Data da publicação
-            $table->timestamp('publish_at')->default(date('Y-m-d H:i:s'));
+            $table->timestamp('publish_at')->default(now());
             // Data de expiração
             $table->timestamp('expiration_at')->nullable();
             // Configurações da página
-            $table->json('settings')->nullable();              
-            $table->timestamps();          
+            $table->json('settings')->nullable();
+            $table->timestamps();
             $table->softDeletes();
         });
     }

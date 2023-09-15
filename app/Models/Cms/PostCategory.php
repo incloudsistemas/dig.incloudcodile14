@@ -22,7 +22,6 @@ class PostCategory extends Model
     protected $fillable = [
         'name',
         'slug',
-        'order',
         'status'
     ];
 
@@ -34,9 +33,9 @@ class PostCategory extends Model
     public function cmsPosts(): BelongsToMany
     {
         return $this->belongsToMany(
-            related: Post::class, 
-            table: 'cms_post_has_categories', 
-            foreignPivotKey: 'category_id', 
+            related: Post::class,
+            table: 'cms_post_has_categories',
+            foreignPivotKey: 'category_id',
             relatedPivotKey: 'post_id'
         );
     }
@@ -45,7 +44,7 @@ class PostCategory extends Model
      * SCOPES.
      *
      */
-    
+
     public function scopeByStatuses(Builder $query, array $statuses = [1,]): Builder
     {
         return $query->whereIn('status', $statuses);
@@ -60,12 +59,12 @@ class PostCategory extends Model
      * CUSTOMS.
      *
      */
- 
+
      public function getDisplayStatusAttribute(): string
      {
          return DefaultStatus::getDescription(value: (int) $this->status);
      }
- 
+
      public function getDisplayStatusColorAttribute(): string
      {
          return DefaultStatus::getColorByValue(status: (int) $this->status);

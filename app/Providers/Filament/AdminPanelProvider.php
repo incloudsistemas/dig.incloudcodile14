@@ -53,9 +53,11 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(url: asset('images/filament/favicon.ico'))
             ->navigationGroups([
                 NavigationGroup::make()
+                     ->label('Shop'),
+                NavigationGroup::make()
                      ->label('CMS & Marketing'),
                 NavigationGroup::make()
-                     ->label('Sistema'),                
+                     ->label('Sistema'),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

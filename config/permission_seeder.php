@@ -36,6 +36,10 @@ return [
             // '[Cms] Membros da Equipe'     => 'c,r,u,d',
             '[Cms] Sliders'                  => 'c,r,u,d',
             '[Cms] Categorias'               => 'c,r,u,d',
+
+            '[Shop] Produtos'   => 'c,r,u,d',
+            '[Shop] Categorias' => 'c,r,u,d',
+            '[Shop] Marcas'     => 'c,r,u,d',
         ],
     ],
 

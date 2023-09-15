@@ -22,7 +22,7 @@ class PermissionResource extends Resource
 
     protected static ?string $slug = 'permissions';
 
-    // protected static ?string $recordTitleAttribute = 'name';    
+    // protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $modelLabel = 'Permissão';
 

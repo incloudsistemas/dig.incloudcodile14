@@ -159,9 +159,9 @@ class RoleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRoles::route('/'),
+            'index'  => Pages\ListRoles::route('/'),
             'create' => Pages\CreateRole::route('/create'),
-            'edit' => Pages\EditRole::route('/{record}/edit'),
+            'edit'   => Pages\EditRole::route('/{record}/edit'),
         ];
     }
 
@@ -169,6 +169,6 @@ class RoleResource extends Resource
     {
         $user = auth()->user();
         return parent::getEloquentQuery()
-            ->byAuthUserRoles($user);
+            ->byAuthUserRoles(user: $user);
     }
 }
