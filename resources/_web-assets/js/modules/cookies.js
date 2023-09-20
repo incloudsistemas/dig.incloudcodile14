@@ -68,6 +68,8 @@ CNVS.Cookies = function() {
 
 				if( __core.cookie.get('__cnvs_cookies_accept') != '1' ) {
 					setTimeout( function() {
+						cookieBar.style.display = 'block';
+						cookieBar.style.pointerEvents = 'auto';
 						cookieBar.style[elDirection] = 0;
 						cookieBar.style.opacity = 1;
 					}, Number( elDelay ) );
@@ -86,6 +88,10 @@ CNVS.Cookies = function() {
 						if( cookieBar ) {
 							cookieBar.style[elDirection] = elSize + 'px';
 							cookieBar.style.opacity = 0;
+							cookieBar.ontransitionend = function() {
+								cookieBar.style.display = 'none';
+								cookieBar.style.pointerEvents = 'none';
+							};
 						}
 
 						__core.cookie.set('__cnvs_cookies_accept', '1', elExpire);
@@ -104,6 +110,10 @@ CNVS.Cookies = function() {
 						if( cookieBar ) {
 							cookieBar.style[elDirection] = elSize + 'px';
 							cookieBar.style.opacity = 0;
+							cookieBar.ontransitionend = function() {
+								cookieBar.style.display = 'none';
+								cookieBar.style.pointerEvents = 'none';
+							};
 						}
 
 						__core.cookie.set('__cnvs_cookies_accept', '0', elExpire);

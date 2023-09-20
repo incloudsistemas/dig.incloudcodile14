@@ -14,7 +14,7 @@ class BlogPost extends Model implements HasMedia
     use HasFactory, Postable;
 
     protected $table = 'cms_blog_posts';
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -29,11 +29,12 @@ class BlogPost extends Model implements HasMedia
         'body',
         'url',
         'embed_video',
+        'tags',
         'order',
         'featured',
         'comment',
         'publish_at',
-        'expiration_at', 
+        'expiration_at',
     ];
 
     /**
@@ -41,12 +42,28 @@ class BlogPost extends Model implements HasMedia
      *
      * @var array<string, string>
      */
-    protected $casts = [        
-        'featured' => 'boolean',
-        'comment' => 'boolean',
-        'publish_at' => DateTimeCast::class,
+    protected $casts = [
+        'tags'          => 'array',
+        'featured'      => 'boolean',
+        'comment'       => 'boolean',
+        'publish_at'    => DateTimeCast::class,
         'expiration_at' => DateTimeCast::class,
     ];
+
+    /**
+     * EVENT LISTENERS.
+     *
+     */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Self $post): void {
+            $post->slug = $post->slug . '//deleted_' . md5(uniqid());
+            $post->save();
+        });
+    }
 
     /**
      * SCOPES.
@@ -68,5 +85,5 @@ class BlogPost extends Model implements HasMedia
         return isset($this->role)
             ? BlogRole::getDescription(value: (int) $this->role)
             : null;
-    }    
+    }
 }

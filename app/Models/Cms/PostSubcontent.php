@@ -48,9 +48,9 @@ class PostSubcontent extends Model implements HasMedia
      * @var array<string, string>
      */
     protected $casts = [
-        'cta' => 'array',
-        'custom' => 'array',
-        'publish_at' => DateTimeCast::class,
+        'cta'           => 'array',
+        'custom'        => 'array',
+        'publish_at'    => DateTimeCast::class,
         'expiration_at' => DateTimeCast::class,
     ];
 

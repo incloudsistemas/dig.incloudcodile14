@@ -67,8 +67,7 @@ class PageResource extends Resource
                             )
                             ->dehydrated()
                             ->hidden(
-                                fn (Page $page, ?string $state): bool =>
-                                (empty($state) && !auth()->user()->can('Cadastrar [Cms] Páginas')) || $page->subpages->count() > 0
+                                fn (Page $page, ?string $state): bool => (empty($state) && !auth()->user()->can('Cadastrar [Cms] Páginas')) || $page->subpages->count() > 0
                             )
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('title')
@@ -246,14 +245,28 @@ class PageResource extends Resource
                 Forms\Components\Section::make(__('Infos. Complementares'))
                     ->description(__('Forneça informações adicionais relevantes sobre a página.'))
                     ->schema([
+                        Forms\Components\TagsInput::make('tags')
+                            ->label(__('Tags'))
+                            ->helperText(__('As tags são usadas para filtragem e busca. Uma postagem pode ter até 120 tags.'))
+                            ->nestedRecursiveRules([
+                                // 'min:1',
+                                'max:120',
+                            ])
+                            ->columnSpanFull(),
                         Forms\Components\Fieldset::make(__('Otimização para motores de busca (SEO)'))
                             ->relationship(name: 'cmsPost')
                             ->schema([
-                                Forms\Components\TextInput::make('meta_title')
-                                    ->label(__('Título SEO'))
-                                    ->helperText('55 - 60 caracteres')
-                                    ->minLength(2)
-                                    ->maxLength(60)
+                                Forms\Components\TagsInput::make('tags')
+                                    ->label(__('Tags'))
+                                    ->helperText(__('As tags são usadas para filtragem e busca. Uma página pode ter até 120 tags.'))
+                                    ->nestedRecursiveRules([
+                                        // 'min:1',
+                                        'max:120',
+                                    ])
+                                    ->hidden(
+                                        fn (callable $get): bool =>
+                                        !in_array('tags', $get('settings'))
+                                    )
                                     ->columnSpanFull(),
                                 Forms\Components\Textarea::make('meta_description')
                                     ->label(__('Descrição SEO'))
@@ -262,10 +275,10 @@ class PageResource extends Resource
                                     ->minLength(2)
                                     ->maxLength(155)
                                     ->columnSpanFull(),
-                                Forms\Components\TagsInput::make('meta_keywords')
-                                    ->label(__('Palavras chave'))
-                                    // ->separator(',')
-                                    ->columnSpanFull(),
+                                // Forms\Components\TagsInput::make('meta_keywords')
+                                //     ->label(__('Palavras chave'))
+                                //     // ->separator(',')
+                                //     ->columnSpanFull(),
                             ])
                             ->hidden(
                                 fn (callable $get): bool =>
@@ -369,6 +382,7 @@ class PageResource extends Resource
                     ->hidden(
                         fn (callable $get): bool =>
                         empty(array_intersect([
+                            'tags',
                             'seo',
                             'user_id',
                             'order',
@@ -458,29 +472,30 @@ class PageResource extends Resource
                         Forms\Components\CheckboxList::make('settings')
                             ->label('')
                             ->options([
-                                'categories' => 'Categorias',
-                                'subtitle' => 'Subtítulo',
-                                'excerpt' => 'Resumo',
-                                'body' => 'Conteúdo',
-                                'cta' => 'CTA',
-                                'url' => 'Url',
-                                'embed_video' => 'Youtube Vídeo',
-                                'video' => 'Vídeo',
-                                'image' => 'Imagem',
-                                'seo' => 'SEO',
-                                'user_id' => 'Autor',
-                                'order' => 'Ordem',
-                                'featured' => 'Destaque',
-                                'comment' => 'Comentário',
-                                'publish_at' => 'Data de publicação',
+                                'categories'    => 'Categorias',
+                                'subtitle'      => 'Subtítulo',
+                                'excerpt'       => 'Resumo',
+                                'body'          => 'Conteúdo',
+                                'cta'           => 'CTA',
+                                'url'           => 'Url',
+                                'embed_video'   => 'Youtube Vídeo',
+                                'video'         => 'Vídeo',
+                                'image'         => 'Imagem',
+                                'tags'          => 'Tags',
+                                'seo'           => 'SEO',
+                                'user_id'       => 'Autor',
+                                'order'         => 'Ordem',
+                                'featured'      => 'Destaque',
+                                'comment'       => 'Comentário',
+                                'publish_at'    => 'Data de publicação',
                                 'expiration_at' => 'Data de expiração',
-                                'status' => 'Status',
-                                'images' => 'Galeria de Imagens',
-                                'videos' => 'Galeria de Vídeos',
-                                'sliders' => 'Sliders',
-                                'tabs' => 'Abas',
-                                'accordions' => 'Acordeões',
-                                'attachments' => 'Anexos',
+                                'status'        => 'Status',
+                                'images'        => 'Galeria de Imagens',
+                                'videos'        => 'Galeria de Vídeos',
+                                'sliders'       => 'Sliders',
+                                'tabs'          => 'Abas',
+                                'accordions'    => 'Acordeões',
+                                'attachments'   => 'Anexos',
                             ])
                             ->searchable()
                             ->bulkToggleable()
@@ -540,6 +555,7 @@ class PageResource extends Resource
         return $table
             ->striped()
             ->columns(static::getTableColumns())
+            // ->reorderable('order')
             ->defaultSort(
                 fn (PostService $service, Builder $query): Builder =>
                 $service->tableDefaultSort(query: $query, publishAtDirection: 'asc')
@@ -552,13 +568,7 @@ class PageResource extends Resource
                         Tables\Actions\EditAction::make(),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make()
-                        ->after(
-                            function (PageService $service, PostService $postService, Page $page)  {
-                                $service->deleteSubpagesWhenDeleted($page);
-                                $postService->anonymizeUniqueSlugWhenDeleted($page);
-                            }
-                        ),
+                    Tables\Actions\DeleteAction::make(),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')
@@ -580,7 +590,7 @@ class PageResource extends Resource
             );
     }
 
-    public static function getTableColumns(): array
+    public static function getTableColumns(bool $subpages = false): array
     {
         return [
             Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
@@ -598,6 +608,7 @@ class PageResource extends Resource
                 ->searchable(),
             Tables\Columns\TextColumn::make('order')
                 ->label(__('Ordem'))
+                ->hidden($subpages)
                 ->sortable(),
             Tables\Columns\TextColumn::make('cmsPost.owner.name')
                 ->label(__('Autor'))

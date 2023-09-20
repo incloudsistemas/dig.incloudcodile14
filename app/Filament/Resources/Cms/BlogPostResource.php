@@ -241,6 +241,14 @@ class BlogPostResource extends Resource
                 Forms\Components\Section::make(__('Infos. Complementares'))
                     ->description(__('Forneça informações adicionais relevantes sobre a postagem.'))
                     ->schema([
+                        Forms\Components\TagsInput::make('tags')
+                            ->label(__('Tags'))
+                            ->helperText(__('As tags são usadas para filtragem e busca. Uma postagem pode ter até 120 tags.'))
+                            ->nestedRecursiveRules([
+                                // 'min:1',
+                                'max:120',
+                            ])
+                            ->columnSpanFull(),
                         Forms\Components\Fieldset::make(__('Otimização para motores de busca (SEO)'))
                             ->relationship(name: 'cmsPost')
                             ->schema([
@@ -257,10 +265,10 @@ class BlogPostResource extends Resource
                                     ->minLength(2)
                                     ->maxLength(155)
                                     ->columnSpanFull(),
-                                Forms\Components\TagsInput::make('meta_keywords')
-                                    ->label(__('Palavras chave'))
-                                    // ->separator(',')
-                                    ->columnSpanFull(),
+                                // Forms\Components\TagsInput::make('meta_keywords')
+                                //     ->label(__('Palavras chave'))
+                                //     // ->separator(',')
+                                //     ->columnSpanFull(),
                             ])
                             ->hidden(
                                 fn (callable $get): bool =>
@@ -447,6 +455,7 @@ class BlogPostResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            // ->reorderable('order')
             ->defaultSort(
                 fn (PostService $service, Builder $query): Builder =>
                 $service->tableDefaultSort(query: $query)
@@ -494,11 +503,7 @@ class BlogPostResource extends Resource
                         Tables\Actions\EditAction::make(),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make()
-                        ->after(
-                            fn (PostService $service, BlogPost $blog) =>
-                            $service->anonymizeUniqueSlugWhenDeleted($blog)
-                        ),
+                    Tables\Actions\DeleteAction::make(),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')

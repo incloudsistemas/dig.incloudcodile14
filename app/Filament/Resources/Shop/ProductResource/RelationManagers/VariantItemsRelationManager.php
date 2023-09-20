@@ -285,7 +285,7 @@ class VariantItemsRelationManager extends RelationManager
                     ),
             ])
             ->reorderable('order')
-            ->defaultSort(column: 'created_at', direction: 'asc')
+            ->defaultSort(column: 'order', direction: 'asc')
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->multiple()

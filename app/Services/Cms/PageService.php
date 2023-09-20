@@ -13,7 +13,7 @@ class PageService
         $this->postService = $postService;
     }
 
-    public function getMainPages(Builder $query, Page $page): Builder 
+    public function getMainPages(Builder $query, Page $page): Builder
     {
         return $query->whereNull('page_id')
             ->where('id', '<>', $page->id);

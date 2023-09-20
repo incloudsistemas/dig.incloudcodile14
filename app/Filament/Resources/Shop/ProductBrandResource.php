@@ -28,7 +28,7 @@ class ProductBrandResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Marcas / Fabricantes';
 
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'Loja';
 
     protected static ?int $navigationSort = 99;
 

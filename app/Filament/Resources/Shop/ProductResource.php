@@ -33,7 +33,7 @@ class ProductResource extends Resource
 
     protected static ?string $modelLabel = 'Produto';
 
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'Loja';
 
     protected static ?int $navigationSort = 1;
 
@@ -593,40 +593,43 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('productCategory.name')
                     ->label(__('Categoria'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('order')
-                    ->label(__('Ordem'))
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('cmsPost.display_status')
-                    ->label(__('Status'))
-                    ->badge()
-                    ->color(
-                        fn (string $state): string =>
-                        DefaultPostStatus::getColorByDescription(statusDesc: $state)
-                    )
-                    ->searchable(
-                        query: fn (PostService $service, Builder $query, string $search): Builder =>
-                        $service->tableSearchByStatus(query: $query, search: $search)
-                    )
-                    ->sortable(
-                        query: fn (PostService $service, Builder $query, string $direction): Builder =>
-                        $service->tableSortByStatus(postableType: 'shop_products', query: $query, direction: $direction)
-                    ),
-                Tables\Columns\TextColumn::make('publish_at')
-                    ->label(__('Publicação'))
-                    ->dateTime('d/m/Y H:i')
-                    ->searchable()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('productBrand.name')
+                    ->label(__('Marca / Fabricante'))
+                    ->searchable(),
+                // Tables\Columns\TextColumn::make('order')
+                //     ->label(__('Ordem'))
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('cmsPost.display_status')
+                //     ->label(__('Status'))
+                //     ->badge()
+                //     ->color(
+                //         fn (string $state): string =>
+                //         DefaultPostStatus::getColorByDescription(statusDesc: $state)
+                //     )
+                //     ->searchable(
+                //         query: fn (PostService $service, Builder $query, string $search): Builder =>
+                //         $service->tableSearchByStatus(query: $query, search: $search)
+                //     )
+                //     ->sortable(
+                //         query: fn (PostService $service, Builder $query, string $direction): Builder =>
+                //         $service->tableSortByStatus(postableType: 'shop_products', query: $query, direction: $direction)
+                //     ),
+                // Tables\Columns\TextColumn::make('publish_at')
+                //     ->label(__('Publicação'))
+                //     ->dateTime('d/m/Y H:i')
+                //     ->searchable()
+                //     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('Últ. atualização'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            // ->reorderable('order')
             ->defaultSort(
                 fn (PostService $service, Builder $query): Builder =>
                 $service->tableDefaultSort(query: $query)
@@ -637,19 +640,29 @@ class ProductResource extends Resource
                     ->relationship(
                         name: 'productCategory',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn (ProductCategoryService $service): Builder =>
-                        $service->forceScopeActiveStatus()
+                        modifyQueryUsing: fn (ProductCategoryService $service, Builder $query): Builder =>
+                        $service->getActiveCategories(query: $query)
                     )
                     ->multiple()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('status')
-                    ->label(__('Status'))
-                    ->options(DefaultPostStatus::asSelectArray())
-                    ->query(
-                        fn (PostService $service, Builder $query, array $data): Builder =>
-                        $service->tableFilterGetQueryByStatuses(query: $query, data: $data)
+                Tables\Filters\SelectFilter::make('productBrand')
+                    ->label(__('Marcas / Fabricantes'))
+                    ->relationship(
+                        name: 'productBrand',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (ProductBrandService $service, Builder $query): Builder =>
+                        $service->getActiveBrands(query: $query)
                     )
-                    ->multiple(),
+                    ->multiple()
+                    ->preload(),
+                // Tables\Filters\SelectFilter::make('status')
+                //     ->label(__('Status'))
+                //     ->options(DefaultPostStatus::asSelectArray())
+                //     ->query(
+                //         fn (PostService $service, Builder $query, array $data): Builder =>
+                //         $service->tableFilterGetQueryByStatuses(query: $query, data: $data)
+                //     )
+                //     ->multiple(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -684,11 +697,11 @@ class ProductResource extends Resource
                     ->label(__('Produto')),
                 Infolists\Components\TextEntry::make('slug')
                     ->label(__('Slug')),
-                Infolists\Components\TextEntry::make('cmsPost.display_status')
-                    ->label(__('Status')),
-                Infolists\Components\TextEntry::make('publish_at')
-                    ->label(__('Dt. publicação'))
-                    ->dateTime('d/m/Y H:i'),
+                // Infolists\Components\TextEntry::make('cmsPost.display_status')
+                //     ->label(__('Status')),
+                // Infolists\Components\TextEntry::make('publish_at')
+                //     ->label(__('Dt. publicação'))
+                //     ->dateTime('d/m/Y H:i'),
                 // Infolists\Components\TextEntry::make('expiration_at')
                 //     ->label(__('Dt. expiração'))
                 //     ->dateTime('d/m/Y H:i'),

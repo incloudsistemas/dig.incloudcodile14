@@ -4,15 +4,11 @@ namespace App\Providers\Filament;
 
 use App\Filament\AvatarProviders\BoringAvatarsProvider;
 use App\Filament\Pages\Auth\EditProfile;
-use App\Filament\Resources\Categories\CategoryResource;
-use App\Filament\Resources\Categories\CmsPostCategoryResource;
-use App\Models\Category;
+use App\Filament\Resources\Cms;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-use Filament\Navigation\NavigationBuilder;
-use Filament\Navigation\NavigationGroup;
+use Filament\Navigation;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -38,12 +34,12 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile(EditProfile::class)
             ->userMenuItems([
-                'profile' => MenuItem::make()->label('Meu Perfil'),
-                MenuItem::make()
-                ->label('Website')
-                ->url('/')
-                ->icon('heroicon-o-globe-alt'),
-                'logout' => MenuItem::make()->label('Sair'),
+                'profile' => Navigation\MenuItem::make()->label('Meu Perfil'),
+                Navigation\MenuItem::make()
+                    ->label('Website')
+                    ->url('/')
+                    ->icon('heroicon-o-globe-alt'),
+                'logout' => Navigation\MenuItem::make()->label('Sair'),
             ])
             // ->defaultAvatarProvider(BoringAvatarsProvider::class)
             ->colors([
@@ -52,13 +48,31 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->favicon(url: asset('images/filament/favicon.ico'))
             ->navigationGroups([
-                NavigationGroup::make()
-                     ->label('Shop'),
-                NavigationGroup::make()
-                     ->label('CMS & Marketing'),
-                NavigationGroup::make()
-                     ->label('Sistema'),
+                Navigation\NavigationGroup::make()
+                    ->label('Shop'),
+                Navigation\NavigationGroup::make()
+                    ->label('CMS & Marketing'),
+                Navigation\NavigationGroup::make()
+                    ->label('Sistema'),
             ])
+            // ->navigationItems([
+            //     NavigationItem::make('cms.products')
+            //         ->label(fn (): string => Cms\ProductResource::getNavigationLabel())
+            //         ->group(fn (): string => Cms\ProductResource::getNavigationGroup())
+            //         ->sort(fn (): string => Cms\ProductResource::getNavigationSort())
+            //         ->icon(fn (): string => Cms\ProductResource::getNavigationIcon())
+            //         ->url(fn (): string => Cms\ProductResource::getUrl())
+            //         ->isActiveWhen(fn () => request()->routeIs('filament.i2c-admin.resources.cms.products.index'))
+            //         ->visible(fn(): bool => auth()->user()->can('Visualizar [Cms] Produtos')),
+            //     NavigationItem::make('cms.services')
+            //         ->label(fn (): string => Cms\ServiceResource::getNavigationLabel())
+            //         ->group(fn (): string => Cms\ServiceResource::getNavigationGroup())
+            //         ->sort(fn (): string => Cms\ServiceResource::getNavigationSort())
+            //         ->icon(fn (): string => Cms\ServiceResource::getNavigationIcon())
+            //         ->url(fn (): string => Cms\ServiceResource::getUrl())
+            //         ->isActiveWhen(fn () => request()->routeIs('filament.i2c-admin.resources.cms.services.index'))
+            //         ->visible(fn(): bool => auth()->user()->can('Visualizar [Cms] Serviços')),
+            // ])
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -68,8 +82,12 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
+            ->renderHook(
+                'panels::body.end',
+                fn () => view('vendor.filament-panels.components.footer'),
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

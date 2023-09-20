@@ -31,11 +31,12 @@ class Page extends Model implements HasMedia
         'cta',
         'url',
         'embed_video',
+        'tags',
         'order',
         'featured',
         'comment',
         'publish_at',
-        'expiration_at',        
+        'expiration_at',
         'settings'
     ];
 
@@ -45,12 +46,13 @@ class Page extends Model implements HasMedia
      * @var array<string, string>
      */
     protected $casts = [
-        'cta' => 'array',
-        'featured' => 'boolean',
-        'comment' => 'boolean',
-        'publish_at' => DateTimeCast::class,
+        'cta'           => 'array',
+        'tags'          => 'array',
+        'featured'      => 'boolean',
+        'comment'       => 'boolean',
+        'publish_at'    => DateTimeCast::class,
         'expiration_at' => DateTimeCast::class,
-        'settings' => 'array',
+        'settings'      => 'array',
     ];
 
     /**
@@ -71,6 +73,25 @@ class Page extends Model implements HasMedia
     public function subpages(): HasMany
     {
         return $this->hasMany(related: Self::class, foreignKey: 'page_id');
+    }
+
+    /**
+     * EVENT LISTENERS.
+     *
+     */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Self $post): void {
+            $post->slug = $post->slug . '//deleted_' . md5(uniqid());
+            $post->save();
+
+            foreach ($post->subpages as $subpage) {
+                $subpage->delete();
+            }
+        });
     }
 
     /**

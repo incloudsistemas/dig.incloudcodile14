@@ -36,7 +36,7 @@ CNVS.Menus = function() {
 					});
 				});
 
-				onClickMenuCurrent.forEach( function(current) {
+				onClickMenuCurrent?.forEach( function(current) {
 					current.classList.add('current');
 				});
 			}
@@ -54,7 +54,7 @@ CNVS.Menus = function() {
 					});
 				});
 
-				onClickTopMenuCurrent.forEach( function(current) {
+				onClickTopMenuCurrent?.forEach( function(current) {
 					current.classList.add('current');
 				});
 			}
@@ -241,7 +241,7 @@ CNVS.Menus = function() {
 				pMenu.querySelectorAll(subMenuSel).forEach( function(item){
 					var _t;
 
-					item.addEventListener('mouseover', function() {
+					item.addEventListener('mouseenter', function() {
 						clearTimeout(_t);
 						item.classList.add('menu-item-hover');
 					}, false);

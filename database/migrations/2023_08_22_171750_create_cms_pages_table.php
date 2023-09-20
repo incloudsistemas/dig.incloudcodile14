@@ -35,6 +35,8 @@ return new class extends Migration
             $table->string('url')->nullable();
             // Vídeo destaque (embed)
             $table->string('embed_video')->nullable();
+            // Tags
+            $table->json('tags')->nullable();
             // Ordem
             $table->integer('order')->unsigned()->default(1);
             // Em destaque? 1 - sim, 0 - não

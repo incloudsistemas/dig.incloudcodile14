@@ -120,10 +120,4 @@ class PostService
             return $query->whereIn('status', $data['values']);
         });
     }
-
-    public function anonymizeUniqueSlugWhenDeleted(Model $record): void
-    {
-        $record->slug = $record->slug . '//deleted_' . md5(uniqid());
-        $record->save();
-    }
 }

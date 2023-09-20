@@ -245,9 +245,9 @@ class PostSliderService
                         query: fn (PostSliderService $service, Builder $query, string $direction): Builder =>
                         $service->tableSortByRole(query: $query, direction: $direction)
                     ),
-                Tables\Columns\TextColumn::make('order')
-                    ->label(__('Ordem'))
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('order')
+                //     ->label(__('Ordem'))
+                //     ->sortable(),
                 Tables\Columns\TextColumn::make('display_status')
                     ->label(__('Status'))
                     ->badge()
@@ -280,6 +280,10 @@ class PostSliderService
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->reorderable('order')
+            ->defaultSort(
+                fn (PostSliderService $service, Builder $query): Builder =>
+                $service->tableDefaultSort(query: $query, orderDirection: 'asc', publishAtDirection: 'asc')
+            )
             ->filters([
                 Tables\Filters\SelectFilter::make('role')
                     ->label(__('Tipo'))
@@ -422,4 +426,11 @@ class PostSliderService
 
         return $query->orderByRaw("$orderByCase $direction", $bindings);
     }
+
+    public function tableDefaultSort(Builder $query, string $orderDirection = 'desc', string $publishAtDirection = 'desc'): Builder
+    {
+        return $query->orderBy('order', $orderDirection)
+            ->orderBy('publish_at', $publishAtDirection);
+    }
+
 }

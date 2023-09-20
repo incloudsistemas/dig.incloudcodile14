@@ -19,6 +19,11 @@ class ProductCategoryService
             ->where('id', '<>', $category->id);
     }
 
+    public function getActiveCategories(Builder $query): Builder
+    {
+        return $query->byStatuses(statuses: [1,]); // 1 - active
+    }
+
     public function getCategoriesWithSubcategories(Builder $query): Builder
     {
         return $query->byStatuses(statuses: [1,]) // 1 - active

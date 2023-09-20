@@ -124,7 +124,7 @@ CNVS.HoverAnimations = function() {
 					elReset: elReset,
 				}
 
-				elParent.addEventListener( 'mouseover', function(){
+				elParent.addEventListener( 'mouseenter', function(){
 					_showOverlay(params);
 				}, false);
 

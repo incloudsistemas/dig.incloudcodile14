@@ -104,7 +104,7 @@ class Product extends Model implements HasMedia
     {
         parent::boot();
 
-        static::deleting(function (Product $product): void {
+        static::deleting(function (Self $product): void {
             $product->slug = $product->slug . '//deleted_' . md5(uniqid());
             $product->save();
 

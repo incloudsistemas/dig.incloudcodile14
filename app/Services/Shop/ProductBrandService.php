@@ -13,6 +13,11 @@ class ProductBrandService
         $this->brand = $brand;
     }
 
+    public function getActiveBrands(Builder $query): Builder
+    {
+        return $query->byStatuses(statuses: [1,]); // 1 - active
+    }
+
     public function forceScopeActiveStatus(): Builder
     {
         return $this->brand->byStatuses(statuses: [1,]); // 1 - active

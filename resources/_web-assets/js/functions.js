@@ -83,6 +83,10 @@ if( typeof jQuery !== 'undefined' ) {
 			var value = this.elBody.getAttribute('data-tips') || options.tips;
 			return value == 'true' || value === true ? true : false;
 		},
+		get smoothScroll() {
+			var value = this.elBody.getAttribute('data-smooth-scroll') || options.smoothScroll;
+			return value == 'true' || value === true ? true : false;
+		},
 		get isRTL() {
 			return this.elRoot.getAttribute('dir') == 'rtl' ? true : false;
 		},
@@ -273,6 +277,7 @@ if( typeof jQuery !== 'undefined' ) {
 
 				document.documentElement.style.setProperty('--cnvs-viewport-width', viewport.width);
 				document.documentElement.style.setProperty('--cnvs-viewport-height', viewport.height);
+				document.documentElement.style.setProperty('--cnvs-body-height', vars.elBody.clientHeight);
 
 				return viewport;
 			},
@@ -448,8 +453,8 @@ if( typeof jQuery !== 'undefined' ) {
 
 			offset: function(el) {
 				var rect = el.getBoundingClientRect(),
-					scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
-					scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+					scrollLeft = window.scrollX || document.documentElement.scrollLeft,
+					scrollTop = window.scrollY || document.documentElement.scrollTop;
 
 				return {top: rect.top + scrollTop, left: rect.left + scrollLeft};
 			},
@@ -1237,7 +1242,7 @@ if( typeof jQuery !== 'undefined' ) {
 				Core.runModules();
 				Core.topScrollOffset();
 
-				if( options.smoothScroll ) {
+				if( vars.smoothScroll ) {
 					new Core.smoothScroll();
 				}
 

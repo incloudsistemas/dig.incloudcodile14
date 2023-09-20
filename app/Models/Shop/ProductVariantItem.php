@@ -90,7 +90,7 @@ class ProductVariantItem extends Model implements HasMedia
     {
         parent::boot();
 
-        static::deleting(function (ProductVariantItem $variantItem): void {
+        static::deleting(function (Self $variantItem): void {
             $variantItem->sku = $variantItem->sku . '//deleted_' . md5(uniqid());
             $variantItem->barcode = $variantItem->barcode . '//deleted_' . md5(uniqid());
             $variantItem->save();

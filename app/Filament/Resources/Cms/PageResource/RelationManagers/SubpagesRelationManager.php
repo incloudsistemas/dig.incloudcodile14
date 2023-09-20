@@ -31,7 +31,7 @@ class SubpagesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('title')
             ->striped()
-            ->columns(PageResource::getTableColumns())
+            ->columns(PageResource::getTableColumns(subpages: true))
             ->reorderable('order')
             ->defaultSort(
                 fn (PostService $service, Builder $query): Builder =>
@@ -64,11 +64,7 @@ class SubpagesRelationManager extends RelationManager
                             ),
                     ])
                         ->dropdown(false),
-                    Tables\Actions\DeleteAction::make()
-                        ->after(
-                            fn (PostService $service, Page $page) =>
-                            $service->anonymizeUniqueSlugWhenDeleted($page)
-                        ),
+                    Tables\Actions\DeleteAction::make(),
                 ])
                     ->label(__('Ações'))
                     ->icon('heroicon-m-chevron-down')

@@ -16,13 +16,7 @@ class EditPage extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()
-                ->after(
-                    function (PageService $service, PostService $postService, Page $page)  {
-                        $service->deleteSubpagesWhenDeleted($page);
-                        $postService->anonymizeUniqueSlugWhenDeleted($page);
-                    }
-                ),
+            Actions\DeleteAction::make(),
         ];
     }
 

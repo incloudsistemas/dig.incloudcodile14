@@ -1,6 +1,5 @@
 CNVS.LazyLoad = function() {
 	var __core = SEMICOLON.Core;
-	var __modules = SEMICOLON.Modules;
 
 	return {
 		init: function(selector) {
@@ -30,7 +29,6 @@ CNVS.LazyLoad = function() {
 						if( el.parentNode.getAttribute('data-lazy-container') == 'true' ) {
 							__core.runContainerModules( el.parentNode );
 						}
-						__modules.parallax();
 					}
 				});
 			});

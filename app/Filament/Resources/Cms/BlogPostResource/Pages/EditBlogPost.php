@@ -15,11 +15,7 @@ class EditBlogPost extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()
-                ->after(
-                    fn (PostService $service, BlogPost $blog) =>
-                    $service->anonymizeUniqueSlugWhenDeleted($blog)
-                ),
+            Actions\DeleteAction::make(),
         ];
     }
 
