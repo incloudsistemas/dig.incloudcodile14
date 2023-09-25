@@ -6,6 +6,7 @@
 /public/js/web
 /public/images/web
 /resources/web-assets
+/resources/js/web/plugins
 /resources/views/web
 /storage/*.key
 /vendor
