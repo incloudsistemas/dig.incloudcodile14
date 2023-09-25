@@ -10,8 +10,9 @@
     ============================================= -->
     <section id="content">
         <div class="content-wrap">
-            <div class="container">
-
+            <div class="section m-0 header-stick footer-stick">
+                <div class="container">
+                </div>
             </div>
         </div>
     </section>

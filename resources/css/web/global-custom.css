@@ -1,0 +1,58 @@
+/* ----------------------------------------------------------------
+	Global Custom CSS
+
+	Add all your Custom Styled CSS here for New Styles or
+	Overwriting Default Theme Styles for Better Handling Updates
+-----------------------------------------------------------------*/
+
+/* Extra small devices (phones, 600px and down) */
+/* @media only screen and (max-width: 600px) {...} */
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+/* @media only screen and (min-width: 600px) {...} */
+
+/* Medium devices (landscape tablets, 768px and up) */
+/* @media only screen and (min-width: 768px) {...} */
+
+/* Large devices (laptops/desktops, 992px and up) */
+/* @media only screen and (min-width: 992px) {...} */
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+/* @media only screen and (min-width: 1200px) {...} */
+
+.custom-link {
+    cursor: pointer !important;
+}
+
+/* FORM
+-----------------------------------------------------------------*/
+
+.indicator-progress {
+    display: none;
+}
+
+.was-validated .form-control:valid,
+.form-control.is-valid {
+    background-image: none;
+}
+
+/* FORM ERRORS */
+.fv-plugins-message-container {
+    font-size: 12px;
+}
+
+/* SWAL2
+-----------------------------------------------------------------*/
+
+h2.swal2-title {
+    font-size: 1.3em;
+}
+
+#swal2-html-container {
+    font-size: 16px;
+    margin: 0.5em 1.6em 0.3em;
+}
+
+.swal2-actions {
+    margin: 0.8em auto 0 !important;
+}

@@ -32,11 +32,26 @@ class DefaultPageController extends Controller
         return view('web.pages.about', compact('page'));
     }
 
+    public function photos()
+    {
+        $page = $this->getPage(slug: 'fotos');
+        $this->generateSEOAttribute($page);
+
+        return view('web.pages.photos', compact('page'));
+    }
+
+    public function videos()
+    {
+        $page = $this->getPage(slug: 'videos');
+        $this->generateSEOAttribute($page);
+
+        return view('web.pages.videos', compact('page'));
+    }
+
     public function contactUs()
     {
-        $page = null;
-        // $page = $this->getPage('contato');
-        // $this->generateSEOAttribute($page);
+        $page = $this->getPage('fale-conosco');
+        $this->generateSEOAttribute($page);
 
         return view('web.pages.contact-us', compact('page'));
     }
@@ -47,9 +62,8 @@ class DefaultPageController extends Controller
             abort(404);
         }
 
-        $page = null;
-        // $page = $this->getPage($slug);
-        // $this->generateSEOAttribute($page);
+        $page = $this->getPage($slug);
+        $this->generateSEOAttribute($page);
 
         return view('web.pages.rules', compact('page'));
     }

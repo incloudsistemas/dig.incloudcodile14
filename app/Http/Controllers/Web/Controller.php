@@ -33,7 +33,7 @@ class Controller extends BaseController
             'twitter'        => null,
             'twitter_link'   => null,
             'linkedin'       => null,
-            'linkedin_link'  => null,
+            'linkedin_link'  => 'https://www.linkedin.com/company/2385527/',
             'youtube'        => null,
             'youtube_link'   => null,
             'gmaps_link'     => 'https://goo.gl/maps/TVudpDggzXHiJUZA7',
@@ -68,10 +68,10 @@ class Controller extends BaseController
 
     protected function generateSEOAttribute(Model $page, string $type = 'website'): void
     {
-        $title = $page->meta_title ?? $page->title ?? $page->name ?? config('app.name', 'InCloud digital');
+        $title = $page->cmsPost->meta_title ?? $page->title ?? $page->name ?? config('app.name', 'InCloud digital');
         SEOTools::setTitle(strip_tags($title));
 
-        $description = $page->meta_description ?? $page->excerpt ?? $page->subtitle ?? $title;
+        $description = $page->cmsPost->meta_description ?? $page->excerpt ?? $page->subtitle ?? $title;
         SEOTools::setDescription(strip_tags($description));
 
         SEOTools::opengraph()->setUrl(URL::current());

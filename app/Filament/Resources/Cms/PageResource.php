@@ -252,21 +252,19 @@ class PageResource extends Resource
                                 // 'min:1',
                                 'max:120',
                             ])
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('tags', $get('settings'))
+                            )
                             ->columnSpanFull(),
                         Forms\Components\Fieldset::make(__('Otimização para motores de busca (SEO)'))
                             ->relationship(name: 'cmsPost')
                             ->schema([
-                                Forms\Components\TagsInput::make('tags')
-                                    ->label(__('Tags'))
-                                    ->helperText(__('As tags são usadas para filtragem e busca. Uma página pode ter até 120 tags.'))
-                                    ->nestedRecursiveRules([
-                                        // 'min:1',
-                                        'max:120',
-                                    ])
-                                    ->hidden(
-                                        fn (callable $get): bool =>
-                                        !in_array('tags', $get('settings'))
-                                    )
+                                Forms\Components\TextInput::make('meta_title')
+                                    ->label(__('Título SEO'))
+                                    ->helperText('55 - 60 caracteres')
+                                    ->minLength(2)
+                                    ->maxLength(60)
                                     ->columnSpanFull(),
                                 Forms\Components\Textarea::make('meta_description')
                                     ->label(__('Descrição SEO'))

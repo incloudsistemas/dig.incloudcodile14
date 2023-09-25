@@ -123,7 +123,7 @@ trait Postable
         string $publishAtDirection = 'desc'
     ): Builder {
         return $this->newQuery()
-            ->with(['cmsPost', 'cmsPost.owner', 'cmsPost.categories'])
+            ->with(['cmsPost', 'cmsPost.owner'])
             ->whereHas('cmsPost', fn (Builder $query): Builder => $query->whereIn('status', $statuses))
             ->where('publish_at', '<=', now())
             ->where(fn (Builder $query): Builder => $query->where('expiration_at', '>', now())
