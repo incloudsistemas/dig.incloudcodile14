@@ -89,6 +89,7 @@ class PartnerResource extends Resource
                     ->imageResizeMode('contain')
                     ->imageResizeTargetWidth('1920')
                     ->imageResizeTargetHeight('1080')
+                    ->imageResizeUpscale(false)
                     ->required()
                     ->maxSize(5120)
                     ->downloadable(),

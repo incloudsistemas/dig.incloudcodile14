@@ -194,6 +194,38 @@ class PageResource extends Resource
                                 !in_array('url', $get('settings'))
                             )
                             ->columnSpanFull(),
+                        Forms\Components\Group::make()
+                            ->relationship(name: 'cmsPost')
+                            ->schema([
+                                Forms\Components\Repeater::make('custom.embed_instagram')
+                                    ->label(__('Incorporar postagens do Instagram'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('cod_url')
+                                            ->label(__('IG. post'))
+                                            ->prefix('.../p/')
+                                            ->helperText(new HtmlString('https://Instagram.com/p/<span class="font-bold">CxbhiTzLiBx</span>'))
+                                            ->required()
+                                            ->maxLength(255),
+                                    ])
+                                    ->addActionLabel(__('Adicionar reel'))
+                                    ->defaultItems(1)
+                                    ->reorderableWithButtons()
+                                    ->collapsible()
+                                    ->collapseAllAction(
+                                        fn (Forms\Components\Actions\Action $action) =>
+                                        $action->label(__('Minimizar todos'))
+                                    )
+                                    ->deleteAction(
+                                        fn (Forms\Components\Actions\Action $action) =>
+                                        $action->requiresConfirmation()
+                                    )
+                                    ->grid(2),
+                            ])
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('embed_reels', $get('settings'))
+                            )
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('embed_video')
                             ->label(__('Youtube vídeo'))
                             ->prefix('.../watch?v=')
@@ -233,6 +265,7 @@ class PageResource extends Resource
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth('1920')
                             ->imageResizeTargetHeight('1080')
+                            ->imageResizeUpscale(false)
                             ->maxSize(5120)
                             ->downloadable()
                             ->hidden(
@@ -241,6 +274,79 @@ class PageResource extends Resource
                             ),
                     ])
                     ->columns(2)
+                    ->collapsible(),
+                Forms\Components\Section::make(
+                    function (callable $get): string {
+                        $hasImages = in_array('images', $get('settings'));
+                        $hasVideos = in_array('videos', $get('settings'));
+                        return ($hasImages && $hasVideos)
+                            ? __('Galeria de Imagens e Vídeos')
+                            : ($hasImages
+                                ? __('Galeria de Imagens')
+                                : __('Galeria de Vídeos')
+                            );
+                    }
+                )
+                    ->description(
+                        function (callable $get): string {
+                            $hasImages = in_array('images', $get('settings'));
+                            $hasVideos = in_array('videos', $get('settings'));
+                            return ($hasImages && $hasVideos)
+                                ? __('Adicione e gerencie as imagens e vídeos da página.')
+                                : ($hasImages
+                                    ? __('Adicione e gerencie as imagens da página.')
+                                    : __('Adicione e gerencie os vídeos da página.')
+                                );
+                        }
+                    )
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            ->label(__('Upload das imagens'))
+                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
+                            ->collection('images')
+                            ->image()
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->responsiveImages()
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('1080')
+                            ->imageResizeUpscale(false)
+                            ->maxSize(5120)
+                            ->downloadable()
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('images', $get('settings'))
+                            ),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
+                            ->label(__('Upload dos vídeos'))
+                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
+                            ->collection('videos')
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend($get('slug')),
+                            )
+                            ->multiple()
+                            ->acceptedFileTypes(['video/mp4'])
+                            ->maxSize(25600)
+                            ->downloadable()
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !in_array('videos', $get('settings'))
+                            ),
+                    ])
+                    ->columns(2)
+                    ->hidden(
+                        fn (callable $get): bool =>
+                        empty(array_intersect(['images', 'videos'], $get('settings') ?? []))
+                    )
                     ->collapsible(),
                 Forms\Components\Section::make(__('Infos. Complementares'))
                     ->description(__('Forneça informações adicionais relevantes sobre a página.'))
@@ -392,108 +498,38 @@ class PageResource extends Resource
                     )
                     ->columns(2)
                     ->collapsible(),
-                Forms\Components\Section::make(
-                    function (callable $get): string {
-                        $hasImages = in_array('images', $get('settings'));
-                        $hasVideos = in_array('videos', $get('settings'));
-                        return ($hasImages && $hasVideos)
-                            ? __('Galeria de Imagens e Vídeos')
-                            : ($hasImages
-                                ? __('Galeria de Imagens')
-                                : __('Galeria de Vídeos')
-                            );
-                    }
-                )
-                    ->description(
-                        function (callable $get): string {
-                            $hasImages = in_array('images', $get('settings'));
-                            $hasVideos = in_array('videos', $get('settings'));
-                            return ($hasImages && $hasVideos)
-                                ? __('Adicione e gerencie as imagens e vídeos da página.')
-                                : ($hasImages
-                                    ? __('Adicione e gerencie as imagens da página.')
-                                    : __('Adicione e gerencie os vídeos da página.')
-                                );
-                        }
-                    )
-                    ->schema([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                            ->label(__('Upload das imagens'))
-                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
-                            ->collection('images')
-                            ->image()
-                            ->multiple()
-                            ->reorderable()
-                            ->appendFiles()
-                            ->responsiveImages()
-                            ->getUploadedFileNameForStorageUsing(
-                                fn (TemporaryUploadedFile $file, callable $get): string =>
-                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
-                                    ->prepend($get('slug')),
-                            )
-                            ->imageResizeMode('contain')
-                            ->imageResizeTargetWidth('1920')
-                            ->imageResizeTargetHeight('1080')
-                            ->maxSize(5120)
-                            ->downloadable()
-                            ->hidden(
-                                fn (callable $get): bool =>
-                                !in_array('images', $get('settings'))
-                            ),
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
-                            ->label(__('Upload dos vídeos'))
-                            ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
-                            ->collection('videos')
-                            ->getUploadedFileNameForStorageUsing(
-                                fn (TemporaryUploadedFile $file, callable $get): string =>
-                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
-                                    ->prepend($get('slug')),
-                            )
-                            ->multiple()
-                            ->acceptedFileTypes(['video/mp4'])
-                            ->maxSize(25600)
-                            ->downloadable()
-                            ->hidden(
-                                fn (callable $get): bool =>
-                                !in_array('videos', $get('settings'))
-                            ),
-                    ])
-                    ->columns(2)
-                    ->hidden(
-                        fn (callable $get): bool =>
-                        empty(array_intersect(['images', 'videos'], $get('settings') ?? []))
-                    )
-                    ->collapsible(),
+
                 Forms\Components\Section::make(__('Configs. da página'))
                     ->description(__('Personalize a página com os campos desejados.'))
                     ->schema([
                         Forms\Components\CheckboxList::make('settings')
                             ->label('')
                             ->options([
-                                'categories'    => 'Categorias',
-                                'subtitle'      => 'Subtítulo',
-                                'excerpt'       => 'Resumo',
-                                'body'          => 'Conteúdo',
-                                'cta'           => 'CTA',
-                                'url'           => 'Url',
-                                'embed_video'   => 'Youtube Vídeo',
-                                'video'         => 'Vídeo',
-                                'image'         => 'Imagem',
-                                'tags'          => 'Tags',
-                                'seo'           => 'SEO',
-                                'user_id'       => 'Autor',
-                                'order'         => 'Ordem',
-                                'featured'      => 'Destaque',
-                                'comment'       => 'Comentário',
-                                'publish_at'    => 'Data de publicação',
-                                'expiration_at' => 'Data de expiração',
-                                'status'        => 'Status',
-                                'images'        => 'Galeria de Imagens',
-                                'videos'        => 'Galeria de Vídeos',
-                                'sliders'       => 'Sliders',
-                                'tabs'          => 'Abas',
-                                'accordions'    => 'Acordeões',
-                                'attachments'   => 'Anexos',
+                                'categories'     => 'Categorias',
+                                'subtitle'       => 'Subtítulo',
+                                'excerpt'        => 'Resumo',
+                                'body'           => 'Conteúdo',
+                                'cta'            => 'CTA',
+                                'url'            => 'Url',
+                                'embed_intagram' => 'Instagram posts',
+                                'embed_video'    => 'Youtube vídeo',
+                                'video'          => 'Vídeo',
+                                'image'          => 'Imagem',
+                                'images'         => 'Galeria de imagens',
+                                'videos'         => 'Galeria de vídeos',
+                                'tags'           => 'Tags',
+                                'seo'            => 'SEO',
+                                'user_id'        => 'Autor',
+                                'order'          => 'Ordem',
+                                'featured'       => 'Destaque',
+                                'comment'        => 'Comentário',
+                                'publish_at'     => 'Data de publicação',
+                                'expiration_at'  => 'Data de expiração',
+                                'status'         => 'Status',
+                                'sliders'        => 'Sliders',
+                                'tabs'           => 'Abas',
+                                'accordions'     => 'Acordeões',
+                                'attachments'    => 'Anexos',
                             ])
                             ->searchable()
                             ->bulkToggleable()

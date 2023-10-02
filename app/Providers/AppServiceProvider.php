@@ -12,7 +12,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // // Create storage folder
+        // // utilizar apenas no ambiente de produção em host compartilhado.
+        // if (!file_exists('storage')) {
+
+        //     \App::make('files')->link(storage_path('app/public'), 'storage');
+        // }
+
+        // // Public Path
+        // // utilizar apenas no ambiente de produção em host compartilhado.
+        // app()->usePublicPath(realpath(base_path() . '/..'));
     }
 
     /**

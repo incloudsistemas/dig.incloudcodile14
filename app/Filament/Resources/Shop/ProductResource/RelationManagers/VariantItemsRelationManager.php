@@ -196,6 +196,7 @@ class VariantItemsRelationManager extends RelationManager
                     ->imageResizeMode('contain')
                     ->imageResizeTargetWidth('1920')
                     ->imageResizeTargetHeight('1080')
+                    ->imageResizeUpscale(false)
                     ->maxSize(5120)
                     ->downloadable(),
                 // Forms\Components\Fieldset::make(__('Galeria de Imagens e Vídeos'))
@@ -217,6 +218,7 @@ class VariantItemsRelationManager extends RelationManager
                 //             ->imageResizeMode('contain')
                 //             ->imageResizeTargetWidth('1920')
                 //             ->imageResizeTargetHeight('1080')
+                //             ->imageResizeUpscale(false)
                 //             ->maxSize(5120)
                 //             ->downloadable(),
                 //         Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
@@ -335,6 +337,7 @@ class VariantItemsRelationManager extends RelationManager
                                 ->imageResizeMode('contain')
                                 ->imageResizeTargetWidth('1920')
                                 ->imageResizeTargetHeight('1080')
+                                ->imageResizeUpscale(false)
                                 ->maxSize(5120)
                                 ->downloadable()
                                 ->columnSpanFull(),

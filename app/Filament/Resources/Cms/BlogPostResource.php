@@ -191,6 +191,7 @@ class BlogPostResource extends Resource
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth('1920')
                             ->imageResizeTargetHeight('1080')
+                            ->imageResizeUpscale(false)
                             ->maxSize(5120)
                             ->downloadable(),
                     ])
@@ -216,6 +217,7 @@ class BlogPostResource extends Resource
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth('1920')
                             ->imageResizeTargetHeight('1080')
+                            ->imageResizeUpscale(false)
                             ->maxSize(5120)
                             ->downloadable(),
                         Forms\Components\SpatieMediaLibraryFileUpload::make('videos')

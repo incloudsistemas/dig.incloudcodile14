@@ -6,10 +6,13 @@ use App\Models\Cms\Post;
 use App\Models\Cms\PostSlider;
 use App\Models\Cms\PostSubcontent;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -102,6 +105,21 @@ trait Postable
             : 'Não';
     }
 
+    public function getFeaturedImageAttribute(): ?Media
+    {
+        $featuredImage = $this->getMedia('image')
+            ->first();
+
+        return $featuredImage ?? null;
+    }
+
+    public function getDisplayFeaturedImageAttribute(): string
+    {
+        return isset($this->featured_image)
+            ? $this->featured_image->getUrl()
+            : PlaceholderImg(width: 1920, height: 1080);
+    }
+
     /**
      * WEBSITE EXCLUSIVE.
      *
@@ -123,7 +141,11 @@ trait Postable
         string $publishAtDirection = 'desc'
     ): Builder {
         return $this->newQuery()
-            ->with(['cmsPost', 'cmsPost.owner'])
+            ->with([
+                'cmsPost',
+                'cmsPost.owner:id,name,email',
+                'media'
+            ])
             ->whereHas('cmsPost', fn (Builder $query): Builder => $query->whereIn('status', $statuses))
             ->where('publish_at', '<=', now())
             ->where(fn (Builder $query): Builder => $query->where('expiration_at', '>', now())

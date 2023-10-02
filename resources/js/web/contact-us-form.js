@@ -15,11 +15,11 @@ class ContactUsForm {
 
         this.initForm();
         this.handleFormSubmit();
-        this.handleRuleCheck();
     }
 
     initForm() {
         webCustom.initMasks();
+        webCustom.formRuleCheck(this.form);
     }
 
     handleFormSubmit() {
@@ -153,21 +153,6 @@ class ContactUsForm {
             if (result.isConfirmed) {
                 // make something, if necessary
             }
-        });
-    }
-
-    handleRuleCheck() {
-        const ruleCheck = this.form.querySelector('#ruleCheck');
-        const submitButton = this.form.querySelector('[data-form-action="submit"]');
-
-        if (!ruleCheck) {
-            return;
-        }
-
-        submitButton.disabled = true;
-
-        ruleCheck.addEventListener('change', function () {
-            submitButton.disabled = !this.checked;
         });
     }
 }

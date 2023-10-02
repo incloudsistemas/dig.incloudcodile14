@@ -8,6 +8,7 @@ use App\Traits\Cms\Postable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Testimonial extends Model implements HasMedia
 {
@@ -83,5 +84,20 @@ class Testimonial extends Model implements HasMedia
         return isset($this->role)
             ? TestimonialRole::getDescription(value: (int) $this->role)
             : null;
+    }
+
+    public function getCompanyLogoAttribute(): ?Media
+    {
+        $companyLogo = $this->getMedia('company-logo')
+            ->first();
+
+        return $companyLogo ?? null;
+    }
+
+    public function getDisplayCompanyLogoAttribute(): string
+    {
+        return isset($this->company_logo)
+            ? $this->company_logo->getUrl()
+            : PlaceholderImg(width: 1920, height: 1080);
     }
 }

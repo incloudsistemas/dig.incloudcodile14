@@ -60,3 +60,29 @@ Route::group(['prefix' => 'blog'], function () {
     Route::get('{slug}', [BlogPostController::class, 'show'])
         ->name('web.blog.show');
 });
+
+/*
+|--------------------------------------------------------------------------
+| CLEAR
+|--------------------------------------------------------------------------
+|
+*/
+
+Route::get('/app-clear', function () {
+    $optimizeClear = Artisan::call('optimize:clear');
+    echo "Optimize cache cleared! <br/>";
+    $cacheClear = Artisan::call('cache:clear');
+    echo "Application cache cleared! <br/>";
+    $clearCompiled = Artisan::call('clear-compiled');
+    echo "Compiled services and packages files removed! <br/>";
+    $routeClear = Artisan::call('route:clear');
+    echo "Route cache cleared! <br/>";
+    $viewClear = Artisan::call('view:clear');
+    echo "Compiled views cleared! <br/>";
+    $configClear = Artisan::call('config:clear');
+    echo "Configuration cache cleared! <br/>";
+    // $configCache = Artisan::call('config:cache');
+    // echo "Configuration cache cleared! <br/>";
+    // echo "Configuration cached successfully! <br/><br/>";
+    echo 'App cleared!';
+});

@@ -160,6 +160,7 @@ class UserResource extends Resource
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth('500')
                             ->imageResizeTargetHeight('500')
+                            ->imageResizeUpscale(false)
                             ->maxSize(5120),
                     ])
                     ->columns(2)

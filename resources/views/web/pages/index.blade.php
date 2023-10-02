@@ -6,301 +6,454 @@
 
 {{-- Content --}}
 @section('content')
+    <!-- Slider
+    ============================================= -->
+    <section id="slider" class="slider-element slider-parallax min-vh-100 include-header">
+        <div class="slider-inner">
+            <div class="row align-items-stretch text-center dark w-100 h-100 mx-0 position-absolute">
+                <div class="col-lg-6 px-0 dark videoplay-on-hover">
+                    <div class="vertical-middle text-center slider-element-fade mt-lg-5">
+                        <div class="container">
+                            <h2 class="mb-2 ls-1">
+                                {!! $subpages[0]->title !!}
+                            </h2>
+                            <p class="lead ls-1">
+                                <span class="bg-tertiary">
+                                    {!! $subpages[0]->excerpt !!}
+                                </span>
+                            </p>
+
+                            @if ($subpages[0]->cta)
+                                <a href="{{ $subpages[0]->cta['url'] }}"
+                                    target="{{ $subpages[0]->cta['target'] ?? '_blank' }}"
+                                    class="button button-white button-large button-shadow button-shadow-dark border border-width-2 border-dark rounded text-dark h-text-light">
+                                    <span>{!! $subpages[0]->cta['call'] ?? 'Saiba mais!' !!}</span>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="video-wrap no-placeholder">
+                        <video id="slide-video" class="lazy"
+                            data-poster="{{ $subpages[0]->getMedia('image')->first()->getUrl() }}" preload="auto"
+                            loop muted playsinline>
+                            {{-- <source class="lazy" data-src='{{ asset('web-build/images/marketing-digital.webm') }}'
+                                type='video/webm'> --}}
+                            <source class="lazy" data-src='{{ $subpages[0]->getMedia('video')->first()->getUrl() }}'
+                                type='video/mp4'>
+                        </video>
+                        <div class="video-overlay" style="background-color: rgba(var(--cnvs-quaternarycolor-rgb), 0.5);">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 px-0 dark videoplay-on-hover">
+                    <div class="vertical-middle text-center slider-element-fade mt-lg-5">
+                        <div class="container">
+                            <h2 class="mb-2 ls-1">
+                                {!! $subpages[1]->title !!}
+                            </h2>
+                            <p class="lead ls-1">
+                                <span class="bg-primary">
+                                    {!! $subpages[1]->excerpt !!}
+                                </span>
+                            </p>
+
+                            @if ($subpages[1]->cta)
+                                <a href="{{ $subpages[1]->cta['url'] }}"
+                                    target="{{ $subpages[1]->cta['target'] ?? '_blank' }}"
+                                    class="button button-white button-large button-shadow button-shadow-dark border border-width-2 border-dark rounded text-dark h-text-light">
+                                    <span>{!! $subpages[1]->cta['call'] ?? 'Saiba mais!' !!}</span>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="video-wrap no-placeholder">
+                        <video id="slide-video" class="lazy"
+                            data-poster="{{ $subpages[1]->getMedia('image')->first()->getUrl() }}" preload="auto"
+                            loop muted playsinline>
+                            {{-- <source class="lazy" data-src='{{ asset('web-build/images/marketing-digital.webm') }}'
+                                type='video/webm'> --}}
+                            <source class="lazy" data-src='{{ $subpages[1]->getMedia('video')->first()->getUrl() }}'
+                                type='video/mp4'>
+                        </video>
+                        <div class="video-overlay" style="background-color: rgba(var(--cnvs-secondarycolor-rgb), 0.8);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- #slider end -->
+
     <!-- Content
     ============================================= -->
     <section id="content">
         <div class="content-wrap">
-            <div class="section m-0 pb-0 header-stick">
-                <div class="container">
+            <div id="about" class="section dark m-0 header-stick lazy"
+                data-bg="{{ asset('web-build/images/incloud-background.jpg') }}"
+                style="background-position: center center; background-size: cover; background-repeat: no-repeat;">
+                <div class="container z-9">
                     <div class="heading-block text-center">
-                        <h2>
-                            {{ $page->title }}
+                        <h2 class="text-uppercase ls-1 px-5">
+                            {!! $subpages[2]->subtitle !!}
                         </h2>
                         <span class="ls-1">
-                            {{ $page->excerpt }}
+                            {!! $subpages[2]->excerpt !!}
                         </span>
                     </div>
 
-                    <div class="row col-mb-50">
-                        <div class="col-lg-6 text-center text-lg-start">
-                            <img class="lazy"
-                                data-src="{{ asset('images/web/paulo-victor-zanella.jpg') }}"
-                                alt="Paulo Zanella" data-animate="fadeInLeft">
-                        </div>
-
-                        <div class="col-lg-6">
-                            <h4>
-                                Vestibulum eleifend ex non quam dignissim.
-                            </h4>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec sapien tincidunt,
-                                feugiat mauris sit amet, dapibus felis. Nulla tempus est nulla, eu ullamcorper velit
-                                imperdiet sit amet. Quisque vel purus auctor, egestas mi nec, rhoncus turpis. Nulla non
-                                felis quis orci condimentum bibendum.
-                            </p>
-                            <p>
-                                Donec porta felis nec fringilla ornare. Suspendisse placerat leo dictum semper interdum.
-                                Mauris gravida a ligula euismod varius. Nunc laoreet tincidunt justo sed imperdiet. Aenean
-                                consequat tincidunt elit. Duis eget tempor tortor.
-                            </p>
-                            <p>
-                                Morbi sit amet iaculis est. Duis in lectus a dolor pretium lacinia. Aliquam nisl enim,
-                                scelerisque vitae pellentesque a, hendrerit faucibus lorem. Sed fermentum posuere dolor, sit
-                                amet molestie metus feugiat id. Ut iaculis tortor accumsan odio commodo eleifend. Nulla non
-                                justo nec urna luctus dignissim.
-                            </p>
+                    <div class="row">
+                        <div class="col-lg-10 ls-1 mx-auto">
+                            {!! $subpages[2]->body !!}
                         </div>
                     </div>
                 </div>
 
-                <div id="idx-carousel" class="owl-carousel image-carousel carousel-widget mt-3 mt-md-6" data-margin="2"
-                    data-nav="true" data-pagi="false" data-loop="true" data-autoplay="5000" data-stage-padding="90"
-                    data-slideby="2" data-items-xs="1" data-items-sm="1" data-items-md="2" data-items-lg="3"
-                    data-lazyload="true" data-animate="fadeInUp">
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/321680825_640491554535062_5798178862851451767_n.jpeg') }}"
-                            alt="Image 1">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/321718859_878952523288783_8954911764277244172_n.jpeg') }}"
-                            alt="Image 2">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/321868566_210572051346545_4647306259367905979_n.jpeg') }}"
-                            alt="Image 3">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/321920888_198234449403023_3495137717605438560_n.jpeg') }}"
-                            alt="Image 4">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/322062716_472491731739621_1346951323628680603_n.jpeg') }}"
-                            alt="Image 5">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/347072255_796757251654058_6804174911090529059_n.jpeg') }}"
-                            alt="Image 6">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/347228101_191212936809275_289295329964123891_n.jpeg') }}"
-                            alt="Image 7">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/347262894_270167588787752_251521177650855994_n.jpeg') }}"
-                            alt="Image 8">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/347442689_1583007722195390_949735712889745891_n.jpeg') }}"
-                            alt="Image 9">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/360011363_1220078232016337_8158792128970414407_n.jpeg') }}"
-                            alt="Image 10">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/360043154_820522012806661_7439337900957890774_n.jpeg') }}"
-                            alt="Image 11">
-                    </div>
-                    <div class="oc-item">
-                        <img class="lazy"
-                            data-src="{{ asset('images/web/gallery/360059900_812076853765497_4880657281702302364_n.jpeg') }}"
-                            alt="Image 12">
-                    </div>
+                <div class="video-overlay" style="background-color: rgba(var(--cnvs-secondarycolor-rgb), 0.4);">
                 </div>
             </div>
 
-            <div class="section bg-tertiary m-0 footer-stick">
-                <div class="container">
-                    <div class="heading-block text-center">
-                        <h4>Clientes</h4>
-                        <span class="ls-1">Veja algumas das marcas que já passaram pelo ateliê</span>
-                    </div>
+            <div id="contact-us" class="section dark m-0 footer-stick lazy"
+                data-bg="{{ asset('web-build/images/incloud-digital-background.jpg') }}"
+                style="background-position: center center; background-size: cover; background-repeat: no-repeat;">
+                <div class="container z-9">
+                    <div class="row col-mb-30">
+                        <div class="col-lg-6">
+                            <div class="heading-block text-start">
+                                <h3 class="text-uppercase ls-1">
+                                    {!! $subpages[3]->title !!}
+                                </h3>
+                            </div>
 
-                    <ul class="clients-grid row row-cols-2 row-cols-sm-3 row-cols-md-5 mb-0"
-                        data-animate="fadeInUp">
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/1.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/2.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/3.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/4.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/5.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/6.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/7.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/8.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/9.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                        <li class="grid-item">
-                            <a href="#">
-                                <img class="bg-color lazy"
-                                    data-src="{{ asset('images/web/clients/10.png') }}"
-                                    alt="Clients">
-                            </a>
-                        </li>
-                    </ul>
+                            <div class="clear mb-0"></div>
 
-                    <div class="owl-carousel carousel-widget mt-6" data-nav="false" data-pagi="true" data-loop="true"
-                        data-autoplay="5000" data-items-xs="1" data-items-sm="1" data-items-md="2" data-items-lg="3"
-                        data-lazyload="true" data-animate="fadeInUp">
-                        <div class="oc-item">
-							<div class="row flex-row-reverse g-2">
-								<div class="col">
-									<div class="quote-bubble quote-bubble-left mb-3 bg-secondary text-white text-smaller ls-1">
-										<p>Seamlessly conceptualize multimedia based web services for optimal human capital. Collaboratively evisculate e-business value.</p>
-									</div>
-									<h4 class="ps-3 h6 mb-0 fw-medium">John Doe</h4>
-									<small class="ps-3 text-muted">Google Inc.</small>
-								</div>
-								<div class="col-auto">
-									<img class="rounded-circle mt-1 lazy"
-                                        data-src="{{ asset('images/web/testimonials/1.jpg') }}"
-                                        alt="Customer Testimonails" width="48">
-								</div>
-							</div>
-						</div>
-                        <div class="oc-item">
-							<div class="row flex-row-reverse g-2">
-								<div class="col">
-									<div class="quote-bubble quote-bubble-left mb-3 bg-dark text-white text-smaller ls-1">
-										<p>Seamlessly conceptualize multimedia based web services for optimal human capital. Collaboratively evisculate e-business value.</p>
-									</div>
-									<h4 class="ps-3 h6 mb-0 fw-medium">John Doe</h4>
-									<small class="ps-3 text-muted">Google Inc.</small>
-								</div>
-								<div class="col-auto">
-									<img class="rounded-circle mt-1 lazy"
-                                        data-src="{{ asset('images/web/testimonials/2.jpg') }}"
-                                        alt="Customer Testimonails" width="48">
-								</div>
-							</div>
-						</div>
-                        <div class="oc-item">
-							<div class="row flex-row-reverse g-2">
-								<div class="col">
-									<div class="quote-bubble quote-bubble-left mb-3 bg-secondary text-white text-smaller ls-1">
-										<p>Seamlessly conceptualize multimedia based web services for optimal human capital. Collaboratively evisculate e-business value.</p>
-									</div>
-									<h4 class="ps-3 h6 mb-0 fw-medium">John Doe</h4>
-									<small class="ps-3 text-muted">Google Inc.</small>
-								</div>
-								<div class="col-auto">
-									<img class="rounded-circle mt-1 lazy"
-                                        data-src="{{ asset('images/web/testimonials/3.jpg') }}"
-                                        alt="Customer Testimonails" width="48">
-								</div>
-							</div>
-						</div>
-                        <div class="oc-item">
-							<div class="row flex-row-reverse g-2">
-								<div class="col">
-									<div class="quote-bubble quote-bubble-left mb-3 bg-dark text-white text-smaller ls-1">
-										<p>Seamlessly conceptualize multimedia based web services for optimal human capital. Collaboratively evisculate e-business value.</p>
-									</div>
-									<h4 class="ps-3 h6 mb-0 fw-medium">John Doe</h4>
-									<small class="ps-3 text-muted">Google Inc.</small>
-								</div>
-								<div class="col-auto">
-									<img class="rounded-circle mt-1 lazy"
-                                        data-src="{{ asset('images/web/testimonials/7.jpg') }}"
-                                        alt="Customer Testimonails" width="48">
-								</div>
-							</div>
-						</div>
-                        <div class="oc-item">
-							<div class="row flex-row-reverse g-2">
-								<div class="col">
-									<div class="quote-bubble quote-bubble-left mb-3 bg-secondary text-white text-smaller ls-1">
-										<p>Seamlessly conceptualize multimedia based web services for optimal human capital. Collaboratively evisculate e-business value.</p>
-									</div>
-									<h4 class="ps-3 h6 mb-0 fw-medium">John Doe</h4>
-									<small class="ps-3 text-muted">Google Inc.</small>
-								</div>
-								<div class="col-auto">
-									<img class="rounded-circle mt-1 lazy"
-                                        data-src="{{ asset('images/web/testimonials/5.jpg') }}"
-                                        alt="Customer Testimonails" width="48">
-								</div>
-							</div>
-						</div>
-                        <div class="oc-item">
-							<div class="row flex-row-reverse g-2">
-								<div class="col">
-									<div class="quote-bubble quote-bubble-left mb-3 bg-dark text-white text-smaller ls-1">
-										<p>Seamlessly conceptualize multimedia based web services for optimal human capital. Collaboratively evisculate e-business value.</p>
-									</div>
-									<h4 class="ps-3 h6 mb-0 fw-medium">John Doe</h4>
-									<small class="ps-3 text-muted">Google Inc.</small>
-								</div>
-								<div class="col-auto">
-									<img class="rounded-circle mt-1 lazy"
-                                        data-src="{{ asset('images/web/testimonials/8.jpg') }}"
-                                        alt="Customer Testimonails" width="48">
-								</div>
-							</div>
-						</div>
+                            <div class="feature-box fbox-sm fbox-plain mb-4">
+                                <div class="fbox-icon">
+                                    <a href="{{ $webSettings['whatsapp_link'] }}" target="_blank">
+                                        <i class="bi-whatsapp color-whatsapp"></i>
+                                    </a>
+                                </div>
+                                <div class="fbox-content custom-link" data-href="{{ $webSettings['whatsapp_link'] }}"
+                                    data-target="_blank">
+                                    <p class="text-smaller text-uppercase ls-1 mt-0">
+                                        Whatsapp
+                                    </p>
+                                    <h3>
+                                        {{ $webSettings['whatsapp'] }}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="feature-box fbox-sm fbox-plain mb-4">
+                                <div class="fbox-icon">
+                                    <a href="mailto:{{ $webSettings['mail'] }}">
+                                        <i class="bi-envelope-at text-muted"></i>
+                                    </a>
+                                </div>
+                                <div class="fbox-content custom-link" data-href="mailto:{{ $webSettings['mail'] }}">
+                                    <p class="text-smaller text-uppercase ls-1 mt-0">
+                                        Email
+                                    </p>
+                                    <h3>
+                                        {{ $webSettings['mail'] }}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="feature-box fbox-sm fbox-plain">
+                                <div class="fbox-icon">
+                                    <a href="{{ $webSettings['gmaps_link'] }}" target="_blank">
+                                        <i class="bi-broadcast-pin text-muted"></i>
+                                    </a>
+                                </div>
+                                <div class="fbox-content custom-link" data-href="{{ $webSettings['gmaps_link'] }}"
+                                    data-target="_blank">
+                                    <p class="text-smaller text-uppercase ls-1 mt-0">
+                                        Onde estamos
+                                    </p>
+                                    <h3>
+                                        {!! $webSettings['address'] !!}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="clear mb-5"></div>
+
+                            <a href="https://instagram.com/incloud.digital" target="_blank"
+                                class="social-icon border-transparent bg-light h-bg-instagram" data-bs-toggle="tooltip"
+                                data-bs-placement="bottom" title="@incloud.digital">
+                                <i class="fa-brands fa-instagram"></i>
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+
+                            <a href="{{ $webSettings['instagram_link'] }}" target="_blank"
+                                class="social-icon border-transparent bg-light h-bg-instagram" data-bs-toggle="tooltip"
+                                data-bs-placement="bottom" title="{{ $webSettings['instagram'] }}">
+                                <i class="fa-brands fa-instagram"></i>
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+
+                            <a href="{{ $webSettings['facebook_link'] }}" target="_blank"
+                                class="social-icon border-transparent bg-light h-bg-facebook" title="Facebook">
+                                <i class="fa-brands fa-facebook-f"></i>
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="card bg-tertiary border-0">
+                                <div class="card-body p-4 p-lg-5">
+                                    <h3 class="text-light fw-bolder mb-0">
+                                        {!! $subpages[3]->subtitle !!}
+                                    </h3>
+
+                                    <p class="text-smaller ls-1">
+                                        {!! $subpages[3]->excerpt !!}
+                                    </p>
+
+                                    @include('web.layouts.partials._form-alert')
+
+                                    <form method="post" action="{{ route('web.leads.business') }}"
+                                        id="business-lead-form" class="mb-0 not-dark">
+                                        @csrf
+
+                                        <div class="row">
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-name" class="text-light">
+                                                    <small>*</small> Nome
+                                                </label>
+
+                                                <input type="text" name="name" id="business-lead-name"
+                                                    class="form-control" value="{{ old('name') }}">
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-email" class="text-light">
+                                                    <small>*</small> Email
+                                                </label>
+
+                                                <input type="email" name="email" id="business-lead-email"
+                                                    class="form-control" value="{{ old('email') }}">
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-phone" class="text-light">
+                                                    <small>*</small> Telefone para contato
+                                                </label>
+
+                                                <input type="text" name="phone" id="business-lead-phone"
+                                                    class="form-control kt_phone_ptbr_mask" value="{{ old('phone') }}">
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-company" class="text-light">
+                                                    <small>*</small> Empresa
+                                                </label>
+
+                                                <input type="text" name="company" id="business-lead-company"
+                                                    class="form-control" value="{{ old('company') }}">
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-company-segment" class="text-light">
+                                                    <small>*</small> Segmento de atuação da empresa
+                                                </label>
+
+                                                <select name="company_segment" id="business-lead-company-segment"
+                                                    class="form-select">
+                                                    <option value="">
+                                                        -- Selecione a opção --
+                                                    </option>
+                                                    <option value="Serviços"
+                                                        {{ old('company_segment') == 'Serviços' ? 'selected' : '' }}>
+                                                        Serviços
+                                                    </option>
+                                                    <option value="Comércio"
+                                                        {{ old('company_segment') == 'Comércio' ? 'selected' : '' }}>
+                                                        Comércio
+                                                    </option>
+                                                    <option value="Indústria"
+                                                        {{ old('company_segment') == 'Indústria' ? 'selected' : '' }}>
+                                                        Indústria
+                                                    </option>
+                                                    <option value="Outros"
+                                                        {{ old('company_segment') == 'Outros' ? 'selected' : '' }}>
+                                                        Outros
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-company-occupation" class="text-light">
+                                                    <small>*</small> Cargo
+                                                </label>
+
+                                                <select name="company_occupation" id="business-lead-company-occupation"
+                                                    class="form-select">
+                                                    <option value="">
+                                                        -- Selecione a opção --
+                                                    </option>
+                                                    <option value="Sócio/Dono"
+                                                        {{ old('company_occupation') == 'Sócio/Dono' ? 'selected' : '' }}>
+                                                        Sócio/Dono
+                                                    </option>
+                                                    <option value="Diretor"
+                                                        {{ old('company_occupation') == 'Diretor' ? 'selected' : '' }}>
+                                                        Diretor
+                                                    </option>
+                                                    <option value="Gerente/Coordenador"
+                                                        {{ old('company_occupation') == 'Gerente/Coordenador' ? 'selected' : '' }}>
+                                                        Gerente/Coordenador
+                                                    </option>
+                                                    <option value="Auxiliar/Assistente"
+                                                        {{ old('company_occupation') == 'Auxiliar/Assistente' ? 'selected' : '' }}>
+                                                        Auxiliar/Assistente
+                                                    </option>
+                                                    <option value="Consultor"
+                                                        {{ old('company_occupation') == 'Consultor' ? 'selected' : '' }}>
+                                                        Consultor
+                                                    </option>
+                                                    <option value="Autônomo"
+                                                        {{ old('company_occupation') == 'Autônomo' ? 'selected' : '' }}>
+                                                        Autônomo
+                                                    </option>
+                                                    <option value="Outros"
+                                                        {{ old('company_occupation') == 'Outros' ? 'selected' : '' }}>
+                                                        Outros
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-company-employees" class="text-light">
+                                                    <small>*</small> Nº de funcionários
+                                                </label>
+
+                                                <select name="company_employees" id="business-lead-company-employees"
+                                                    class="form-select">
+                                                    <option value="">
+                                                        -- Selecione a opção --
+                                                    </option>
+                                                    <option value="1-5"
+                                                        {{ old('company_employees') == '1-5' ? 'selected' : '' }}>
+                                                        1-5
+                                                    </option>
+                                                    <option value="6-10"
+                                                        {{ old('company_employees') == '6-10' ? 'selected' : '' }}>
+                                                        6-10
+                                                    </option>
+                                                    <option value="11-50"
+                                                        {{ old('company_employees') == '11-50' ? 'selected' : '' }}>
+                                                        11-50
+                                                    </option>
+                                                    <option value="51-250"
+                                                        {{ old('company_employees') == '51-250' ? 'selected' : '' }}>
+                                                        51-250
+                                                    </option>
+                                                    <option value="251-1000"
+                                                        {{ old('company_employees') == '251-1000' ? 'selected' : '' }}>
+                                                        251-1000
+                                                    </option>
+                                                    <option value="+1000"
+                                                        {{ old('company_employees') == '+1000' ? 'selected' : '' }}>
+                                                        +1000
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-company-target" class="text-light">
+                                                    <small>*</small> Para quem você vende?
+                                                </label>
+
+                                                <select name="company_target" id="business-lead-company-target"
+                                                    class="form-select">
+                                                    <option value="">
+                                                        -- Selecione a opção --
+                                                    </option>
+                                                    <option value="Para empresas - B2B"
+                                                        {{ old('company_target') == 'Para empresas - B2B' ? 'selected' : '' }}>
+                                                        Para empresas - B2B
+                                                    </option>
+                                                    <option value="Direto para o consumidor - B2C"
+                                                        {{ old('company_target') == 'Direto para o consumidor - B2C' ? 'selected' : '' }}>
+                                                        Direto para o consumidor - B2C
+                                                    </option>
+                                                    <option value="Ambos - B2B e B2C"
+                                                        {{ old('company_target') == 'Ambos - B2B e B2C' ? 'selected' : '' }}>
+                                                        Ambos - B2B e B2C
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-company-website" class="text-light">
+                                                    Website
+                                                </label>
+
+                                                <input type="text" name="company_website"
+                                                    placeholder="Caso já tenha um site, informar aqui..."
+                                                    id="business-lead-company-website" class="form-control"
+                                                    value="{{ old('company_website') }}">
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <label for="business-lead-message" class="text-light">
+                                                    Mensagem
+                                                </label>
+
+                                                <textarea name="message" id="business-lead-message" class="form-control"
+                                                    placeholder="Deseja enviar alguma mensagem adcional?" rows="4" cols="30">{{ old('message') }}</textarea>
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox" id="ruleCheck" class="form-check-input"
+                                                        value="1">
+                                                    <label class="form-check-label text-light" for="ruleCheck">
+                                                        Estou ciente e aceito a <span
+                                                            style="text-decoration:underline dotted; text-underline-offset: 0.375rem;"><a
+                                                                href="{{ route('web.pgs.rules', 'politica-de-privacidade') }}"
+                                                                class="text-white" target="_blank">política de
+                                                                privacidade</a></span>.
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-12 form-group d-none">
+                                                <input type="text" name="business-lead-botcheck"
+                                                    id="business-lead-botcheck" class="form-control">
+                                            </div>
+
+                                            <div class="col-lg-12 form-group mb-0">
+                                                <button type="submit" id="business-lead-submit"
+                                                    class="button button-white button-large button-shadow button-shadow-dark border border-width-2 border-dark rounded text-dark h-text-light"
+                                                    data-form-action="submit">
+                                                    <div class="indicator-label">
+                                                        <i class="uil uil-navigator"></i>
+                                                        <span>Envie sua mensagem</span>
+                                                    </div>
+                                                    <div class="indicator-progress">
+                                                        Por Favor, Aguarde...
+                                                        <span
+                                                            class="align-middle spinner-border spinner-border-sm ms-2"></span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <input type="hidden" name="post_id" value="{{ $page->cmsPost->id }}">
+                                        <input type="hidden" name="page" value="{{ $page->title ?? $page->name }}">
+
+                                        <input type="hidden" name="prefix" value="business-lead-">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div class="video-overlay" style="background-color: rgba(var(--cnvs-quaternarycolor-rgb), 0.8);">
                 </div>
             </div>
         </div>
@@ -310,4 +463,6 @@
 
 {{-- Scripts Section --}}
 @section('scripts')
+    <script async src="{{ mix('web-build/js/form-validation.bundle.js') }}"></script>
+    <script async src="{{ mix('web-build/js/business-lead.bundle.js') }}"></script>
 @endsection

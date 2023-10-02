@@ -12,6 +12,20 @@
         <div class="content-wrap">
             <div class="section m-0 header-stick footer-stick">
                 <div class="container">
+                    <div class="heading-block text-center">
+                        <h2>
+                            {!! $page->title !!}
+                        </h2>
+                        <span class="ls-1">
+                            {!! $page->excerpt !!}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-10 mx-auto">
+                            {!! $page->body !!}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

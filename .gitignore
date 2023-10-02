@@ -1,13 +1,13 @@
 /.phpunit.cache
+/_DB
 /node_modules
 /public/hot
 /public/storage
-/public/css/web
-/public/js/web
-/public/images/web
-/resources/web-assets
-/resources/js/web/plugins
-/resources/views/web
+/public/web-build
+/public/mix-manifest
+# /resources/web-assets
+# /resources/js/web/plugins
+# /resources/views/web
 /storage/*.key
 /vendor
 .env

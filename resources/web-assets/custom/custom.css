@@ -1,0 +1,145 @@
+/* ----------------------------------------------------------------
+	Custom CSS
+
+	Add all your Custom Styled CSS here for New Styles or
+	Overwriting Default Theme Styles for Better Handling Updates
+-----------------------------------------------------------------*/
+
+/* Extra small devices (phones, 600px and down) */
+/* @media only screen and (max-width: 600px) {...} */
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+/* @media only screen and (min-width: 600px) {...} */
+
+/* Medium devices (landscape tablets, 768px and up) */
+/* @media only screen and (min-width: 768px) {...} */
+
+/* Large devices (laptops/desktops, 992px and up) */
+/* @media only screen and (min-width: 992px) {...} */
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+/* @media only screen and (min-width: 1200px) {...} */
+
+/*  COLORS
+    primary: 	#1EA1D9
+    secondary: 	#06222E
+	tertiary:   #714091
+	quaternary: #180E1F
+-----------------------------------------------------------------*/
+
+/* GLOBAL
+-----------------------------------------------------------------*/
+
+:root {
+    --cnvs-themecolor: #1EA1D9;
+    --cnvs-themecolor-rgb: 30, 161, 217;
+
+    --cnvs-secondarycolor: #06222E;
+    --cnvs-secondarycolor-rgb: 6, 34, 46;
+
+    --cnvs-tertiarycolor: #714091;
+    --cnvs-tertiarycolor-rgb: 113, 64, 145;
+
+    --cnvs-quaternarycolor: #180E1F;
+    --cnvs-quaternarycolor-rgb: 24, 14, 31;
+}
+
+.bg-secondary {
+    background-color: var(--cnvs-secondarycolor) !important;
+}
+
+.bg-tertiary {
+    background-color: var(--cnvs-tertiarycolor) !important;
+}
+
+.bg-quaternary {
+    background-color: var(--cnvs-quaternarycolor) !important;
+}
+
+.secondary-color {
+    color: var(--cnvs-secondarycolor) !important;
+}
+
+.tertiary-color {
+    color: var(--cnvs-tertiarycolor) !important;
+}
+
+.quaternary-color {
+    color: var(--cnvs-quaternarycolor) !important;
+}
+
+.button-secondary {
+    background-color: var(--cnvs-secondarycolor);
+    color: #FFF;
+}
+
+.button-tertiary {
+    background-color: var(--cnvs-tertiarycolor);
+    color: #FFF;
+}
+
+.button-quaternary {
+    background-color: var(--cnvs-quaternarycolor);
+    color: #FFF;
+}
+
+/* .button-shadow */
+.btn-shadow,
+.btn-shadow.reverse:hover {
+    --bg-color: #FFF;
+    --border-color: #666;
+    --position: -5px -5px;
+    box-shadow: var(--position) 0px 0px var(--bg-color),
+        var(--position) 0px 1px var(--border-color);
+    transition: all .3s ease-out !important;
+}
+
+.btn-shadow:hover,
+.btn-shadow.reverse:not(:hover) {
+    box-shadow: 0px 0px 0px 0px var(--bg-color),
+        0px 0px 0px 1px var(--bg-color);
+}
+
+.btn-shadow.top-right { --position: 5px -5px !important; }
+.btn-shadow.bottom-right { --position: 5px 5px !important; }
+.btn-shadow.bottom-left { --position: -5px 5px !important; }
+
+/* HEADER
+-----------------------------------------------------------------*/
+
+.primary-menu-trigger,
+#page-menu-trigger {
+    background-color: var(--cnvs-themecolor);
+    border-radius: 5px;
+}
+
+.cnvs-hamburger .cnvs-hamburger-inner,
+.cnvs-hamburger .cnvs-hamburger-inner::before,
+.cnvs-hamburger .cnvs-hamburger-inner::after {
+    background-color: #FFF;
+}
+
+/* WHATSAPP BTN
+-----------------------------------------------------------------*/
+
+#whatsapp-button {
+    --cnvs-whatsapp-btn-size: 3.5rem;
+    --cnvs-whatsapp-btn-bg: var(--cnvs-color-whatsapp);
+    --cnvs-whatsapp-btn-icon-size: 1.5rem;
+    --cnvs-whatsapp-btn-icon-color: #fff;
+    --cnvs-whatsapp-btn-position-boxed-top: auto;
+    --cnvs-whatsapp-btn-position-boxed-left: 25px;
+    --cnvs-whatsapp-btn-position-boxed-right: auto;
+    --cnvs-whatsapp-btn-position-boxed-bottom: 55px;
+    --cnvs-whatsapp-btn-position-botom: 30px;
+    --cnvs-whatsapp-btn-border-radius: 100px;
+    --cnvs-whatsapp-btn-hover-color: #1FA463;
+}
+
+/* FOOTER
+-----------------------------------------------------------------*/
+
+.dark #copyrights, #copyrights.dark {
+    color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(0, 0, 0, 0.9);
+}

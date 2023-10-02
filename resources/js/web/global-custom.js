@@ -125,7 +125,7 @@ class WebGlobalCustom {
                     .then((response) => {
                         modalEl.querySelector('.modal-content').innerHTML = response.data;
                     }).catch((error) => {
-                        i2cCustom.showSystemErrorMessage(error);
+                        this.showSystemErrorMessage(error);
                     }).then(() => {
                         // always executed
                     });
@@ -147,6 +147,21 @@ class WebGlobalCustom {
                     });
             });
         }
+    }
+
+    formRuleCheck(form) {
+        const ruleCheck = form.querySelector('#ruleCheck');
+        const submitButton = form.querySelector('[data-form-action="submit"]');
+
+        if (!ruleCheck) {
+            return;
+        }
+
+        submitButton.disabled = true;
+
+        ruleCheck.addEventListener('change', function () {
+            submitButton.disabled = !this.checked;
+        });
     }
 
     submitButtonToggleIndicator(button) {

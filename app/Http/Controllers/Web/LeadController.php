@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 class LeadController extends Controller
 {
     protected array $mailTo = [
-        'contato@paulozanella.com.br',
         'contato@incloudsistemas.com.br'
     ];
 

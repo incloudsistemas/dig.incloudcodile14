@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\View;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Agent\Agent;
 
 class Controller extends BaseController
 {
@@ -26,26 +27,25 @@ class Controller extends BaseController
             'phone_link'     => null,
             'whatsapp'       => '(62) 98193-6169',
             'whatsapp_link'  => 'https://wa.me/5562981936169',
-            'facebook'       => null,
-            'facebook_link'  => 'https://www.facebook.com/incloudsistemas',
-            'instagram'      => null,
-            'instagram_link' => 'https://www.instagram.com/incloud.digital',
+            'facebook'       => '@incloudsistemas',
+            'facebook_link'  => 'https://www.facebook.com/incloudsistemas/',
+            'instagram'      => '@incloud.sistemas',
+            'instagram_link' => 'https://www.instagram.com/incloud.sistemas/',
             'twitter'        => null,
             'twitter_link'   => null,
             'linkedin'       => null,
-            'linkedin_link'  => 'https://www.linkedin.com/company/2385527/',
+            'linkedin_link'  => null,
             'youtube'        => null,
             'youtube_link'   => null,
-            'gmaps_link'     => 'https://goo.gl/maps/TVudpDggzXHiJUZA7',
-            'address'        => 'Rua 9 de Julho, 1385, Vila São José, Anápolis - GO, 75155-525',
+            'gmaps_link'     => 'https://maps.app.goo.gl/wuaodKJo5DHNDpFe8',
+            'address'        => 'Anápolis - GO.',
             'coordinates'    => null,
         ];
 
         View::share('webSettings', $webSettings);
 
-        // $agent = new Agent();
-
-        // View::share('agent', $agent);
+        $agent = new Agent();
+        View::share('agent', $agent);
     }
 
     protected function getPage(string $slug): Model
@@ -68,7 +68,7 @@ class Controller extends BaseController
 
     protected function generateSEOAttribute(Model $page, string $type = 'website'): void
     {
-        $title = $page->cmsPost->meta_title ?? $page->title ?? $page->name ?? config('app.name', 'InCloud digital');
+        $title = $page->cmsPost->meta_title ?? $page->title ?? $page->name ?? config('app.name', 'InCloud');
         SEOTools::setTitle(strip_tags($title));
 
         $description = $page->cmsPost->meta_description ?? $page->excerpt ?? $page->subtitle ?? $title;
@@ -84,7 +84,9 @@ class Controller extends BaseController
             SEOTools::twitter()->setSite($this->twitter);
         }
 
-        $image = $page->cover_image ? $page->getCoverImageThumb(300, 300) : asset('images/cover.jpg');
+        $image = $page->featured_image
+            ? CreateThumb(src: $page->featured_image->getUrl(), width: 300, height: 300)
+            : asset('images/web/cover.jpg');
         SEOTools::opengraph()->addImage($image);
     }
 }

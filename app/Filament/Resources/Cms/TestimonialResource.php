@@ -145,10 +145,28 @@ class TestimonialResource extends Resource
                     ->imageResizeMode('contain')
                     ->imageResizeTargetWidth('1920')
                     ->imageResizeTargetHeight('1080')
+                    ->imageResizeUpscale(false)
                     ->required(
                         fn (callable $get): bool =>
                         in_array($get('role'), [2,])
                     )
+                    ->maxSize(5120)
+                    ->downloadable(),
+                Forms\Components\SpatieMediaLibraryFileUpload::make('company-logo')
+                    ->label(__('Logo da empresa'))
+                    ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
+                    ->collection('company-logo')
+                    ->image()
+                    ->responsiveImages()
+                    ->getUploadedFileNameForStorageUsing(
+                        fn (TemporaryUploadedFile $file, callable $get): string =>
+                        (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                            ->prepend($get('slug')),
+                    )
+                    ->imageResizeMode('contain')
+                    ->imageResizeTargetWidth('1920')
+                    ->imageResizeTargetHeight('1080')
+                    ->imageResizeUpscale(false)
                     ->maxSize(5120)
                     ->downloadable(),
                 Forms\Components\Grid::make(['default' => 3])
