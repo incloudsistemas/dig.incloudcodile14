@@ -125,18 +125,109 @@ class VariantItemsRelationManager extends RelationManager
                                 !$get('inventory_management')
                             )
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('inventory_quantity')
-                            ->label(__('Quantidade em estoque'))
+                        Forms\Components\Group::make()
+                            // ->relationship(name: 'inventory')
+                            ->schema([
+                                Forms\Components\Grid::make(['default' => 3])
+                                    ->schema([
+                                        Forms\Components\TextInput::make('inventory.available')
+                                            ->numeric()
+                                            ->label(__('Estoque disponível'))
+                                            ->default(0)
+                                            ->live(debounce: 1000)
+                                            ->afterStateUpdated(
+                                                function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                    $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
+                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                }
+                                            ),
+                                        Forms\Components\TextInput::make('inventory.committed')
+                                            ->numeric()
+                                            ->label(__('Comprometido'))
+                                            ->default(0)
+                                            ->afterStateUpdated(
+                                                function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                    $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
+                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                }
+                                            ),
+                                        Forms\Components\TextInput::make('inventory.to_receive')
+                                            ->numeric()
+                                            ->label(__('A ser recebido'))
+                                            ->default(0)
+                                    ]),
+                                Forms\Components\Fieldset::make(__('Estoque indisponível'))
+                                    ->schema([
+                                        Forms\Components\TextInput::make('inventory.unavailable_damaged')
+                                            ->numeric()
+                                            ->label(__('Danificado'))
+                                            ->default(0)
+                                            ->afterStateUpdated(
+                                                function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                    $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
+                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                }
+                                            ),
+                                        Forms\Components\TextInput::make('inventory.unavailable_quality_control')
+                                            ->numeric()
+                                            ->label(__('Controle de qualidade'))
+                                            ->default(0)
+                                            ->afterStateUpdated(
+                                                function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                    $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
+                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                }
+                                            ),
+                                        Forms\Components\TextInput::make('inventory.unavailable_safety')
+                                            ->numeric()
+                                            ->label(__('Estoque de segurança'))
+                                            ->default(0)
+                                            ->afterStateUpdated(
+                                                function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                    $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
+                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                }
+                                            ),
+                                        Forms\Components\TextInput::make('inventory.unavailable_other')
+                                            ->numeric()
+                                            ->label(__('Outro'))
+                                            ->default(0)
+                                            ->afterStateUpdated(
+                                                function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                    $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
+                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                }
+                                            ),
+                                    ])
+                                    ->columns(4),
+                            ])
+                            ->hidden(
+                                fn (callable $get): bool =>
+                                !$get('inventory_management')
+                            )
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('inventory.total')
                             ->numeric()
-                            ->mask(9999999)
+                            ->label(__('Total em estoque'))
+                            ->helperText(__('Estoque completo que você tem em um local, incluindo a quantidade de estoque comprometido, indisponível e disponível.'))
+                            ->default(0)
+                            ->disabled()
                             ->hidden(
                                 fn (callable $get): bool =>
                                 !$get('inventory_management')
                             ),
+                        // Forms\Components\TextInput::make('inventory_quantity')
+                        //     ->numeric()
+                        //     ->label(__('Quantidade em estoque'))
+                        //     ->mask(9999999)
+                        //     ->hidden(
+                        //         fn (callable $get): bool =>
+                        //         !$get('inventory_management')
+                        //     ),
                         Forms\Components\TextInput::make('inventory_security_alert')
-                            ->label(__('Estoque de segurança'))
-                            ->helperText(__('Estoque limite para seus produtos, que lhe alerta se o produto estará em breve fora de estoque.'))
                             ->numeric()
+                            ->label(__('Alerta de segurança'))
+                            ->helperText(__('Estoque limite para seus produtos, que lhe alerta se o produto estará em breve fora de estoque.'))
                             ->mask(9999999)
                             ->hidden(
                                 fn (callable $get): bool =>
@@ -235,6 +326,13 @@ class VariantItemsRelationManager extends RelationManager
                 //             ->maxSize(25600)
                 //             ->downloadable(),
                 //     ]),
+                Forms\Components\Select::make('status')
+                    ->label(__('Status'))
+                    ->options(DefaultStatus::asSelectArray())
+                    ->default(1)
+                    ->required()
+                    ->in(DefaultStatus::getValues())
+                    ->native(false),
             ]);
     }
 
@@ -267,8 +365,8 @@ class VariantItemsRelationManager extends RelationManager
                         query: fn (ProductVariantItemService $service, Builder $query, string $direction): Builder =>
                         $service->tableSortByPrice(query: $query, direction: $direction)
                     ),
-                Tables\Columns\TextColumn::make('inventory_quantity')
-                    ->label(__('Estoque'))
+                Tables\Columns\TextColumn::make('inventory.available')
+                    ->label(__('Estoque disponível'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('display_status')
                     ->label(__('Status'))
@@ -303,7 +401,11 @@ class VariantItemsRelationManager extends RelationManager
                         Tables\Actions\EditAction::make()
                             ->mutateRecordDataUsing(
                                 fn (ProductVariantItemService $service, ProductVariantItem $variantItem, array $data): array =>
-                                $service->mutateRecordDataToEditUsing(variantItem: $variantItem, data: $data)
+                                $service->mutateRecordDataToEditUsing(variantItem: $variantItem, data: $data),
+                            )
+                            ->using(
+                                fn (ProductVariantItemService $service, ProductVariantItem $variantItem, array $data): ProductVariantItem =>
+                                $service->editAction(variantItem: $variantItem, data: $data),
                             ),
                     ])
                         ->dropdown(false),
@@ -346,6 +448,60 @@ class VariantItemsRelationManager extends RelationManager
                             fn (Collection $records, array $data) =>
                             $records->each->update($data)
                         ),
+                    // Tables\Actions\BulkAction::make('update_inventory')
+                    //     ->label(__('Controle de estoque'))
+                    //     ->icon('heroicon-o-cube')
+                    //     ->form([
+                    //         Forms\Components\Grid::make(['default' => 4])
+                    //             ->schema([
+                    //                 Forms\Components\TextInput::make('available')
+                    //                     ->numeric()
+                    //                     ->label(__('Disponível'))
+                    //                     ->default(0),
+                    //                 Forms\Components\TextInput::make('committed')
+                    //                     ->numeric()
+                    //                     ->label(__('Comprometido'))
+                    //                     ->default(0),
+                    //                 Forms\Components\TextInput::make('to_receive')
+                    //                     ->numeric()
+                    //                     ->label(__('A ser recebido'))
+                    //                     ->default(0),
+                    //                 Forms\Components\TextInput::make('total')
+                    //                     ->numeric()
+                    //                     ->label(__('Total'))
+                    //                     ->default(0)
+                    //                     ->disabled(),
+                    //             ]),
+                    //         Forms\Components\Fieldset::make(__('Indisponível'))
+                    //             ->schema([
+                    //                     Forms\Components\TextInput::make('unavailable_damaged')
+                    //                         ->numeric()
+                    //                         ->label(__('Danificado'))
+                    //                         ->default(0),
+                    //                     Forms\Components\TextInput::make('unavailable_quality_control')
+                    //                         ->numeric()
+                    //                         ->label(__('Controle de qualidade'))
+                    //                         ->default(0),
+                    //                     Forms\Components\TextInput::make('unavailable_safety')
+                    //                         ->numeric()
+                    //                         ->label(__('Estoque de segurança'))
+                    //                         ->default(0),
+                    //                     Forms\Components\TextInput::make('unavailable_other')
+                    //                         ->numeric()
+                    //                         ->label(__('Outro'))
+                    //                         ->default(0),
+                    //             ])
+                    //             ->columns(4),
+                    //     ])
+                    //     ->action(
+                    //         fn (Collection $records, array $data) =>
+                    //         $records->each(function ($record) use ($data) {
+                    //             $record->inventory()->updateOrCreate(
+                    //                 ['variant_item_id' => $record->id],
+                    //                 $data
+                    //             );
+                    //         }),
+                    //     ),
                     // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])

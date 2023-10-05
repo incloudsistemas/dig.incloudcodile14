@@ -7,12 +7,14 @@ use App\Filament\Resources\Shop\ProductResource\Pages;
 use App\Filament\Resources\Shop\ProductResource\RelationManagers;
 use App\Models\Shop\Product;
 use App\Models\Shop\ProductCategory;
+use App\Models\Shop\ProductVariantItem;
 use App\Services\Cms\PostService;
 use App\Services\Shop\ProductBrandService;
 use App\Services\Shop\ProductCategoryService;
 use App\Services\Shop\ProductVariantItemService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -21,8 +23,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductResource extends Resource
@@ -236,10 +240,12 @@ class ProductResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('default_variant.sku')
                                     ->label(__('SKU (Unidade de manutenção de estoque)'))
+                                    ->unique(ProductVariantItem::class, 'sku', ignoreRecord: true)
                                     ->minLength(2)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('default_variant.barcode')
                                     ->label(__('Código de barras (ISBN, UPC, GTIN etc.)'))
+                                    // ->unique(ProductVariantItem::class, 'barcode', ignoreRecord: true)
                                     ->minLength(2)
                                     ->maxLength(255),
                                 Forms\Components\Checkbox::make('default_variant.inventory_management')
@@ -255,18 +261,106 @@ class ProductResource extends Resource
                                         !$get('default_variant.inventory_management')
                                     )
                                     ->columnSpanFull(),
-                                Forms\Components\TextInput::make('default_variant.inventory_quantity')
-                                    ->label(__('Quantidade em estoque'))
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        Forms\Components\Grid::make(['default' => 3])
+                                            ->schema([
+                                                Forms\Components\TextInput::make('default_variant.inventory.available')
+                                                    ->numeric()
+                                                    ->label(__('Estoque disponível'))
+                                                    ->default(0)
+                                                    ->live(debounce: 1000)
+                                                    ->afterStateUpdated(
+                                                        function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                            $inventoryTotal = $service->getInventoryTotal(data: $get('default_variant.inventory'));
+                                                            $set('default_variant.inventory.total', $inventoryTotal);
+                                                        }
+                                                    ),
+                                                Forms\Components\TextInput::make('default_variant.inventory.committed')
+                                                    ->numeric()
+                                                    ->label(__('Comprometido'))
+                                                    ->default(0)
+                                                    ->live(debounce: 1000)
+                                                    ->afterStateUpdated(
+                                                        function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                            $inventoryTotal = $service->getInventoryTotal(data: $get('default_variant.inventory'));
+                                                            $set('default_variant.inventory.total', $inventoryTotal);
+                                                        }
+                                                    ),
+                                                Forms\Components\TextInput::make('default_variant.inventory.to_receive')
+                                                    ->numeric()
+                                                    ->label(__('A ser recebido'))
+                                                    ->default(0),
+                                            ]),
+                                        Forms\Components\Fieldset::make(__('Estoque indisponível'))
+                                            ->schema([
+                                                Forms\Components\TextInput::make('default_variant.inventory.unavailable_damaged')
+                                                    ->numeric()
+                                                    ->label(__('Danificado'))
+                                                    ->default(0)
+                                                    ->live(debounce: 1000)
+                                                    ->afterStateUpdated(
+                                                        function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                            $inventoryTotal = $service->getInventoryTotal(data: $get('default_variant.inventory'));
+                                                            $set('default_variant.inventory.total', $inventoryTotal);
+                                                        }
+                                                    ),
+                                                Forms\Components\TextInput::make('default_variant.inventory.unavailable_quality_control')
+                                                    ->numeric()
+                                                    ->label(__('Controle de qualidade'))
+                                                    ->default(0)
+                                                    ->live(debounce: 1000)
+                                                    ->afterStateUpdated(
+                                                        function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                            $inventoryTotal = $service->getInventoryTotal(data: $get('default_variant.inventory'));
+                                                            $set('default_variant.inventory.total', $inventoryTotal);
+                                                        }
+                                                    ),
+                                                Forms\Components\TextInput::make('default_variant.inventory.unavailable_safety')
+                                                    ->numeric()
+                                                    ->label(__('Estoque de segurança'))
+                                                    ->default(0),
+                                                Forms\Components\TextInput::make('default_variant.inventory.unavailable_other')
+                                                    ->numeric()
+                                                    ->label(__('Outro'))
+                                                    ->default(0)
+                                                    ->live(debounce: 1000)
+                                                    ->afterStateUpdated(
+                                                        function (ProductVariantItemService $service, callable $set, callable $get): void {
+                                                            $inventoryTotal = $service->getInventoryTotal(data: $get('default_variant.inventory'));
+                                                            $set('default_variant.inventory.total', $inventoryTotal);
+                                                        }
+                                                    ),
+                                            ])
+                                            ->columns(4),
+                                    ])
+                                    ->hidden(
+                                        fn (callable $get, string $operation): bool =>
+                                        !$get('default_variant.inventory_management') || $operation === 'create'
+                                    )
+                                    ->columnSpanFull(),
+                                Forms\Components\TextInput::make('default_variant.inventory.total')
                                     ->numeric()
+                                    ->label(__('Total em estoque'))
+                                    ->helperText(__('Estoque completo que você tem em um local, incluindo a quantidade de estoque comprometido, indisponível e disponível.'))
+                                    ->default(0)
+                                    ->disabled()
+                                    ->hidden(
+                                        fn (callable $get, string $operation): bool =>
+                                        !$get('default_variant.inventory_management') || $operation === 'create'
+                                    ),
+                                Forms\Components\TextInput::make('default_variant.inventory_quantity')
+                                    ->numeric()
+                                    ->label(__('Quantidade em estoque'))
                                     ->mask(9999999)
                                     ->hidden(
-                                        fn (callable $get): bool =>
-                                        !$get('default_variant.inventory_management')
+                                        fn (callable $get, string $operation): bool =>
+                                        !$get('default_variant.inventory_management') || $operation === 'edit'
                                     ),
                                 Forms\Components\TextInput::make('default_variant.inventory_security_alert')
-                                    ->label(__('Estoque de segurança'))
-                                    ->helperText(__('Estoque limite para seus produtos, que lhe alerta se o produto estará em breve fora de estoque.'))
                                     ->numeric()
+                                    ->label(__('Alerta de segurança'))
+                                    ->helperText(__('Estoque limite para seus produtos, que lhe alerta se o produto estará em breve fora de estoque.'))
                                     ->mask(9999999)
                                     ->hidden(
                                         fn (callable $get): bool =>

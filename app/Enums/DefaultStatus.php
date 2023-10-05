@@ -12,7 +12,7 @@ final class DefaultStatus extends Enum
     public static function getStatusColors(): array
     {
         return [
-            self::Ativo => 'success',
+            self::Ativo   => 'success',
             self::Inativo => 'danger',
         ];
     }

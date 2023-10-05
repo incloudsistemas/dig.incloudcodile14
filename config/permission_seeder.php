@@ -40,6 +40,13 @@ return [
             '[Shop] Produtos'   => 'c,r,u,d',
             '[Shop] Categorias' => 'c,r,u,d',
             '[Shop] Marcas'     => 'c,r,u,d',
+            '[Shop] Estoque'    => 'c,r,u,d',
+
+            '[CRM] Funis de Negócios'    => 'c,r,u,d',
+            '[CRM] Funis de Contatos'    => 'c,r,u,d',
+            '[CRM] Origens dos Contatos' => 'c,r,u,d',
+            '[CRM] Tipos de Contatos'    => 'c,r,u,d',
+            '[CRM] Contatos'             => 'c,r,u,d',
         ],
     ],
 

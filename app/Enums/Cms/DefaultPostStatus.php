@@ -14,8 +14,8 @@ final class DefaultPostStatus extends Enum
     {
         return [
             self::Publicado => 'success',
-            self::Rascunho => 'warning',
-            self::Inativo => 'danger',
+            self::Rascunho  => 'warning',
+            self::Inativo   => 'danger',
         ];
     }
 

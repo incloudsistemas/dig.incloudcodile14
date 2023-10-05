@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Shop\ProductResource\Pages;
 
 use App\Filament\Resources\Shop\ProductResource;
 use App\Services\Shop\ProductService;
+use App\Services\Shop\ProductVariantItemService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -35,8 +36,10 @@ class EditProduct extends EditRecord
             $data['default_variant']['barcode'] = $defaultVariant->barcode;
             $data['default_variant']['inventory_management'] = $defaultVariant->inventory_management;
             $data['default_variant']['inventory_out_allowed'] = $defaultVariant->inventory_out_allowed;
-            $data['default_variant']['inventory_quantity'] = $defaultVariant->inventory_quantity;
+            // $data['default_variant']['inventory_quantity'] = $defaultVariant->inventory_quantity;
             $data['default_variant']['inventory_security_alert'] = $defaultVariant->inventory_security_alert;
+
+            $data['default_variant']['inventory'] = ProductVariantItemService::getInventoryData(inventory: $defaultVariant->inventory);
 
             $data['default_variant']['requires_shipping'] = $defaultVariant->requires_shipping;
             $data['default_variant']['weight'] = $defaultVariant->weight;
@@ -55,6 +58,7 @@ class EditProduct extends EditRecord
             $record->variantOptions()
                 ->first()
                 ->delete();
+
             // Delete default variant item
             $record->variantItems()
                 ->first()
@@ -66,15 +70,13 @@ class EditProduct extends EditRecord
         if ($record->has_variants) {
             $this->syncVariants();
         } else {
-            $record->variantItems()
-                ->first()
-                ->update($data['default_variant']);
+            $this->updateDefaultVariant($data['default_variant']);
         }
 
         return $record;
     }
 
-    protected function syncVariants()
+    protected function syncVariants(): void
     {
         $variants = $this->record->variantOptions
             ->whereNull('deleted_at')
@@ -115,5 +117,24 @@ class EditProduct extends EditRecord
 
         $this->record->variantItems()
             ->createMany($newVariants);
+    }
+
+    protected function updateDefaultVariant(array $defaultVariant): void
+    {
+        $variantItem = $this->record->variantItems()
+            ->first();
+
+        if ($variantItem) {
+            $variantItem->update($defaultVariant);
+
+            $data['activity']['changed_from'] = ProductVariantItemService::getInventoryData(inventory: $variantItem->inventory);
+            $data['activity']['changed_to'] = $defaultVariant['inventory'];
+
+            // Update variant inventory
+            $variantItem->inventory()
+                ->update($defaultVariant['inventory']);
+
+            ProductVariantItemService::createInventoryActivity(data: $data['activity'], inventory: $variantItem->inventory);
+        }
     }
 }

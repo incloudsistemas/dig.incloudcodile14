@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Shop\ProductResource\Pages;
 
 use App\Filament\Resources\Shop\ProductResource;
+use App\Models\Shop\ProductVariantItem;
 use App\Services\Shop\ProductService;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
@@ -32,6 +33,7 @@ class CreateProduct extends CreateRecord
         if ($this->record->has_variants) {
             $defaultVariant = Session::get('default_variant');
             $this->createVariantItems(record: $this->record, defaultVariant: $defaultVariant);
+            $this->createVariantItemsInventories(record: $this->record, defaultVariant: $defaultVariant);
         }
 
         Session::forget('default_variant');
@@ -56,8 +58,14 @@ class CreateProduct extends CreateRecord
         $data['default_variant']['options'] = $defaultVariantOption->option_values;
 
         // Create the default variant item
-        $record->variantItems()
+        $variantItem = $record->variantItems()
             ->create($data['default_variant']);
+
+        // Create variant inventory
+        $variantItem->inventory()
+            ->create([
+                'available' => $data['default_variant']['inventory_quantity'] ?? 0,
+            ]);
     }
 
     protected function createVariantItems(Model $record, array $defaultVariant): void
@@ -89,11 +97,23 @@ class CreateProduct extends CreateRecord
 
             // Reset next datas
             $defaultVariant['barcode'] = null;
-            $defaultVariant['inventory_quantity'] = null;
+            // $defaultVariant['inventory_quantity'] = null;
         }
 
         $record->variantItems()
             ->createMany($variantItemRecords);
+    }
+
+    protected function createVariantItemsInventories(Model $record, array $defaultVariant): void
+    {
+        foreach ($record->variantItems as $variantItem) {
+            $variantItem->inventory()
+                ->create([
+                    'available' => $defaultVariant['inventory_quantity'] ?? 0
+                ]);
+
+            $defaultVariant['inventory_quantity'] = 0;
+        }
     }
 
     protected function incrementSku(int $key, ?string $sku): ?string

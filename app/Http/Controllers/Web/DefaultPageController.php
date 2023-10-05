@@ -39,7 +39,7 @@ class DefaultPageController extends Controller
         $page = $this->getPage('sobre');
         $this->generateSEOAttribute($page);
 
-        return view('web.pages.contact-us', compact('page'));
+        return view('web.pages.about', compact('page'));
     }
 
     public function contactUs(): \Illuminate\View\View

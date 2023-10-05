@@ -8,6 +8,7 @@ use App\Services\Shop\ProductService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -37,7 +38,7 @@ class ProductVariantItem extends Model implements HasMedia
         'barcode',
         'inventory_management',
         'inventory_out_allowed',
-        'inventory_quantity',
+        // 'inventory_quantity',
         'inventory_security_alert',
         'requires_shipping',
         'weight',
@@ -63,6 +64,16 @@ class ProductVariantItem extends Model implements HasMedia
         'weight'                => FloatCast::class,
         'dimensions'            => 'array',
     ];
+
+    /**
+     * The inventory of the variant option.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function inventory(): HasOne
+    {
+        return $this->hasOne(related: ProductInventory::class, foreignKey: 'variant_item_id');
+    }
 
     /**
      * The product of the variant option.

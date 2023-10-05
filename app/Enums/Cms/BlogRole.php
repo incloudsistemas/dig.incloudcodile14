@@ -15,10 +15,10 @@ final class BlogRole extends Enum
     public static function getSlug(): array
     {
         return [
-            self::Artigo => 'artigo',
-            self::Link => 'link',
+            self::Artigo  => 'artigo',
+            self::Link    => 'link',
             self::Galeria => 'galeria',
-            self::Vídeo => 'video',
+            self::Vídeo   => 'video',
         ];
     }
 

@@ -1,21 +1,19 @@
 <?php
 
-namespace App\Models\Cms;
+namespace App\Models\Crm\Contacts;
 
-use App\Casts\DateTimeCast;
-use App\Enums\Cms\DefaultPostStatus;
+use App\Enums\DefaultStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Post extends Model
+class Contact extends Model
 {
     use HasFactory;
 
-    protected $table = 'cms_posts';
+    protected $table = 'crm_contacts';
 
     public $timestamps = false;
 
@@ -25,12 +23,10 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'postable_type',
-        'postable_id',
+        'contactable_type',
+        'contactable_id',
         'user_id',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
+        'source_id',
         'status',
         'custom',
     ];
@@ -41,27 +37,36 @@ class Post extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'meta_keywords' => 'array',
-        'custom'        => 'array',
+        'custom' => 'array',
     ];
 
     /**
-     * The categories that belongs to the post.
+     * The roles that belongs to the contact.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function postCategories(): BelongsToMany
+    public function roles()
     {
         return $this->belongsToMany(
-            related: PostCategory::class,
-            table: 'cms_post_has_categories',
-            foreignPivotKey: 'post_id',
-            relatedPivotKey: 'category_id'
+            related: Role::class,
+            table: 'crm_contact_has_roles',
+            foreignPivotKey: 'contact_id',
+            relatedPivotKey: 'contact_role_id'
         );
     }
 
     /**
-     * The user that owns the post.
+     * The source of the contact.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function source(): BelongsTo
+    {
+        return $this->belongsTo(related: Source::class, foreignKey: 'source_id');
+    }
+
+    /**
+     * The user that owns the contact.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -71,11 +76,11 @@ class Post extends Model
     }
 
     /**
-     * Get all of the owning postable models.
+     * Get all of the owning contactable models.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function postable(): MorphTo
+    public function contactable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -97,11 +102,11 @@ class Post extends Model
 
     public function getDisplayStatusAttribute(): string
     {
-        return DefaultPostStatus::getDescription(value: (int) $this->status);
+        return DefaultStatus::getDescription(value: (int) $this->status);
     }
 
     public function getDisplayStatusColorAttribute(): string
     {
-        return DefaultPostStatus::getColorByValue(status: (int) $this->status);
+        return DefaultStatus::getColorByValue(status: (int) $this->status);
     }
 }

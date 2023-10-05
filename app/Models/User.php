@@ -11,6 +11,7 @@ use App\Enums\ProfileInfos\MaritalStatus;
 use App\Enums\UserStatus;
 use App\Models\Address;
 use App\Models\Cms\Post;
+use App\Models\Crm\Contacts\Contact;
 use App\Services\Permissions\RoleService;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -72,11 +73,21 @@ class User extends Authenticatable implements FilamentUser, HasMedia
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'password'          => 'hashed',
         'additional_emails' => 'array',
-        'phones' => 'array',
-        'birth_date' => DateCast::class
+        'phones'            => 'array',
+        'birth_date'        => DateCast::class
     ];
+
+    /**
+     * The contacts that belong to the owner/user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(related: Contact::class);
+    }
 
     /**
      * The cms posts that belong to the owner/user.

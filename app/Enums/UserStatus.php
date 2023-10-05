@@ -13,9 +13,9 @@ final class UserStatus extends Enum
     public static function getStatusColors(): array
     {
         return [
-            self::Ativo => 'success',
+            self::Ativo    => 'success',
             self::Pendente => 'warning',
-            self::Inativo => 'danger',
+            self::Inativo  => 'danger',
         ];
     }
 

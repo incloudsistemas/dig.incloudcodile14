@@ -23,10 +23,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [DefaultPageController::class, 'index'])->name('web.pgs.index');
-Route::get('fotos', [DefaultPageController::class, 'photos'])->name('web.pgs.photos');
-Route::get('videos', [DefaultPageController::class, 'videos'])->name('web.pgs.videos');
-Route::get('fale-conosco', [DefaultPageController::class, 'contactUs'])->name('web.pgs.contact-us');
+Route::get('/', [DefaultPageController::class, 'index'])
+    ->name('web.pgs.index');
+
+Route::get('sobre', [DefaultPageController::class, 'about'])
+    ->name('web.pgs.about');
+
+Route::get('fale-conosco', [DefaultPageController::class, 'contactUs'])
+    ->name('web.pgs.contact-us');
 // ...
 Route::get('regras/{slug}', [DefaultPageController::class, 'rules'])->name('web.pgs.rules');
 

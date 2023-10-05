@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('crm_contact_individuals', function (Blueprint $table) {
             $table->id();
+            // Nome
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('slug')->unique();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
             // Email(s) adicionais
             $table->json('additional_emails')->nullable();
@@ -31,21 +33,8 @@ return new class extends Migration
             $table->char('gender', 1)->nullable();
             // Data de nascimento
             $table->date('birth_date')->nullable();
-            // Estado civil
-            // 1 - 'Solteiro(a)', 2 - 'Casado(a)', 3 - 'Divorciado(a)', 4 - 'Viúvo(a)', 5 - 'Separado(a)', 6 - 'Companheiro(a)'.
-            $table->integer('marital_status')->nullable();
-            // Escolaridade
-            //1 - 'Fundamental', 2 - 'Médio', 3 - 'Superior', 4 - 'Pós-graduação', 5 - 'Mestrado', 6 - 'Doutorado'.
-            $table->integer('educational_level')->nullable();
-            // Nacionalidade
-            $table->string('nationality')->nullable();
-            // Cidadania / Naturalidade
-            $table->string('citizenship')->nullable();
-            // Complemento
-            $table->text('complement')->nullable();
-            // Status
-            // 0- Inativo, 1 - Ativo, 2 - Pendente.
-            $table->char('status', 1)->default(1);
+            // Cargo
+            $table->string('occupation')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -56,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('crm_contact_individuals');
     }
 };

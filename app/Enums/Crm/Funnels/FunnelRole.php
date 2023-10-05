@@ -1,23 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace App\Enums\Cms;
+namespace App\Enums\Crm\Funnels;
 
 use BenSampo\Enum\Enum;
 
-final class PostSliderRole extends Enum
+final class FunnelRole extends Enum
 {
-    #[Description('Padrão (Imagem)')]
-    const Padrão = 1;
-    const Vídeo = 2;
-    #[Description('Youtube Vídeo')]
-    const Youtube = 3;
+    #[Description('Funis de negócios')]
+    const Business = 1;
+    #[Description('Funis de contatos')]
+    const Contact = 2;
 
     public static function getSlug(): array
     {
         return [
-            self::Padrão  => 'padrao',
-            self::Vídeo   => 'video',
-            self::Youtube => 'youtube',
+            self::Business => 'artigo',
+            self::Contact  => 'link',
         ];
     }
 

@@ -57,6 +57,17 @@ class AppServiceProvider extends ServiceProvider
             'shop_products'                => 'App\Models\Shop\Product',
             'shop_product_variant_options' => 'App\Models\Shop\ProductVariantOption',
             'shop_product_variant_items'   => 'App\Models\Shop\ProductVariantItem',
+            'shop_product_inventory_items' => 'App\Models\Shop\ProductInventoryItem',
+            'shop_inventory_activities'    => 'App\Models\Shop\InventoryActivity',
+
+            'crm_funnels'                 => 'App\Models\Crm\Funnels\Funnel',
+            'crm_funnel_stages'           => 'App\Models\Crm\Funnels\FunnelStage',
+            'crm_model_has_funnel_stages' => 'App\Models\Crm\Funnels\ModelHasFunnelStage',
+            'crm_contact_sources'         => 'App\Models\Crm\Contacts\Source',
+            'crm_contact_roles'           => 'App\Models\Crm\Contacts\Role',
+            'crm_contacts'                => 'App\Models\Crm\Contacts\Contact',
+            'crm_contact_individuals'     => 'App\Models\Crm\Contacts\Individual',
+            'crm_contact_legal_entities'  => 'App\Models\Crm\Contacts\LegalEntity',
         ]);
     }
 }

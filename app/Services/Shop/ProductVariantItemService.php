@@ -3,6 +3,7 @@
 namespace App\Services\Shop;
 
 use App\Enums\DefaultStatus;
+use App\Models\Shop\ProductInventory;
 use App\Models\Shop\ProductVariantItem;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -13,28 +14,34 @@ class ProductVariantItemService
         $this->variantItem = $variantItem;
     }
 
-    public function getProfitAndMargin(?string $price, ?string $cost): array
+    public function editAction(ProductVariantItem $variantItem, array $data): ProductVariantItem
     {
-        $result = [
-            'profit'        => '',
-            'profit_margin' => ''
-        ];
+        $data['activity']['changed_from'] = $this->getInventoryData($variantItem->inventory);
+        $data['activity']['changed_to'] = $data['inventory'];
 
-        if ($price && $cost) {
-            $price = ConvertPtBrFloatStringToInt(value: $price);
-            $cost  = ConvertPtBrFloatStringToInt(value: $cost);
+        $variantItem->update($data);
 
-            $profit = $price - $cost;
-            $profitMargin = $profit / $price;
+        $inventory = $variantItem->inventory()->updateOrCreate(
+            ['variant_item_id' => $variantItem->id],
+            $data['inventory']
+        );
 
-            $profit = round(floatval($profit) / 100, precision: 2);
-            $profitMargin = round(floatval($profitMargin) * 100, precision: 2);
+        $this->createInventoryActivity(data: $data['activity'], inventory: $inventory);
 
-            $result['profit'] = number_format($profit, 2, ',', '.');
-            $result['profit_margin'] = number_format($profitMargin, 2, ',', '.');
+        return $variantItem;
+    }
+
+    public static function createInventoryActivity(array $data, ProductInventory $inventory): void
+    {
+        $changes = array_diff_assoc($data['changed_to'], $data['changed_from']);
+
+        if (!empty($changes) && auth()->check()) {
+            $data['user_id'] = auth()->user()->id;
+            $data['reason'] = null;
+
+            $inventory->inventoryActivities()
+                ->create($data);
         }
-
-        return $result;
     }
 
     public function tableSortByPrice(Builder $query, string $direction): Builder
@@ -86,11 +93,65 @@ class ProductVariantItemService
         $data['profit'] = $variantItem->display_profit;
         $data['profit_margin'] = $variantItem->display_profit_margin;
 
+        $data['inventory'] = $this->getInventoryData($variantItem->inventory);
+
         return $data;
     }
 
     public function ignoreDefaultVariantOption(Builder $query): Builder
     {
         return $query->where('name', '<>', 'Default Variant');
+    }
+
+    public static function getInventoryData(?ProductInventory $inventory): array
+    {
+        $fields = [
+            'available',
+            'committed',
+            'unavailable_damaged',
+            'unavailable_quality_control',
+            'unavailable_safety',
+            'unavailable_other',
+            'to_receive',
+            'total'
+        ];
+
+        $data = [];
+
+        foreach ($fields as $field) {
+            $data[$field] = isset($inventory) ? $inventory->$field : 0;
+        }
+
+        return $data;
+    }
+
+    public function getProfitAndMargin(?string $price, ?string $cost): array
+    {
+        $result = [
+            'profit'        => '',
+            'profit_margin' => ''
+        ];
+
+        if ($price && $cost) {
+            $price = ConvertPtBrFloatStringToInt(value: $price);
+            $cost  = ConvertPtBrFloatStringToInt(value: $cost);
+
+            $profit = $price - $cost;
+            $profitMargin = $profit / $price;
+
+            $profit = round(floatval($profit) / 100, precision: 2);
+            $profitMargin = round(floatval($profitMargin) * 100, precision: 2);
+
+            $result['profit'] = number_format($profit, 2, ',', '.');
+            $result['profit_margin'] = number_format($profitMargin, 2, ',', '.');
+        }
+
+        return $result;
+    }
+
+    public function getInventoryTotal(array $data): int
+    {
+        $total = $data['available'] + $data['committed'] + $data['unavailable_damaged'] + $data['unavailable_quality_control'] + $data['unavailable_safety'] + $data['unavailable_other'];
+        return $total;
     }
 }
