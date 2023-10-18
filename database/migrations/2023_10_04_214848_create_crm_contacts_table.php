@@ -34,7 +34,6 @@ return new class extends Migration
             $table->char('status', 1)->default(1);
             // Atributos personalizados
             $table->json('custom')->nullable();
-
             // Permite apenas um contato por registro.
             $table->unique(['contactable_id', 'contactable_type'], 'contactable_unique');
         });

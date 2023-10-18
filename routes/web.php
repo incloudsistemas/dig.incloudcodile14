@@ -65,6 +65,31 @@ Route::group(['prefix' => 'blog'], function () {
         ->name('web.blog.show');
 });
 
+Route::get('inventory-func-to-products-script', function () {
+
+    $variantItem = App\Models\Shop\ProductVariantItem::class;
+
+    $items = $variantItem::all();
+
+    Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+    Illuminate\Support\Facades\DB::table('shop_product_inventories')->truncate();
+    Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
+    echo "SCRIPT INICIADO. <br>";
+
+    foreach ($items as $variantItem) {
+        $variantItem->inventory()
+            ->create([
+                'available' => $variantItem->inventory_quantity ?? 0,
+            ]);
+
+        // echo "Inventário do produto: " . $variantItem->product->name . " - " . $variantItem->name ." Finalizou <br>";
+    }
+
+    echo "SCRIPT FINALIZADO. <br>";
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | CLEAR

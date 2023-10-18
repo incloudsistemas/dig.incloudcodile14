@@ -22,7 +22,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             // Nome
             $table->string('name');
-            $table->string('slug')->unique();
+            // $table->string('slug')->unique();
             // Descrição
             $table->longText('description')->nullable();
             // Probabilidade de negócio

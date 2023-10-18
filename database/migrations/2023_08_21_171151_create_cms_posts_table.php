@@ -25,7 +25,7 @@ return new class extends Migration
             // SEO
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
-            $table->json('meta_keywords')->nullable();          
+            $table->json('meta_keywords')->nullable();
             // Status
             // 0- Inativo, 1 - Ativo, 2 - Rascunho
             $table->char('status', 1)->default(1);

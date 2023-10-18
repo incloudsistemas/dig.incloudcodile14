@@ -14,7 +14,6 @@ class ProductCategoriesForWomenStoresSeeder extends Seeder
      */
     public function run(): void
     {
-        // Array com as categorias e subcategorias
         $categories = [
             'Calçados' => [
                 'Anabela',
@@ -85,7 +84,6 @@ class ProductCategoriesForWomenStoresSeeder extends Seeder
         ];
 
         foreach ($categories as $parentName => $subcategories) {
-            // Inserir a categoria pai
             $categoryId = DB::table('shop_product_categories')->insertGetId([
                 'category_id' => null,
                 'name'        => $parentName,
@@ -94,7 +92,6 @@ class ProductCategoriesForWomenStoresSeeder extends Seeder
                 'updated_at'  => now()
             ]);
 
-            // Inserir as subcategorias relacionadas
             foreach ($subcategories as $subcategoryName) {
                 DB::table('shop_product_categories')->insert([
                     'category_id' => $categoryId,

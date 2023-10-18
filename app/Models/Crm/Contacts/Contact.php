@@ -3,10 +3,16 @@
 namespace App\Models\Crm\Contacts;
 
 use App\Enums\DefaultStatus;
+use App\Models\Business\Business;
+use App\Models\Crm\Funnels\Funnel;
+use App\Models\Crm\Funnels\ModelHasFunnelStage;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Contact extends Model
@@ -39,6 +45,39 @@ class Contact extends Model
     protected $casts = [
         'custom' => 'array',
     ];
+
+    /**
+     * The business(es) that belong to the contact.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function business(): HasMany
+    {
+        return $this->hasMany(related: Business::class, foreignKey: 'contact_id');
+    }
+
+    /**
+     * Get the business' funnel stages.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function funnelStages(): MorphMany
+    {
+        return $this->morphMany(related: ModelHasFunnelStage::class, name: 'model');
+    }
+
+    /**
+     * Get all of the funnels for the contact.
+     */
+    public function funnels()
+    {
+        return $this->morphToMany(
+            related: Funnel::class,
+            name: 'funnelable',
+            table: 'crm_funnelables',
+            relatedPivotKey: 'funnel_id'
+        );
+    }
 
     /**
      * The roles that belongs to the contact.
@@ -90,6 +129,11 @@ class Contact extends Model
      *
      */
 
+    public function scopeByStatuses(Builder $query, array $statuses = [1,]): Builder
+    {
+        return $query->whereIn('status', $statuses);
+    }
+
     /**
      * MUTATORS.
      *
@@ -99,6 +143,11 @@ class Contact extends Model
      * CUSTOMS.
      *
      */
+
+    public function getNameAttribute(): string
+    {
+        return $this->contactable->name;
+    }
 
     public function getDisplayStatusAttribute(): string
     {

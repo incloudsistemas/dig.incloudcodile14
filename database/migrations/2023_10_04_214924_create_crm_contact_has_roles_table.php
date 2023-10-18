@@ -26,7 +26,7 @@ return new class extends Migration
                 ->on('crm_contact_roles')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-
+            // Não permite o contato ter tipos duplicados.
             $table->unique(['contact_id', 'contact_role_id'], 'contact_has_roles_unique');
         });
     }

@@ -131,4 +131,34 @@ class Product extends Model implements HasMedia
      * CUSTOMS.
      *
      */
+
+    public function getRefSkuAttribute(): ?string
+    {
+        $skus = $this->variantItems->pluck('sku')
+            ->filter()
+            ->unique();
+
+        return $skus->count() > 1 ? $skus->first() . ' ... ' . $skus->last() : $skus->first() ?? null;
+    }
+
+    public function getRefPriceAttribute(): ?string
+    {
+        $refPrice =  $this->variantItems->min('price');
+
+        return $refPrice ? number_format($refPrice, 2, ',', '.') : null;
+    }
+
+    public function getAvailableInventoryAttribute(): string
+    {
+        $availableInventory = $this->variantItems->sum(
+            fn($variantItem) => $variantItem->inventory->available ?? 0
+        );
+
+        $variantsCount = $this->variantItems->count();
+
+        $unit = $availableInventory > 1 ? 'unds.' : 'und.';
+        $variant = $variantsCount > 1 ? 'variantes' : 'variante';
+
+        return "{$availableInventory} {$unit} em {$variantsCount} {$variant}";
+    }
 }

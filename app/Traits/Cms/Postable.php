@@ -120,6 +120,13 @@ trait Postable
             : PlaceholderImg(width: 1920, height: 1080);
     }
 
+    public function getFeaturedImageThumb(int $width, int $height, string $type = 'fit'): string
+    {
+        return isset($this->featured_image)
+            ? CreateThumb(src: $this->featured_image->getUrl(), width: $width, height: $height)
+            : PlaceholderImg(width: $width, height: $height);
+    }
+
     /**
      * WEBSITE EXCLUSIVE.
      *

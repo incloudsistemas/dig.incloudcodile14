@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         Models\Cms\Partner::class            => Policies\Cms\PartnerPolicy::class,
         Models\Cms\TeamMember::class         => Policies\Cms\TeamMemberPolicy::class,
         Models\Cms\ExternalUsefulLink::class => Policies\Cms\ExternalUsefulLinkPolicy::class,
-
+        // ...
         Models\Cms\PostSlider::class    => Policies\Cms\MainPostSliderPolicy::class,
         Models\Cms\PostCategory::class  => Policies\Cms\PostCategoryPolicy::class,
 
@@ -36,6 +36,15 @@ class AuthServiceProvider extends ServiceProvider
         Models\Shop\ProductBrand::class    => Policies\Shop\ProductBrandPolicy::class,
         Models\Shop\Product::class         => Policies\Shop\ProductPolicy::class,
 
+        Models\Crm\Funnels\BusinessFunnel::class => Policies\Crm\Funnels\BusinessFunnelPolicy::class,
+        Models\Crm\Funnels\ContactFunnel::class  => Policies\Crm\Funnels\ContactFunnelPolicy::class,
+
+        Models\Crm\Contacts\Source::class      => Policies\Crm\Contacts\SourcePolicy::class,
+        Models\Crm\Contacts\Role::class        => Policies\Crm\Contacts\RolePolicy::class,
+        Models\Crm\Contacts\Individual::class  => Policies\Crm\Contacts\IndividualPolicy::class,
+        Models\Crm\Contacts\LegalEntity::class => Policies\Crm\Contacts\LegalEntityPolicy::class,
+
+        Models\Business\ShopBusiness::class => Policies\Business\ShopBusinessPolicy::class,
     ];
 
     /**

@@ -14,8 +14,8 @@ if (!function_exists('CreateThumb')) {
      */
     function CreateThumb(
         string $src,
-        ?int $width = null,
-        ?int $height = null,
+        int $width,
+        int $height,
         string $disk = 'public',
         string $type = 'fit',
         int $quality = 80
@@ -28,9 +28,9 @@ if (!function_exists('CreateThumb')) {
         return Cache::remember($cacheKey, now()->addDay(), function () use ($src, $width, $height, $disk, $type, $quality) {
             $src = ltrim($src, '/');
 
-            if (is_null($width) && is_null($height)) {
-                return $src;
-            }
+            // if (is_null($width) || is_null($height)) {
+            //     return $src;
+            // }
 
             // Check if it is a complete URL
             if (strpos($src, 'storage') !== false) {

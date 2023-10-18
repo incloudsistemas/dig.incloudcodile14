@@ -9,4 +9,12 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateService extends CreateRecord
 {
     protected static string $resource = ServiceResource::class;
+
+    protected function afterCreate(): void
+    {
+        // Force post create
+        if (!$this->record->cmsPost) {
+            $this->record->cmsPost()->create([]);
+        }
+    }
 }

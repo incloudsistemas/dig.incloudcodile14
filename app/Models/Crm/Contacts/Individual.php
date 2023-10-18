@@ -23,7 +23,7 @@ class Individual extends Model implements HasMedia
      */
     protected $fillable = [
         'name',
-        'slug',
+        // 'slug',
         'email',
         'password',
         'additional_emails',
@@ -33,6 +33,7 @@ class Individual extends Model implements HasMedia
         'gender',
         'birth_date',
         'occupation',
+        'complement'
     ];
 
     /**
@@ -72,6 +73,21 @@ class Individual extends Model implements HasMedia
             relatedPivotKey: 'legal_entity_id'
         )
             ->withPivot(columns: 'order');
+    }
+
+    /**
+     * EVENT LISTENERS.
+     *
+     */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Self $individual): void {
+            $individual->email = $individual->email . '//deleted_' . md5(uniqid());
+            $individual->save();
+        });
     }
 
     /**

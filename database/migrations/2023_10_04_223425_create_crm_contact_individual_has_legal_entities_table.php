@@ -28,7 +28,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             // order 0 - main
             $table->integer('order')->default(1);
-
+            // Não permite o contato ter empresas duplicadas.
             $table->unique(['individual_id', 'legal_entity_id'], 'individual_has_legal_entities_unique');
         });
     }

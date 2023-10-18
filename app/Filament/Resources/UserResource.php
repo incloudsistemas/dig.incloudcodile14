@@ -146,22 +146,6 @@ class UserResource extends Resource
                             )
                             ->columnSpanFull()
                             ->columns(2),
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('avatar')
-                            ->label(__('Avatar'))
-                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 500x500px // 5 mb.'))
-                            ->collection('avatar')
-                            ->image()
-                            // ->responsiveImages()
-                            ->getUploadedFileNameForStorageUsing(
-                                fn (TemporaryUploadedFile $file, callable $get): string =>
-                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
-                                    ->prepend(Str::slug($get('name'))),
-                            )
-                            ->imageResizeMode('contain')
-                            ->imageResizeTargetWidth('500')
-                            ->imageResizeTargetHeight('500')
-                            ->imageResizeUpscale(false)
-                            ->maxSize(5120),
                     ])
                     ->columns(2)
                     ->collapsible(),
@@ -267,6 +251,22 @@ class UserResource extends Resource
                             ->minLength(2)
                             ->maxLength(65535)
                             ->columnSpanFull(),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('avatar')
+                            ->label(__('Avatar'))
+                            ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 500x500px // 5 mb.'))
+                            ->collection('avatar')
+                            ->image()
+                            // ->responsiveImages()
+                            ->getUploadedFileNameForStorageUsing(
+                                fn (TemporaryUploadedFile $file, callable $get): string =>
+                                (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
+                                    ->prepend(Str::slug($get('name'))),
+                            )
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('500')
+                            ->imageResizeTargetHeight('500')
+                            ->imageResizeUpscale(false)
+                            ->maxSize(5120),
                     ])
                     ->columns(2)
                     ->collapsible(),
@@ -341,7 +341,7 @@ class UserResource extends Resource
                         name: 'roles',
                         titleAttribute: 'name',
                         modifyQueryUsing: fn (RoleService $service, Builder $query): Builder =>
-                            $service->getRolesbyAuthUserRoles(query: $query)
+                        $service->getRolesbyAuthUserRoles(query: $query)
                     )
                     ->multiple()
                     ->preload(),

@@ -69,4 +69,9 @@ class ModelHasFunnelStage extends Model
      * CUSTOMS.
      *
      */
+
+    public function getNameAttribute(): string
+    {
+        return $this->stage->name;
+    }
 }

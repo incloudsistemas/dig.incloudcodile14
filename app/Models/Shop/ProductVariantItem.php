@@ -123,25 +123,36 @@ class ProductVariantItem extends Model implements HasMedia
      *
      */
 
-    public function getDisplayInventoryTrackedAttribute(): ?string
+    public function getDisplayInventoryTrackedAttribute(): string
     {
         return (int) $this->inventory_tracked === 1
             ? 'Sim'
             : 'Não';
     }
 
-    public function getDisplayInventoryOutAllowedAttribute(): ?string
+    public function getDisplayInventoryOutAllowedAttribute(): string
     {
         return (int) $this->inventory_out_allowed === 1
             ? 'Sim'
             : 'Não';
     }
 
-    public function getDisplayRequiresShippingAttribute(): ?string
+    public function getDisplayRequiresShippingAttribute(): string
     {
         return (int) $this->requires_shipping === 1
             ? 'Sim'
             : 'Não';
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        $displayName = $this->product->name;
+
+        if ($this->name !== "Default Variant") {
+            $displayName .= " - {$this->name}";
+        }
+
+        return "{$displayName} ({$this->sku})";
     }
 
     public function getDisplayStatusAttribute(): string

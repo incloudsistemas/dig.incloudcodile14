@@ -3,6 +3,7 @@
 namespace App\Models\Crm\Funnels;
 
 use App\Enums\DefaultStatus;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +24,7 @@ class FunnelStage extends Model
     protected $fillable = [
         'funnel_id',
         'name',
-        'slug',
+        // 'slug',
         'description',
         'business_probability',
         'order',

@@ -14,8 +14,7 @@ class CreatePage extends CreateRecord
     {
         // Force post create
         if (!$this->record->cmsPost) {
-            $this->record->cmsPost()
-                ->create(['publish_at' => now()]);
+            $this->record->cmsPost()->create([]);
         }
     }
 }

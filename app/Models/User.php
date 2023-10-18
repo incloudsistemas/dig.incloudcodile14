@@ -10,6 +10,7 @@ use App\Enums\ProfileInfos\Gender;
 use App\Enums\ProfileInfos\MaritalStatus;
 use App\Enums\UserStatus;
 use App\Models\Address;
+use App\Models\Business\Business;
 use App\Models\Cms\Post;
 use App\Models\Crm\Contacts\Contact;
 use App\Services\Permissions\RoleService;
@@ -78,6 +79,16 @@ class User extends Authenticatable implements FilamentUser, HasMedia
         'phones'            => 'array',
         'birth_date'        => DateCast::class
     ];
+
+    /**
+     * The business(es) that belong to the owner/user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function business(): HasMany
+    {
+        return $this->hasMany(related: Business::class);
+    }
 
     /**
      * The contacts that belong to the owner/user.

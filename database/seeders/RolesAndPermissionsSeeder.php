@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
-use Str;
+use Illuminate\Support\Str;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -72,7 +72,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
                 $user->assignRole($role);
             }
-        }        
+        }
 
         $this->forgetCachedPermissions();
     }
@@ -85,7 +85,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'Editar Níveis de Acessos',
             'Deletar Níveis de Acessos',
         ];
-    
+
         foreach ($permissionNames as $key => $name) {
             Permission::firstOrCreate(['name' => $name]);
 

@@ -31,8 +31,8 @@ return new class extends Migration
             $table->json('changed_from')->nullable();
             // Alterado para
             $table->json('changed_to')->nullable();
-            // Razão
-            $table->text('reason')->nullable();
+            // Descrição/Razão
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

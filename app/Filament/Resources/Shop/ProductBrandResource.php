@@ -32,8 +32,7 @@ class ProductBrandResource extends Resource
 
     protected static ?int $navigationSort = 99;
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
-    // protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
+    protected static ?string $navigationIcon = 'heroicon-o-squares-plus';
 
     public static function form(Form $form): Form
     {

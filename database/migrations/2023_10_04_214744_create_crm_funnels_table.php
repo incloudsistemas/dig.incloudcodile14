@@ -18,7 +18,7 @@ return new class extends Migration
             $table->char('role', 1)->default(1);
             // Nome
             $table->string('name');
-            $table->string('slug')->unique();
+            // $table->string('slug')->unique();
             // Descrição
             $table->longText('description')->nullable();
             // Ordem

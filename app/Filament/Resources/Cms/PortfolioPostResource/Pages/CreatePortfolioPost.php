@@ -9,4 +9,12 @@ use Filament\Resources\Pages\CreateRecord;
 class CreatePortfolioPost extends CreateRecord
 {
     protected static string $resource = PortfolioPostResource::class;
+
+    protected function afterCreate(): void
+    {
+        // Force post create
+        if (!$this->record->cmsPost) {
+            $this->record->cmsPost()->create([]);
+        }
+    }
 }

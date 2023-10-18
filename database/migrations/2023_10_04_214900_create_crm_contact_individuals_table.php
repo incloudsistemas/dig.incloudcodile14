@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             // Nome
             $table->string('name');
-            $table->string('slug')->unique();
+            // $table->string('slug')->unique();
+            // Email
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            // Senha
             $table->string('password')->nullable();
             $table->rememberToken();
             // Email(s) adicionais
@@ -35,6 +37,8 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             // Cargo
             $table->string('occupation')->nullable();
+            // Complemento
+            $table->text('complement')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

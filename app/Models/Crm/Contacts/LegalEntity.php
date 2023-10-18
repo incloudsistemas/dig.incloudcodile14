@@ -25,7 +25,7 @@ class LegalEntity extends Model implements HasMedia
      */
     protected $fillable = [
         'name',
-        'slug',
+        // 'slug',
         'email',
         'additional_emails',
         'phones',
@@ -36,7 +36,8 @@ class LegalEntity extends Model implements HasMedia
         'url',
         'sector',
         'num_employees',
-        'anual_income'
+        'anual_income',
+        'complement'
     ];
 
     /**
@@ -74,6 +75,21 @@ class LegalEntity extends Model implements HasMedia
             relatedPivotKey: 'individual_id'
         )
             ->withPivot(columns: 'order');
+    }
+
+    /**
+     * EVENT LISTENERS.
+     *
+     */
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Self $legalEntity): void {
+            $legalEntity->email = $legalEntity->email . '//deleted_' . md5(uniqid());
+            $legalEntity->save();
+        });
     }
 
     /**

@@ -11,10 +11,10 @@ use App\Models\Shop\ProductVariantItem;
 use App\Services\Cms\PostService;
 use App\Services\Shop\ProductBrandService;
 use App\Services\Shop\ProductCategoryService;
+use App\Services\Shop\ProductService;
 use App\Services\Shop\ProductVariantItemService;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -23,10 +23,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Unique;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductResource extends Resource
@@ -39,7 +36,7 @@ class ProductResource extends Resource
 
     protected static ?string $navigationGroup = 'Loja';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationIcon = 'heroicon-o-gift-top';
 
@@ -202,7 +199,10 @@ class ProductResource extends Resource
                                     )
                                     ->placeholder('0,00')
                                     ->maxValue(42949672.95),
-                                Forms\Components\Grid::make(['default' => 3])
+                                Forms\Components\Grid::make([
+                                    'default' => 1,
+                                    'md'      => 3,
+                                ])
                                     ->schema([
                                         Forms\Components\TextInput::make('default_variant.unit_cost')
                                             ->label(__('Custo por item'))
@@ -240,7 +240,7 @@ class ProductResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('default_variant.sku')
                                     ->label(__('SKU (Unidade de manutenção de estoque)'))
-                                    ->unique(ProductVariantItem::class, 'sku', ignoreRecord: true)
+                                    // ->unique(ProductVariantItem::class, 'sku', ignoreRecord: true)
                                     ->minLength(2)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('default_variant.barcode')
@@ -263,7 +263,14 @@ class ProductResource extends Resource
                                     ->columnSpanFull(),
                                 Forms\Components\Group::make()
                                     ->schema([
-                                        Forms\Components\Grid::make(['default' => 3])
+                                        Forms\Components\Grid::make([
+                                            // 'default' => 3,
+                                            'sm'      => 1,
+                                            'md'      => 3,
+                                            'lg'      => 3,
+                                            'xl'      => 3,
+                                            '2xl'     => 3,
+                                        ])
                                             ->schema([
                                                 Forms\Components\TextInput::make('default_variant.inventory.available')
                                                     ->numeric()
@@ -377,7 +384,10 @@ class ProductResource extends Resource
                                     ->default(true)
                                     ->live()
                                     ->columnSpanFull(),
-                                Forms\Components\Grid::make(['default' => 4])
+                                Forms\Components\Grid::make([
+                                    'default' => 2,
+                                    'lg'      => 4,
+                                ])
                                     ->schema([
                                         Forms\Components\TextInput::make('default_variant.weight')
                                             ->label(__('Peso'))
@@ -691,29 +701,16 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('productBrand.name')
                     ->label(__('Marca / Fabricante'))
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('order')
-                //     ->label(__('Ordem'))
-                //     ->sortable(),
-                // Tables\Columns\TextColumn::make('cmsPost.display_status')
-                //     ->label(__('Status'))
-                //     ->badge()
-                //     ->color(
-                //         fn (string $state): string =>
-                //         DefaultPostStatus::getColorByDescription(statusDesc: $state)
-                //     )
-                //     ->searchable(
-                //         query: fn (PostService $service, Builder $query, string $search): Builder =>
-                //         $service->tableSearchByStatus(query: $query, search: $search)
-                //     )
-                //     ->sortable(
-                //         query: fn (PostService $service, Builder $query, string $direction): Builder =>
-                //         $service->tableSortByStatus(postableType: 'shop_products', query: $query, direction: $direction)
-                //     ),
-                // Tables\Columns\TextColumn::make('publish_at')
-                //     ->label(__('Publicação'))
-                //     ->dateTime('d/m/Y H:i')
-                //     ->searchable()
-                //     ->sortable(),
+                Tables\Columns\TextColumn::make('ref_sku')
+                    ->label(__('SKU Ref.'))
+                    ->searchable(
+                        query: fn (ProductService $service, Builder $query, string $search): Builder =>
+                        $service->tableSearchBySku(query: $query, search: $search)
+                    ),
+                Tables\Columns\TextColumn::make('ref_price')
+                    ->label(__('Preço Ref. (R$)')),
+                Tables\Columns\TextColumn::make('available_inventory')
+                    ->label(__('Estoque disponível')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i')
@@ -750,14 +747,34 @@ class ProductResource extends Resource
                     )
                     ->multiple()
                     ->preload(),
-                // Tables\Filters\SelectFilter::make('status')
-                //     ->label(__('Status'))
-                //     ->options(DefaultPostStatus::asSelectArray())
-                //     ->query(
-                //         fn (PostService $service, Builder $query, array $data): Builder =>
-                //         $service->tableFilterGetQueryByStatuses(query: $query, data: $data)
-                //     )
-                //     ->multiple(),
+                Tables\Filters\Filter::make('created_at')
+                    ->label(__('Cadastro'))
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label(__('Cadastro de'))
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(
+                                function (callable $get, callable $set, ?string $state): void {
+                                    if (empty($get('created_until'))) {
+                                        $set('created_until', $state);
+                                    }
+                                }
+                            ),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label(__('Cadastro até'))
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(
+                                function (callable $get, callable $set, ?string $state): void {
+                                    if (empty($get('created_from'))) {
+                                        $set('created_from', $state);
+                                    }
+                                }
+                            ),
+                    ])
+                    ->query(
+                        fn (ProductService $service, Builder $query, array $data): Builder =>
+                        $service->tableFilterByCreatedAt(query: $query, data: $data)
+                    ),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

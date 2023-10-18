@@ -23,7 +23,7 @@ class InventoryActivity extends Model
         'user_id',
         'changed_from',
         'changed_to',
-        'reason'
+        'description'
     ];
 
     /**

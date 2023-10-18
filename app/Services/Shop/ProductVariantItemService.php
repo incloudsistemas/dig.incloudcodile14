@@ -37,7 +37,6 @@ class ProductVariantItemService
 
         if (!empty($changes) && auth()->check()) {
             $data['user_id'] = auth()->user()->id;
-            $data['reason'] = null;
 
             $inventory->inventoryActivities()
                 ->create($data);

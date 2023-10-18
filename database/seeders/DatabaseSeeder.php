@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use Database\Seeders\Crm\Contacts\RolesSeeder;
+use Database\Seeders\Crm\Contacts\SourcesSeeder;
+use Database\Seeders\Crm\Funnels\FunnelsSeeder;
 use Database\Seeders\Shop\ProductCategoriesForWomenStoresSeeder;
 use Illuminate\Database\Seeder;
 
@@ -16,8 +19,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
-            UsersSeeder::class,
+            // UsersSeeder::class,
+
             // ProductCategoriesForWomenStoresSeeder::class,
+
+            FunnelsSeeder::class,
+            SourcesSeeder::class,
+            RolesSeeder::class,
         ]);
 
         // \App\Models\User::factory(10)->create();

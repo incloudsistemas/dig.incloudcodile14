@@ -68,6 +68,9 @@ class AppServiceProvider extends ServiceProvider
             'crm_contacts'                => 'App\Models\Crm\Contacts\Contact',
             'crm_contact_individuals'     => 'App\Models\Crm\Contacts\Individual',
             'crm_contact_legal_entities'  => 'App\Models\Crm\Contacts\LegalEntity',
+
+            'business'              => 'App\Models\Business\Business',
+            'business_traded_items' => 'App\Models\Business\TradedItem',
         ]);
     }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             // Nome
             $table->string('name');
-            $table->string('slug')->unique();
+            // $table->string('slug')->unique();
             // Email
             $table->string('email')->unique()->nullable();
             // Email(s) adicionais
@@ -38,6 +38,8 @@ return new class extends Migration
             $table->integer('num_employees')->nullable();
             // Receita anual
             $table->integer('anual_income')->nullable();
+            // Complemento
+            $table->text('complement')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
