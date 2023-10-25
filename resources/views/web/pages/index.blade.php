@@ -7,7 +7,7 @@
 {{-- Content --}}
 @section('content')
     <!-- Slider
-    ============================================= -->
+        ============================================= -->
     <section id="slider" class="slider-element slider-parallax min-vh-100 include-header">
         <div class="slider-inner">
             <div class="row align-items-stretch text-center dark w-100 h-100 mx-0 position-absolute">
@@ -34,8 +34,8 @@
                     </div>
                     <div class="video-wrap no-placeholder">
                         <video id="slide-video" class="lazy"
-                            data-poster="{{ $subpages[0]->getMedia('image')->first()->getUrl() }}" preload="auto"
-                            loop muted playsinline>
+                            data-poster="{{ $subpages[0]->getMedia('image')->first()->getUrl() }}" preload="auto" loop muted
+                            playsinline>
                             {{-- <source class="lazy" data-src='{{ asset('web-build/images/marketing-digital.webm') }}'
                                 type='video/webm'> --}}
                             <source class="lazy" data-src='{{ $subpages[0]->getMedia('video')->first()->getUrl() }}'
@@ -69,8 +69,8 @@
                     </div>
                     <div class="video-wrap no-placeholder">
                         <video id="slide-video" class="lazy"
-                            data-poster="{{ $subpages[1]->getMedia('image')->first()->getUrl() }}" preload="auto"
-                            loop muted playsinline>
+                            data-poster="{{ $subpages[1]->getMedia('image')->first()->getUrl() }}" preload="auto" loop muted
+                            playsinline>
                             {{-- <source class="lazy" data-src='{{ asset('web-build/images/marketing-digital.webm') }}'
                                 type='video/webm'> --}}
                             <source class="lazy" data-src='{{ $subpages[1]->getMedia('video')->first()->getUrl() }}'
@@ -86,7 +86,7 @@
     <!-- #slider end -->
 
     <!-- Content
-    ============================================= -->
+        ============================================= -->
     <section id="content">
         <div class="content-wrap">
             <div id="about" class="section dark m-0 header-stick lazy"
@@ -407,7 +407,7 @@
                                             </div>
 
                                             <div class="col-lg-12 form-group mb-2">
-                                                <div class="form-check">
+                                                <div class="form-check mb-0">
                                                     <input type="checkbox" id="ruleCheck" class="form-check-input"
                                                         value="1">
                                                     <label class="form-check-label text-light" for="ruleCheck">
@@ -425,9 +425,9 @@
                                                     id="business-lead-botcheck" class="form-control">
                                             </div>
 
-                                            <div class="col-lg-12 form-group mb-0">
+                                            <div class="col-lg-12 form-group mb-2">
                                                 <button type="submit" id="business-lead-submit"
-                                                    class="button button-white button-large button-shadow button-shadow-dark border border-width-2 border-dark rounded text-dark h-text-light"
+                                                    class="button button-white button-large button-shadow button-shadow-dark border border-width-2 border-dark rounded text-dark h-text-light m-0"
                                                     data-form-action="submit">
                                                     <div class="indicator-label">
                                                         <i class="uil uil-navigator"></i>
@@ -441,6 +441,11 @@
                                                 </button>
                                             </div>
                                         </div>
+
+                                        <input type="hidden" class="g-recaptcha-site"
+                                            value="{{ config('app.g_recapcha_site') }}">
+                                        <input type="hidden" name="g-recaptcha-response" class="g-recaptcha-response"
+                                            value="">
 
                                         <input type="hidden" name="post_id" value="{{ $page->cmsPost->id }}">
                                         <input type="hidden" name="page" value="{{ $page->title ?? $page->name }}">

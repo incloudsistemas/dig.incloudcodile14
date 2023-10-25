@@ -95,3 +95,10 @@ h2.swal2-title {
 .swal2-actions {
     margin: 0.8em auto 0 !important;
 }
+
+/* GOOGLE RECAPTCHA
+-----------------------------------------------------------------*/
+
+.grecaptcha-badge {
+    visibility: hidden;
+}

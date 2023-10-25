@@ -10,6 +10,11 @@ class CreateBlogPost extends CreateRecord
 {
     protected static string $resource = BlogPostResource::class;
 
+    // protected function getRedirectUrl(): string
+    // {
+    //     return $this->getResource()::getUrl('index');
+    // }
+
     protected function afterCreate(): void
     {
         // Force post create

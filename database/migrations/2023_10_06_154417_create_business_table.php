@@ -30,8 +30,13 @@ return new class extends Migration
             // Papel da negociação
             // 1 - [CRM] Padrão (Default), 1 - [Loja] Ponto de Venda (Point of Sale), 2 - [Loja] Loja Virtual
             $table->integer('role')->default(1);
+            // Este negócio exige frete
+            // 0 - Não, 1 - Sim
+            $table->boolean('requires_shipping')->default(0);
+            // Frete
+            $table->integer('shipping_cost')->nullable();
             // Preço Total
-            $table->integer('price')->nullable();
+            $table->integer('price');
             // Custo Total
             $table->integer('cost')->nullable();
             // Desconto

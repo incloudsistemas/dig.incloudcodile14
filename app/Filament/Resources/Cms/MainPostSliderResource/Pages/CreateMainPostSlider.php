@@ -10,6 +10,11 @@ class CreateMainPostSlider extends CreateRecord
 {
     protected static string $resource = MainPostSliderResource::class;
 
+    // protected function getRedirectUrl(): string
+    // {
+    //     return $this->getResource()::getUrl('index');
+    // }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['slideable_type'] = 'cms_pages';

@@ -10,6 +10,11 @@ class CreateIndividual extends CreateRecord
 {
     protected static string $resource = IndividualResource::class;
 
+    // protected function getRedirectUrl(): string
+    // {
+    //     return $this->getResource()::getUrl('index');
+    // }
+
     protected function afterCreate(): void
     {
         $contact = $this->record->contact;

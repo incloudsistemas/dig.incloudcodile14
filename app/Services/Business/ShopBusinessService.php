@@ -64,6 +64,11 @@ class ShopBusinessService
             ->toArray();
     }
 
+    public function getProductVariantOptionLabel(?string $value): string
+    {
+        return $this->variantItem->find($value)?->display_name;
+    }
+
     public function getProductVariantInfos(?int $variantItemId): array
     {
         $result = [

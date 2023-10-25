@@ -5,6 +5,7 @@ namespace Database\Seeders\Crm\Contacts;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class SourcesSeeder extends Seeder
@@ -14,6 +15,8 @@ class SourcesSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->truncateTable();
+
         $sources = [
             'Pesquisa Orgânica',
             'Pesquisa Paga',
@@ -33,5 +36,15 @@ class SourcesSeeder extends Seeder
                 'updated_at' => now()
             ]);
         }
+    }
+
+    private function truncateTable()
+    {
+        $this->command->info('Truncating Contact Source table');
+        Schema::disableForeignKeyConstraints();
+
+        DB::table('crm_contact_sources')->truncate();
+
+        Schema::enableForeignKeyConstraints();
     }
 }

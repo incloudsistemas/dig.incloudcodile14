@@ -188,4 +188,14 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Custom I2C Configs
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+
+    'g_recapcha_site'   => env('G_RECAPCHA_SITE', '6LcAT8gfAAAAAJMW4hlwldrvarGniyv-0mTZpDjx'),
+    'g_recapcha_server' => env('G_RECAPCHA_SERVER', '6LcAT8gfAAAAAI8TLXhqrRAuJQQH4BJqz2OJY0n5'),
 ];

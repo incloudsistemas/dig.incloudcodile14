@@ -6,6 +6,7 @@ use App\Casts\DateTimeCast;
 use App\Casts\FloatCast;
 use App\Enums\Business\BusinessRole;
 use App\Enums\Business\PaymentMethod;
+use App\Models\Address;
 use App\Models\Crm\Contacts\Contact;
 use App\Models\Crm\Funnels\Funnel;
 use App\Models\Crm\Funnels\ModelHasFunnelStage;
@@ -33,6 +34,8 @@ class Business extends Model
         'user_id',
         'contact_id',
         'role',
+        'requires_shipping',
+        'shipping_cost',
         'price',
         'cost',
         'discount',
@@ -48,10 +51,12 @@ class Business extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'price'       => FloatCast::class,
-        'cost'        => FloatCast::class,
-        'discount'    => FloatCast::class,
-        'business_at' => DateTimeCast::class,
+        'requires_shipping' => 'boolean',
+        'shipping_cost'     => FloatCast::class,
+        'price'             => FloatCast::class,
+        'cost'              => FloatCast::class,
+        'discount'          => FloatCast::class,
+        'business_at'       => DateTimeCast::class,
     ];
 
     /**
@@ -108,6 +113,16 @@ class Business extends Model
     }
 
     /**
+     * Get the user's addresses.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function addresses(): MorphMany
+    {
+        return $this->morphMany(related: Address::class, name: 'addressable');
+    }
+
+    /**
      * SCOPES.
      *
      */
@@ -134,19 +149,24 @@ class Business extends Model
             : null;
     }
 
-    public function getDisplayPriceAttribute(): ?string
+    public function getDisplayShippingCostAttribute(): string
     {
-        return $this->price ? number_format($this->price, 2, ',', '.') : null;
+        return $this->shipping_cost ? number_format($this->shipping_cost, 2, ',', '.') : '0,00';
     }
 
-    public function getDisplayCostAttribute(): ?string
+    public function getDisplayPriceAttribute(): string
     {
-        return $this->cost ? number_format($this->cost, 2, ',', '.') : null;
+        return $this->price ? number_format($this->price, 2, ',', '.') : '0,00';
     }
 
-    public function getDisplayDiscountAttribute(): ?string
+    public function getDisplayCostAttribute(): string
     {
-        return $this->discount ? number_format($this->discount, 2, ',', '.') : null;
+        return $this->cost ? number_format($this->cost, 2, ',', '.') : '0,00';
+    }
+
+    public function getDisplayDiscountAttribute(): string
+    {
+        return $this->discount ? number_format($this->discount, 2, ',', '.') : '0,00';
     }
 
     public function getDisplayPaymentMethodAttribute(): ?string
@@ -156,7 +176,7 @@ class Business extends Model
             : null;
     }
 
-    public function getDisplayNumInstallmentsAttribute(): ?string
+    public function getDisplayNumInstallmentsAttribute(): string
     {
         return (int) $this->num_installments === 0 ? 'À vista' : $this->num_installments . 'x';
     }

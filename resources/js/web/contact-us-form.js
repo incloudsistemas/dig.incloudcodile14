@@ -19,6 +19,7 @@ class ContactUsForm {
 
     initForm() {
         webCustom.initMasks();
+        webCustom.googleRecaptcha(this.form);
         webCustom.formRuleCheck(this.form);
     }
 
@@ -147,6 +148,8 @@ class ContactUsForm {
             }
 
             webCustom.clearForm(this.form);
+            webCustom.googleRecaptcha(this.form);
+            webCustom.formRuleCheck(this.form);
 
             // location.reload(); // reload page
 

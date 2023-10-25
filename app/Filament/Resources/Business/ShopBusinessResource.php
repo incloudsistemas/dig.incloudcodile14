@@ -287,10 +287,10 @@ class ShopBusinessResource extends Resource
                                         fn (ShopBusinessService $service, string $search): array =>
                                         $service->getProductVariantOptionsBySearch(search: $search),
                                     )
-                                    // ->getOptionLabelUsing(
-                                    //     fn ($value): ?string =>
-                                    //     ProductVariantItem::find($value)?->name
-                                    // )
+                                    ->getOptionLabelUsing(
+                                        fn (ShopBusinessService $service, string $value): string =>
+                                        $service->getProductVariantOptionLabel(value: $value),
+                                    )
                                     ->required()
                                     ->live(debounce: 1000)
                                     ->afterStateUpdated(
@@ -477,6 +477,7 @@ class ShopBusinessResource extends Resource
                         Forms\Components\Select::make('payment_method')
                             ->label(__('Método de pagamento'))
                             ->options(PaymentMethod::asSelectArray())
+                            ->required()
                             ->in(PaymentMethod::getValues())
                             ->native(false),
                         Forms\Components\Select::make('num_installments')
@@ -661,14 +662,87 @@ class ShopBusinessResource extends Resource
     {
         return $infolist
             ->schema([
-                Infolists\Components\TextEntry::make('desciption')
-                    ->label(__('Descrição')),
-                Infolists\Components\TextEntry::make('created_at')
-                    ->label(__('Cadastro'))
-                    ->dateTime('d/m/Y H:i'),
-                Infolists\Components\TextEntry::make('updated_at')
-                    ->label(__('Últ. atualização'))
-                    ->dateTime('d/m/Y H:i'),
+                Infolists\Components\Tabs::make('Label')
+                    ->tabs([
+                        Infolists\Components\Tabs\Tab::make(__('Infos. Gerais'))
+                            ->schema([
+                                Infolists\Components\TextEntry::make('id')
+                                    ->label(__('#ID')),
+                                Infolists\Components\TextEntry::make('contact.contactable.name')
+                                    ->label(__('Contato')),
+                                Infolists\Components\TextEntry::make('owner.name')
+                                    ->label(__('Angariador')),
+                                Infolists\Components\Grid::make(['default' => 3])
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('funnels')
+                                            ->label(__('Funil / Estágio'))
+                                            ->formatStateUsing(
+                                                fn (Model $record): string =>
+                                                $record->funnels[0]->name . " / " . $record->funnelStages[0]->name
+                                            ),
+                                        // Infolists\Components\TextEntry::make('funnels.0.name')
+                                        //     ->label(__('Funil')),
+                                        // Infolists\Components\TextEntry::make('funnelStages.0.name')
+                                        //     ->label(__('Estágio do Funil')),
+                                        Infolists\Components\TextEntry::make('payment_method')
+                                            ->label(__('Método de pagamento'))
+                                            ->formatStateUsing(
+                                                fn (Model $record): string =>
+                                                $record->display_payment_method . " " . $record->display_num_installments
+                                            ),
+                                        // Infolists\Components\TextEntry::make('display_payment_method')
+                                        //     ->label(__('Método de pagamento')),
+                                        // Infolists\Components\TextEntry::make('display_num_installments')
+                                        //     ->label(__('Condições de pagamento')),
+                                    ]),
+                                Infolists\Components\Grid::make(['default' => 3])
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('display_cost')
+                                            ->label(__('Custo total (R$)')),
+                                        Infolists\Components\TextEntry::make('display_discount')
+                                            ->label(__('Desconto (R$)')),
+                                        Infolists\Components\TextEntry::make('display_price')
+                                            ->label(__('Preço total (R$)')),
+                                    ]),
+                                Infolists\Components\TextEntry::make('description')
+                                    ->label(__('Descrição/observações da venda/pedido'))
+                                    ->visible(
+                                        fn (?string $state): bool  =>
+                                        !empty($state),
+                                    )
+                                    ->columnSpanFull(),
+                                Infolists\Components\TextEntry::make('business_at')
+                                    ->label(__('Dt. venda/pedido'))
+                                    ->dateTime('d/m/Y H:i'),
+                                Infolists\Components\TextEntry::make('created_at')
+                                    ->label(__('Cadastro'))
+                                    ->dateTime('d/m/Y H:i'),
+                                Infolists\Components\TextEntry::make('updated_at')
+                                    ->label(__('Últ. atualização'))
+                                    ->dateTime('d/m/Y H:i'),
+                            ]),
+                        Infolists\Components\Tabs\Tab::make(__('Produtos'))
+                            ->schema([
+                                Infolists\Components\RepeatableEntry::make('tradedItems')
+                                    ->label('')
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('businessable.display_name')
+                                            ->label(__('Produto'))
+                                            ->columnSpanFull(),
+                                        Infolists\Components\TextEntry::make('display_unit_price')
+                                            ->label(__('Preço unitário (R$)')),
+                                        Infolists\Components\TextEntry::make('quantity')
+                                            ->label(__('Quantidade')),
+                                        Infolists\Components\TextEntry::make('display_price')
+                                            ->label(__('Preço (R$)')),
+                                    ])
+                                    ->columns(3)
+                                    ->columnSpanFull(),
+                            ]),
+                    ])
+                    // ->contained(false)
+                    ->columns(3)
+                    ->columnSpanFull(),
             ])
             ->columns(3);
     }

@@ -75,10 +75,10 @@ class LeadService extends BaseService
 
     protected function reCaptchaProtection(array $data, ?string $recaptchaSecret): void
     {
-        if (isset($data['g_recaptcha_response']) && isset($recaptchaSecret)) {
+        if (isset($data['g-recaptcha-response']) && isset($recaptchaSecret)) {
             $recaptchaData = [
                 'secret'   => $recaptchaSecret,
-                'response' => $data['g_recaptcha_response']
+                'response' => $data['g-recaptcha-response']
             ];
 
             $recapVerify = curl_init();
@@ -101,7 +101,7 @@ class LeadService extends BaseService
         $forceRecap = (!empty($data['force_recaptcha']) && $data['force_recaptcha'] !== false) ? true : false;
 
         if ($forceRecap) {
-            if (!isset($data['g_recaptcha_response'])) {
+            if (!isset($data['g-recaptcha-response'])) {
                 throw new \Exception('Error. => ' . $this->message['recaptcha_error']);
             }
         }
@@ -124,10 +124,10 @@ class LeadService extends BaseService
     protected function sendEmail(array $data, array $mailTo, string $role): void
     {
         $mailClass = match ($role) {
-            'contact-us' => ContactUsForm::class,
-            'work-with-us' => WorkWithUsForm::class,
+            'contact-us'            => ContactUsForm::class,
+            'work-with-us'          => WorkWithUsForm::class,
             'newsletter-subscriber' => NewsletterSubscriberFormAlert::class,
-            'business-lead' => BusinessLeadFormAlert::class,
+            'business-lead'         => BusinessLeadFormAlert::class,
             default => throw new \Exception('Error. => ' . $this->message['error_unexpected']),
         };
 

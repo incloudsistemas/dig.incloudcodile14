@@ -61,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
             'shop_inventory_activities'    => 'App\Models\Shop\InventoryActivity',
 
             'crm_funnels'                 => 'App\Models\Crm\Funnels\Funnel',
+            'crm_business_funnels'        => 'App\Models\Crm\Funnels\BusinessFunnel',
+            'crm_contact_funnels'         => 'App\Models\Crm\Funnels\ContactFunnel',
             'crm_funnel_stages'           => 'App\Models\Crm\Funnels\FunnelStage',
             'crm_model_has_funnel_stages' => 'App\Models\Crm\Funnels\ModelHasFunnelStage',
             'crm_contact_sources'         => 'App\Models\Crm\Contacts\Source',
@@ -69,8 +71,10 @@ class AppServiceProvider extends ServiceProvider
             'crm_contact_individuals'     => 'App\Models\Crm\Contacts\Individual',
             'crm_contact_legal_entities'  => 'App\Models\Crm\Contacts\LegalEntity',
 
-            'business'              => 'App\Models\Business\Business',
-            'business_traded_items' => 'App\Models\Business\TradedItem',
+            'business'                 => 'App\Models\Business\Business',
+            'shop_business'            => 'App\Models\Business\ShopBusiness',
+            'business_traded_items'    => 'App\Models\Business\TradedItem',
+            'business_payment_methods' => 'App\Models\Business\PaymentMethod',
         ]);
     }
 }

@@ -8,7 +8,6 @@ class WebGlobalCustom {
         this.displayWhatsappButton();
         this.customLink();
         this.openAjaxModal();
-        this.googleRecaptcha();
     }
 
     // Return base href
@@ -133,12 +132,14 @@ class WebGlobalCustom {
         });
     }
 
-    googleRecaptcha() {
-        const gRecaptchaSite = document.querySelector('.g-recaptcha-site');
-        const gRecaptchaResponse = document.querySelector('.g-recaptcha-response');
+    googleRecaptcha(form) {
+        const gRecaptchaSite = form.querySelector('.g-recaptcha-site');
+        const gRecaptchaResponse = form.querySelector('.g-recaptcha-response');
 
         if (gRecaptchaSite && gRecaptchaResponse) {
             var recaptchaSite = gRecaptchaSite.value;
+
+            console.log(recaptchaSite);
 
             grecaptcha.ready(function () {
                 grecaptcha.execute('' + recaptchaSite + '', { action: 'homepage' })
@@ -303,7 +304,6 @@ class WebGlobalCustom {
 
         // Clear select2 plugins
         const select2Fields = form.querySelectorAll('[data-control="select2"]');
-
         select2Fields.forEach(select2 => {
             $(select2).val(null).trigger('change');
         });

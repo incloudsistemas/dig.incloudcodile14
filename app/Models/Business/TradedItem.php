@@ -78,23 +78,23 @@ class TradedItem extends Model
      *
      */
 
-    public function getDisplayPriceAttribute(): ?string
+    public function getDisplayPriceAttribute(): string
     {
-        return $this->price ? number_format($this->price, 2, ',', '.') : null;
+        return $this->price ? number_format($this->price, 2, ',', '.') : '0,00';
     }
 
-    public function getDisplayUnitPriceAttribute(): ?string
+    public function getDisplayUnitPriceAttribute(): string
     {
-        return $this->unit_price ? number_format($this->unit_price, 2, ',', '.') : null;
+        return $this->unit_price ? number_format($this->unit_price, 2, ',', '.') : '0,00';
     }
 
-    public function getDisplayCostAttribute(): ?string
+    public function getDisplayCostAttribute(): string
     {
-        return $this->cost ? number_format($this->cost, 2, ',', '.') : null;
+        return $this->cost ? number_format($this->cost, 2, ',', '.') : '0,00';
     }
 
-    public function getDisplayUnitCostAttribute(): ?string
+    public function getDisplayUnitCostAttribute(): string
     {
-        return $this->unit_cost ? number_format($this->unit_cost, 2, ',', '.') : null;
+        return $this->unit_cost ? number_format($this->unit_cost, 2, ',', '.') : '0,00';
     }
 }

@@ -17,6 +17,11 @@ class EditLegalEntity extends EditRecord
         ];
     }
 
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $contact = $this->record->contact;

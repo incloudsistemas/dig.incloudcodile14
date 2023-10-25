@@ -10,6 +10,11 @@ class CreateBusinessFunnel extends CreateRecord
 {
     protected static string $resource = BusinessFunnelResource::class;
 
+    // protected function getRedirectUrl(): string
+    // {
+    //     return $this->getResource()::getUrl('index');
+    // }
+
     protected function afterCreate(): void
     {
         $count = $this->record->stages()

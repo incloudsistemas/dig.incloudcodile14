@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Business\ShopBusinessResource\Pages;
 
 use App\Filament\Resources\Business\ShopBusinessResource;
-use App\Models\Business\Business;
+use App\Models\Business\ShopBusiness;
 use App\Models\Shop\ProductVariantItem;
 use App\Services\Shop\ProductVariantItemService;
 use Filament\Actions;
@@ -14,19 +14,27 @@ class CreateShopBusiness extends CreateRecord
 {
     protected static string $resource = ShopBusinessResource::class;
 
+    // protected function getRedirectUrl(): string
+    // {
+    //     return $this->getResource()::getUrl('index');
+    // }
+
     protected function afterCreate(): void
     {
-        $this->updateFunnelStages();
+        $this->createFunnelStage();
         $this->createTradedItemsAndUpdateInventory();
         $this->updateContactRolesToCustomer();
     }
 
-    protected function updateFunnelStages(): void
+    protected function createFunnelStage(): void
     {
         $data['funnel_stages']['funnel_stage_id'] = $this->data['funnel_stage_id'];
 
+        $morphMap  = Relation::morphMap();
+        $modelType = array_search(get_class($this->record), $morphMap, true);
+
         $this->record->funnelStages()->updateOrCreate(
-            ['model_type' => Business::class, 'model_id' => $this->record->id, 'funnel_id' => $this->data['funnel_id']],
+            ['model_type' => $modelType, 'model_id' => $this->record->id, 'funnel_id' => $this->data['funnel_id']],
             $data['funnel_stages']
         );
     }
@@ -79,8 +87,8 @@ class CreateShopBusiness extends CreateRecord
 
     protected function updateContactRolesToCustomer(): void
     {
-        $contact  = $this->record->contact;
-        $roleId = 3; // Cliente/Customer
+        $contact = $this->record->contact;
+        $roleId  = 3; // Cliente/Customer
 
         if (!$contact->roles->contains($roleId)) {
             $contact->roles()->attach($roleId);

@@ -187,10 +187,11 @@
 
     <!-- Javascripts
     ============================================= -->
+    <!-- Google Recaptcha -->
+    <script async src="https://www.google.com/recaptcha/api.js?render={{ config('app.g_recapcha_site') }}"></script>
+
     <script src="{{ mix('web-build/js/script.bundle.js') }}"></script>
     <script async src="{{ mix('web-build/js/global-custom.bundle.js') }}"></script>
-
-    <!-- Plugins/Components JS -->
 
     {{-- Scripts injected in pages --}}
     @yield('scripts')

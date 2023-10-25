@@ -264,12 +264,8 @@ class ProductResource extends Resource
                                 Forms\Components\Group::make()
                                     ->schema([
                                         Forms\Components\Grid::make([
-                                            // 'default' => 3,
+                                            'default' => 3,
                                             'sm'      => 1,
-                                            'md'      => 3,
-                                            'lg'      => 3,
-                                            'xl'      => 3,
-                                            '2xl'     => 3,
                                         ])
                                             ->schema([
                                                 Forms\Components\TextInput::make('default_variant.inventory.available')

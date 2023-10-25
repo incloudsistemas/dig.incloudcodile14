@@ -5,6 +5,7 @@ namespace Database\Seeders\Crm\Contacts;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class RolesSeeder extends Seeder
@@ -14,6 +15,8 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->truncateTable();
+
         $roles = [
             'Assinante',
             'Lead',
@@ -31,5 +34,15 @@ class RolesSeeder extends Seeder
                 'updated_at' => now()
             ]);
         }
+    }
+
+    private function truncateTable()
+    {
+        $this->command->info('Truncating Contact Role table');
+        Schema::disableForeignKeyConstraints();
+
+        DB::table('crm_contact_roles')->truncate();
+
+        Schema::enableForeignKeyConstraints();
     }
 }

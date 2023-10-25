@@ -5,6 +5,7 @@ namespace Database\Seeders\Crm\Funnels;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class FunnelsSeeder extends Seeder
@@ -14,6 +15,8 @@ class FunnelsSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->truncateTable();
+
         $funnels = [
             'Status do Lead' => [
                 'role' => 2, // Funis de contatos
@@ -152,5 +155,15 @@ class FunnelsSeeder extends Seeder
                 ]);
             }
         }
+    }
+
+    private function truncateTable()
+    {
+        $this->command->info('Truncating Funnel table');
+        Schema::disableForeignKeyConstraints();
+
+        DB::table('crm_funnels')->truncate();
+
+        Schema::enableForeignKeyConstraints();
     }
 }

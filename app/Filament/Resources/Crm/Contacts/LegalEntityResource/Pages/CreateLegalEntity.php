@@ -10,6 +10,11 @@ class CreateLegalEntity extends CreateRecord
 {
     protected static string $resource = LegalEntityResource::class;
 
+    // protected function getRedirectUrl(): string
+    // {
+    //     return $this->getResource()::getUrl('index');
+    // }
+
     protected function afterCreate(): void
     {
         $contact = $this->record->contact;

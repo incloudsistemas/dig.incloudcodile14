@@ -1,4 +1,4 @@
-<p align="center"><a href="https://incloudsistemas.com.br" target="_blank"><img src="https://github.com/incloudsistemas/dig.incloudcodile14/blob/main/public/images/filament/i2c-loader.png" alt="The i2C | | Marketing Automation, CMS, E-commerce, CRM and Finance logo."></a></p>
+<p align="center"><a href="https://incloudsistemas.com.br" target="_blank"><img src="https://github.com/incloudsistemas/dig.incloudcodile14/blob/main/public/images/filament/i2c-loader.png" alt="The i2C | Marketing Automation, CMS, E-commerce, CRM and Finance logo."></a></p>
 
 ## InCloudCodile14 - i2C | Marketing Automation, CMS, E-commerce, CRM and Finance.
 
@@ -6,7 +6,7 @@ InCloudCodile14 - i2C is a powerful solution encompassing Marketing Automation, 
 
 ## Requirements
 
-- PHP 8.1+
+- PHP 8.2+
 - MySQL 8+
 
 ## Installation
@@ -21,16 +21,16 @@ cd incloudcodile14
 
 Create a `.env` file and generate the app key:
 
-```bash
-cp .env.example .env
-
-php artisan key:generate
-```
-
 Install the dependencies:
 
 ```bash
 composer install
+```
+
+```bash
+cp .env.example .env
+
+php artisan key:generate
 ```
 
 Create the database:
@@ -48,7 +48,7 @@ php artisan migrate --seed
 Install the frontend dependencies and build the assets:
 
 ```bash
-npm instal && npm run dev or npm run build
+npm instal && npm run dev or npm run watch or npm run prod
 ```
 
 ## Testing
