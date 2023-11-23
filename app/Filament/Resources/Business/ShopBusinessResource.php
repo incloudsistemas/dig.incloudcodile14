@@ -7,11 +7,8 @@ use App\Filament\Resources\Business\ShopBusinessResource\Pages;
 use App\Filament\Resources\Business\ShopBusinessResource\RelationManagers;
 use App\Models\Business\Business;
 use App\Models\Business\ShopBusiness;
-use App\Models\Crm\Contacts\Contact;
 use App\Models\Crm\Contacts\Individual;
 use App\Models\Crm\Contacts\LegalEntity;
-use App\Models\Crm\Funnels\FunnelStage;
-use App\Models\Shop\ProductVariantItem;
 use App\Services\Business\BusinessService;
 use App\Services\Business\ShopBusinessService;
 use App\Services\Crm\Contacts\ContactService;
@@ -19,7 +16,6 @@ use App\Services\Crm\Funnels\FunnelService;
 use App\Services\UserService;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -30,7 +26,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class ShopBusinessResource extends Resource
 {
@@ -79,7 +74,7 @@ class ShopBusinessResource extends Resource
                             ->required()
                             ->when(
                                 auth()->user()->can('Cadastrar [CRM] Contatos P. Físicas') ||
-                                    auth()->user()->can('Cadastrar [CRM] Contatos P. Jurídicas'),
+                                auth()->user()->can('Cadastrar [CRM] Contatos P. Jurídicas'),
                                 fn (Forms\Components\Select $component): Forms\Components\Select =>
                                 $component->suffixAction(
                                     Forms\Components\Actions\Action::make('contact')
@@ -522,6 +517,7 @@ class ShopBusinessResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label(__('#ID'))

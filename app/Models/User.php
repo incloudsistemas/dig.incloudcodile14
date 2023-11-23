@@ -219,4 +219,18 @@ class User extends Authenticatable implements FilamentUser, HasMedia
     {
         return UserStatus::getColorByValue(status: (int) $this->status);
     }
+
+    public function getAvatarAttribute(): ?Media
+    {
+        $avatar = $this->getFirstMedia('avatar');
+
+        return $avatar ?? null;
+    }
+
+    public function getDisplayAvatarAttribute(): string
+    {
+        return isset($this->featured_image)
+            ? $this->featured_image->getUrl()
+            : PlaceholderImg(width: 1920, height: 1080);
+    }
 }

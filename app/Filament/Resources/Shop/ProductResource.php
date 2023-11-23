@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Shop;
 
 use App\Enums\Cms\DefaultPostStatus;
+use App\Enums\DefaultStatus;
 use App\Filament\Resources\Shop\ProductResource\Pages;
 use App\Filament\Resources\Shop\ProductResource\RelationManagers;
 use App\Models\Shop\Product;
 use App\Models\Shop\ProductCategory;
-use App\Models\Shop\ProductVariantItem;
 use App\Services\Cms\PostService;
 use App\Services\Shop\ProductBrandService;
 use App\Services\Shop\ProductCategoryService;
@@ -22,6 +22,7 @@ use Filament\Support;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -252,20 +253,25 @@ class ProductResource extends Resource
                                     ->label(__('Acompanhar quantidade'))
                                     ->default(true)
                                     ->live()
+                                    ->hidden(
+                                        fn (string $operation): bool =>
+                                        ($operation === 'edit' && !auth()->user()->can('Editar [Shop] Estoques'))
+                                    )
                                     ->columnSpanFull(),
                                 Forms\Components\Checkbox::make('default_variant.inventory_out_allowed')
                                     ->label(__('Continuar vendendo mesmo sem estoque'))
                                     ->helperText(__('Permite que os clientes comprem o item quando ele estiver fora de estoque (igual ou inferior a zero).'))
                                     ->hidden(
-                                        fn (callable $get): bool =>
-                                        !$get('default_variant.inventory_management')
+                                        fn (callable $get, string $operation): bool =>
+                                        !$get('default_variant.inventory_management') ||
+                                        ($operation === 'edit' && !auth()->user()->can('Editar [Shop] Estoques'))
                                     )
                                     ->columnSpanFull(),
                                 Forms\Components\Group::make()
                                     ->schema([
                                         Forms\Components\Grid::make([
-                                            'default' => 3,
-                                            'sm'      => 1,
+                                            'default' => 1,
+                                            'md'      => 3,
                                         ])
                                             ->schema([
                                                 Forms\Components\TextInput::make('default_variant.inventory.available')
@@ -339,7 +345,9 @@ class ProductResource extends Resource
                                     ])
                                     ->hidden(
                                         fn (callable $get, string $operation): bool =>
-                                        !$get('default_variant.inventory_management') || $operation === 'create'
+                                        !$get('default_variant.inventory_management') ||
+                                        $operation === 'create' ||
+                                        !auth()->user()->can('Editar [Shop] Estoques')
                                     )
                                     ->columnSpanFull(),
                                 Forms\Components\TextInput::make('default_variant.inventory.total')
@@ -350,7 +358,9 @@ class ProductResource extends Resource
                                     ->disabled()
                                     ->hidden(
                                         fn (callable $get, string $operation): bool =>
-                                        !$get('default_variant.inventory_management') || $operation === 'create'
+                                        !$get('default_variant.inventory_management') ||
+                                        $operation === 'create' ||
+                                        !auth()->user()->can('Editar [Shop] Estoques')
                                     ),
                                 Forms\Components\TextInput::make('default_variant.inventory_quantity')
                                     ->numeric()
@@ -358,7 +368,8 @@ class ProductResource extends Resource
                                     ->mask(9999999)
                                     ->hidden(
                                         fn (callable $get, string $operation): bool =>
-                                        !$get('default_variant.inventory_management') || $operation === 'edit'
+                                        !$get('default_variant.inventory_management') ||
+                                        $operation === 'edit'
                                     ),
                                 Forms\Components\TextInput::make('default_variant.inventory_security_alert')
                                     ->numeric()
@@ -366,8 +377,9 @@ class ProductResource extends Resource
                                     ->helperText(__('Estoque limite para seus produtos, que lhe alerta se o produto estará em breve fora de estoque.'))
                                     ->mask(9999999)
                                     ->hidden(
-                                        fn (callable $get): bool =>
-                                        !$get('default_variant.inventory_management')
+                                        fn (callable $get, string $operation): bool =>
+                                        !$get('default_variant.inventory_management') ||
+                                        ($operation === 'edit' && !auth()->user()->can('Editar [Shop] Estoques'))
                                     ),
                             ])
                             ->columns(2)
@@ -679,6 +691,7 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
                     ->label('')
@@ -703,10 +716,10 @@ class ProductResource extends Resource
                         query: fn (ProductService $service, Builder $query, string $search): Builder =>
                         $service->tableSearchBySku(query: $query, search: $search)
                     ),
-                Tables\Columns\TextColumn::make('ref_price')
-                    ->label(__('Preço Ref. (R$)')),
                 Tables\Columns\TextColumn::make('available_inventory')
                     ->label(__('Estoque disponível')),
+                Tables\Columns\TextColumn::make('ref_price')
+                    ->label(__('Preço Ref. (R$)')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Cadastro'))
                     ->dateTime('d/m/Y H:i')
@@ -801,24 +814,156 @@ class ProductResource extends Resource
     {
         return $infolist
             ->schema([
-                Infolists\Components\TextEntry::make('name')
-                    ->label(__('Produto')),
-                Infolists\Components\TextEntry::make('slug')
-                    ->label(__('Slug')),
-                // Infolists\Components\TextEntry::make('cmsPost.display_status')
-                //     ->label(__('Status')),
-                // Infolists\Components\TextEntry::make('publish_at')
-                //     ->label(__('Dt. publicação'))
-                //     ->dateTime('d/m/Y H:i'),
-                // Infolists\Components\TextEntry::make('expiration_at')
-                //     ->label(__('Dt. expiração'))
-                //     ->dateTime('d/m/Y H:i'),
-                Infolists\Components\TextEntry::make('created_at')
-                    ->label(__('Cadastro'))
-                    ->dateTime('d/m/Y H:i'),
-                Infolists\Components\TextEntry::make('updated_at')
-                    ->label(__('Últ. atualização'))
-                    ->dateTime('d/m/Y H:i'),
+                Infolists\Components\Tabs::make('Label')
+                    ->tabs([
+                        Infolists\Components\Tabs\Tab::make(__('Infos. Gerais'))
+                            ->schema([
+                                Infolists\Components\TextEntry::make('name')
+                                    ->label(__('Produto')),
+                                Infolists\Components\TextEntry::make('productCategory.name')
+                                    ->label(__('Categoria'))
+                                    ->visible(
+                                        fn (?string $state): bool =>
+                                        !empty($state),
+                                    ),
+                                Infolists\Components\TextEntry::make('productBrand.name')
+                                    ->label(__('Marca / Fabricante'))
+                                    ->visible(
+                                        fn (?string $state): bool =>
+                                        !empty($state),
+                                    ),
+                                Infolists\Components\TextEntry::make('ref_sku')
+                                    ->label(__('SKU Ref.')),
+                                Infolists\Components\TextEntry::make('available_inventory')
+                                    ->label(__('Estoque disponível')),
+                                Infolists\Components\Grid::make(['default' => 3])
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('ref_unit_cost')
+                                            ->label(__('Custo Ref. (R$)'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('ref_price')
+                                            ->label(__('Preço Ref. (R$)'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('ref_profit')
+                                            ->label(__('Lucro (R$) / Margem Ref.'))
+                                            ->formatStateUsing(
+                                                fn (Model $record): string =>
+                                                $record->ref_profit . " / " . $record->ref_profit_margin . "%"
+                                            )
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                    ]),
+                                Infolists\Components\TextEntry::make('excerpt')
+                                    ->label(__('Descrição resumida'))
+                                    ->visible(
+                                        fn (?string $state): bool =>
+                                        !empty($state),
+                                    )
+                                    ->columnSpanFull(),
+                                Infolists\Components\TextEntry::make('tags')
+                                    ->badge()
+                                    ->separator(',')
+                                    ->visible(
+                                        fn (?array $state): bool =>
+                                        !empty($state),
+                                    )
+                                    ->columnSpanFull(),
+                                Infolists\Components\Grid::make(['default' => 3])
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('created_at')
+                                            ->label(__('Cadastro'))
+                                            ->dateTime('d/m/Y H:i'),
+                                        Infolists\Components\TextEntry::make('updated_at')
+                                            ->label(__('Últ. atualização'))
+                                            ->dateTime('d/m/Y H:i'),
+                                    ]),
+                            ]),
+                        Infolists\Components\Tabs\Tab::make(__('Mídias'))
+                            ->schema([
+                                // ...
+                            ]),
+                        Infolists\Components\Tabs\Tab::make(__('Variantes'))
+                            ->schema([
+                                Infolists\Components\RepeatableEntry::make('variantItems')
+                                    ->label('')
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('name')
+                                            ->label(__('Produto'))
+                                            ->formatStateUsing(
+                                                fn (Model $record): string =>
+                                                $record->name !== 'Default Variant'
+                                                    ? $record->name
+                                                    : $record->product->name
+                                            ),
+                                        Infolists\Components\TextEntry::make('sku')
+                                            ->label(__('SKU'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('bar_code')
+                                            ->label(__('Código de barras (ISBN, UPC, GTIN etc.)'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('inventory.available')
+                                            ->label(__('Estoque disponível'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('display_compare_at_price')
+                                            ->label(__('Comparação de preços (R$)'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('display_unit_cost')
+                                            ->label(__('Custo (R$)'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('display_price')
+                                            ->label(__('Preço (R$)'))
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('display_profit')
+                                            ->label(__('Lucro (R$) / Margem'))
+                                            ->formatStateUsing(
+                                                fn (Model $record): string =>
+                                                $record->display_profit . " / " . $record->display_profit_margin . "%"
+                                            )
+                                            ->visible(
+                                                fn (?string $state): bool =>
+                                                !empty($state),
+                                            ),
+                                        Infolists\Components\TextEntry::make('display_status')
+                                            ->label(__('Status'))
+                                            ->badge()
+                                            ->color(
+                                                fn (string $state): string =>
+                                                DefaultStatus::getColorByDescription(statusDesc: $state)
+                                            ),
+                                    ])
+                                    ->columns(3)
+                                    ->columnSpanFull(),
+                            ]),
+                    ])
+                    // ->contained(false)
+                    ->columns(3)
+                    ->columnSpanFull(),
             ])
             ->columns(3);
     }

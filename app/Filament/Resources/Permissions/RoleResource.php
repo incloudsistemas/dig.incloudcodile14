@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Support;
-use Illuminate\Database\Eloquent\Model;
 
 class RoleResource extends Resource
 {

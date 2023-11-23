@@ -19,7 +19,7 @@ class CreateProduct extends CreateRecord
     {
         // Force post create
         if (!$this->record->cmsPost) {
-            $this->record->cmsPost()->create([]);
+            $this->record->cmsPost()->create();
         }
     }
 }

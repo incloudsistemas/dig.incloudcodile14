@@ -4,6 +4,7 @@ namespace App\Models\Crm\Contacts;
 
 use App\Casts\DateCast;
 use App\Casts\FloatCast;
+use App\Enums\Crm\Contacts\TaxRegime;
 use App\Traits\Crm\Contacts\Contactable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,7 @@ class LegalEntity extends Model implements HasMedia
         'cnpj',
         'municipal_registration',
         'state_registration',
+        'tax_regime',
         'url',
         'sector',
         'num_employees',
@@ -106,4 +108,11 @@ class LegalEntity extends Model implements HasMedia
      * CUSTOMS.
      *
      */
+
+    public function getDisplayTaxRegimeAttribute(): ?string
+    {
+        return isset($this->tax_regime)
+            ? TaxRegime::getDescription(value: (int) $this->tax_regime)
+            : null;
+    }
 }

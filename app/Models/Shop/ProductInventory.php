@@ -2,6 +2,7 @@
 
 namespace App\Models\Shop;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -63,9 +64,29 @@ class ProductInventory extends Model
      * CUSTOMS.
      *
      */
+
+    public function getDisplayUnavailableAttribute(): string
+    {
+        $displayUnavailable = "
+            <span class='font-bold text-xs'>Danificado:</span> {$this->unavailable_damaged} <br/>
+            <span class='font-bold text-xs'>Controle de qualidade:</span> {$this->unavailable_quality_control} <br/>
+            <span class='font-bold text-xs'>Estoque de segurança:</span> {$this->unavailable_safety} <br/>
+            <span class='font-bold text-xs'>Outro:</span> {$this->unavailable_other} <br/>
+        ";
+
+        return $displayUnavailable;
+    }
+
     public function getTotalAttribute(): int
     {
         $total = $this->available + $this->committed + $this->unavailable_damaged + $this->unavailable_quality_control + $this->unavailable_safety + $this->unavailable_other;
         return $total;
+    }
+
+    public function getListOfActivitiesOrderByDesc(): HasMany
+    {
+        return $this->inventoryActivities()
+            ->orderBy('created_at', 'desc')
+            ->take(10);
     }
 }

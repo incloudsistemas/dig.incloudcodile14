@@ -69,7 +69,10 @@ class VariantItemsRelationManager extends RelationManager
                             )
                             ->placeholder('0,00')
                             ->maxValue(42949672.95),
-                        Forms\Components\Grid::make(['default' => 3])
+                        Forms\Components\Grid::make([
+                            'default' => 1,
+                            'md'      => 3,
+                        ])
                             ->schema([
                                 Forms\Components\TextInput::make('unit_cost')
                                     ->label(__('Custo por item'))
@@ -116,39 +119,46 @@ class VariantItemsRelationManager extends RelationManager
                             ->label(__('Acompanhar quantidade'))
                             ->default(true)
                             ->live()
+                            ->hidden(
+                                fn (): bool =>
+                                !auth()->user()->can('Editar [Shop] Estoques')
+                            )
                             ->columnSpanFull(),
                         Forms\Components\Checkbox::make('inventory_out_allowed')
                             ->label(__('Continuar vendendo mesmo sem estoque'))
                             ->helperText(__('Permite que os clientes comprem o item quando ele estiver fora de estoque (igual ou inferior a zero).'))
                             ->hidden(
                                 fn (callable $get): bool =>
-                                !$get('inventory_management')
+                                !$get('inventory_management') || !auth()->user()->can('Editar [Shop] Estoques')
                             )
                             ->columnSpanFull(),
                         Forms\Components\Group::make()
-                            // ->relationship(name: 'inventory')
                             ->schema([
-                                Forms\Components\Grid::make(['default' => 3])
+                                Forms\Components\Grid::make([
+                                    'default' => 1,
+                                    'md'      => 3,
+                                ])
                                     ->schema([
                                         Forms\Components\TextInput::make('inventory.available')
                                             ->numeric()
                                             ->label(__('Estoque disponível'))
                                             ->default(0)
-                                            ->live(debounce: 1000)
+                                            ->live(debounce: 500)
                                             ->afterStateUpdated(
                                                 function (ProductVariantItemService $service, callable $set, callable $get): void {
                                                     $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
-                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                    $set('inventory.total', $inventoryTotal);
                                                 }
                                             ),
                                         Forms\Components\TextInput::make('inventory.committed')
                                             ->numeric()
                                             ->label(__('Comprometido'))
                                             ->default(0)
+                                            ->live(debounce: 500)
                                             ->afterStateUpdated(
                                                 function (ProductVariantItemService $service, callable $set, callable $get): void {
                                                     $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
-                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                    $set('inventory.total', $inventoryTotal);
                                                 }
                                             ),
                                         Forms\Components\TextInput::make('inventory.to_receive')
@@ -162,40 +172,44 @@ class VariantItemsRelationManager extends RelationManager
                                             ->numeric()
                                             ->label(__('Danificado'))
                                             ->default(0)
+                                            ->live(debounce: 500)
                                             ->afterStateUpdated(
                                                 function (ProductVariantItemService $service, callable $set, callable $get): void {
                                                     $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
-                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                    $set('inventory.total', $inventoryTotal);
                                                 }
                                             ),
                                         Forms\Components\TextInput::make('inventory.unavailable_quality_control')
                                             ->numeric()
                                             ->label(__('Controle de qualidade'))
                                             ->default(0)
+                                            ->live(debounce: 500)
                                             ->afterStateUpdated(
                                                 function (ProductVariantItemService $service, callable $set, callable $get): void {
                                                     $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
-                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                    $set('inventory.total', $inventoryTotal);
                                                 }
                                             ),
                                         Forms\Components\TextInput::make('inventory.unavailable_safety')
                                             ->numeric()
                                             ->label(__('Estoque de segurança'))
                                             ->default(0)
+                                            ->live(debounce: 500)
                                             ->afterStateUpdated(
                                                 function (ProductVariantItemService $service, callable $set, callable $get): void {
                                                     $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
-                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                    $set('inventory.total', $inventoryTotal);
                                                 }
                                             ),
                                         Forms\Components\TextInput::make('inventory.unavailable_other')
                                             ->numeric()
                                             ->label(__('Outro'))
                                             ->default(0)
+                                            ->live(debounce: 500)
                                             ->afterStateUpdated(
                                                 function (ProductVariantItemService $service, callable $set, callable $get): void {
                                                     $inventoryTotal = $service->getInventoryTotal(data: $get('inventory'));
-                                                    $set('default_variant.inventory.total', $inventoryTotal);
+                                                    $set('inventory.total', $inventoryTotal);
                                                 }
                                             ),
                                     ])
@@ -203,7 +217,7 @@ class VariantItemsRelationManager extends RelationManager
                             ])
                             ->hidden(
                                 fn (callable $get): bool =>
-                                !$get('inventory_management')
+                                !$get('inventory_management') || !auth()->user()->can('Editar [Shop] Estoques')
                             )
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('inventory.total')
@@ -214,16 +228,8 @@ class VariantItemsRelationManager extends RelationManager
                             ->disabled()
                             ->hidden(
                                 fn (callable $get): bool =>
-                                !$get('inventory_management')
+                                !$get('inventory_management') || !auth()->user()->can('Editar [Shop] Estoques')
                             ),
-                        // Forms\Components\TextInput::make('inventory_quantity')
-                        //     ->numeric()
-                        //     ->label(__('Quantidade em estoque'))
-                        //     ->mask(9999999)
-                        //     ->hidden(
-                        //         fn (callable $get): bool =>
-                        //         !$get('inventory_management')
-                        //     ),
                         Forms\Components\TextInput::make('inventory_security_alert')
                             ->numeric()
                             ->label(__('Alerta de segurança'))
@@ -231,7 +237,7 @@ class VariantItemsRelationManager extends RelationManager
                             ->mask(9999999)
                             ->hidden(
                                 fn (callable $get): bool =>
-                                !$get('inventory_management')
+                                !$get('inventory_management') || !auth()->user()->can('Editar [Shop] Estoques')
                             ),
                     ]),
                 Forms\Components\Fieldset::make(__('Frete'))
@@ -241,7 +247,10 @@ class VariantItemsRelationManager extends RelationManager
                             ->default(true)
                             ->live()
                             ->columnSpanFull(),
-                        Forms\Components\Grid::make(['default' => 4])
+                        Forms\Components\Grid::make([
+                            'default' => 1,
+                            'lg'      => 4,
+                        ])
                             ->schema([
                                 Forms\Components\TextInput::make('weight')
                                     ->label(__('Peso'))
@@ -290,42 +299,6 @@ class VariantItemsRelationManager extends RelationManager
                     ->imageResizeUpscale(false)
                     ->maxSize(5120)
                     ->downloadable(),
-                // Forms\Components\Fieldset::make(__('Galeria de Imagens e Vídeos'))
-                //     ->schema([
-                //         Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                //             ->label(__('Upload das imagens'))
-                //             ->helperText(__('Tipos de arquivo permitidos: .png, .jpg, .jpeg, .gif. // Máx. 1920x1080px // 5 mb.'))
-                //             ->collection('images')
-                //             ->image()
-                //             ->multiple()
-                //             ->reorderable()
-                //             ->appendFiles()
-                //             ->responsiveImages()
-                //             ->getUploadedFileNameForStorageUsing(
-                //                 fn (TemporaryUploadedFile $file, callable $get): string =>
-                //                 (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
-                //                     ->prepend($get('slug')),
-                //             )
-                //             ->imageResizeMode('contain')
-                //             ->imageResizeTargetWidth('1920')
-                //             ->imageResizeTargetHeight('1080')
-                //             ->imageResizeUpscale(false)
-                //             ->maxSize(5120)
-                //             ->downloadable(),
-                //         Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
-                //             ->label(__('Upload dos vídeos'))
-                //             ->helperText(__('Tipo de arquivo permitido: .mp4. // Máx. 25 mb.'))
-                //             ->collection('videos')
-                //             ->getUploadedFileNameForStorageUsing(
-                //                 fn (TemporaryUploadedFile $file, callable $get): string =>
-                //                 (string) str('-' . md5(uniqid()) . '-' . time() . '.' . $file->extension())
-                //                     ->prepend($get('slug')),
-                //             )
-                //             ->multiple()
-                //             ->acceptedFileTypes(['video/mp4'])
-                //             ->maxSize(25600)
-                //             ->downloadable(),
-                //     ]),
                 Forms\Components\Select::make('status')
                     ->label(__('Status'))
                     ->options(DefaultStatus::asSelectArray())
@@ -448,61 +421,6 @@ class VariantItemsRelationManager extends RelationManager
                             fn (Collection $records, array $data) =>
                             $records->each->update($data)
                         ),
-                    // Tables\Actions\BulkAction::make('update_inventory')
-                    //     ->label(__('Controle de estoque'))
-                    //     ->icon('heroicon-o-cube')
-                    //     ->form([
-                    //         Forms\Components\Grid::make(['default' => 4])
-                    //             ->schema([
-                    //                 Forms\Components\TextInput::make('available')
-                    //                     ->numeric()
-                    //                     ->label(__('Disponível'))
-                    //                     ->default(0),
-                    //                 Forms\Components\TextInput::make('committed')
-                    //                     ->numeric()
-                    //                     ->label(__('Comprometido'))
-                    //                     ->default(0),
-                    //                 Forms\Components\TextInput::make('to_receive')
-                    //                     ->numeric()
-                    //                     ->label(__('A ser recebido'))
-                    //                     ->default(0),
-                    //                 Forms\Components\TextInput::make('total')
-                    //                     ->numeric()
-                    //                     ->label(__('Total'))
-                    //                     ->default(0)
-                    //                     ->disabled(),
-                    //             ]),
-                    //         Forms\Components\Fieldset::make(__('Indisponível'))
-                    //             ->schema([
-                    //                     Forms\Components\TextInput::make('unavailable_damaged')
-                    //                         ->numeric()
-                    //                         ->label(__('Danificado'))
-                    //                         ->default(0),
-                    //                     Forms\Components\TextInput::make('unavailable_quality_control')
-                    //                         ->numeric()
-                    //                         ->label(__('Controle de qualidade'))
-                    //                         ->default(0),
-                    //                     Forms\Components\TextInput::make('unavailable_safety')
-                    //                         ->numeric()
-                    //                         ->label(__('Estoque de segurança'))
-                    //                         ->default(0),
-                    //                     Forms\Components\TextInput::make('unavailable_other')
-                    //                         ->numeric()
-                    //                         ->label(__('Outro'))
-                    //                         ->default(0),
-                    //             ])
-                    //             ->columns(4),
-                    //     ])
-                    //     ->action(
-                    //         fn (Collection $records, array $data) =>
-                    //         $records->each(function ($record) use ($data) {
-                    //             $record->inventory()->updateOrCreate(
-                    //                 ['variant_item_id' => $record->id],
-                    //                 $data
-                    //             );
-                    //         }),
-                    //     ),
-                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([

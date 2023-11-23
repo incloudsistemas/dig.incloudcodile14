@@ -14,19 +14,34 @@ class ProductVariantItemService
         $this->variantItem = $variantItem;
     }
 
+    public function mutateRecordDataToEditUsing(ProductVariantItem $variantItem, array $data): array
+    {
+        $data['price'] = $variantItem->display_price;
+        $data['compare_at_price'] = $variantItem->display_compare_at_price;
+        $data['unit_cost'] = $variantItem->display_unit_cost;
+        $data['profit'] = $variantItem->display_profit;
+        $data['profit_margin'] = $variantItem->display_profit_margin;
+
+        $data['inventory'] = $this->getInventoryData($variantItem->inventory);
+
+        return $data;
+    }
+
     public function editAction(ProductVariantItem $variantItem, array $data): ProductVariantItem
     {
         $data['activity']['changed_from'] = $this->getInventoryData($variantItem->inventory);
-        $data['activity']['changed_to'] = $data['inventory'];
+        $data['activity']['changed_to'] = $data['inventory'] ?? null;
 
         $variantItem->update($data);
 
-        $inventory = $variantItem->inventory()->updateOrCreate(
-            ['variant_item_id' => $variantItem->id],
-            $data['inventory']
-        );
+        if (isset($data['inventory'])) {
+            $inventory = $variantItem->inventory()->updateOrCreate(
+                ['variant_item_id' => $variantItem->id],
+                $data['inventory']
+            );
 
-        $this->createInventoryActivity(data: $data['activity'], inventory: $inventory);
+            $this->createInventoryActivity(data: $data['activity'], inventory: $inventory);
+        }
 
         return $variantItem;
     }
@@ -41,6 +56,28 @@ class ProductVariantItemService
             $inventory->inventoryActivities()
                 ->create($data);
         }
+    }
+
+    public static function getInventoryData(?ProductInventory $inventory): array
+    {
+        $fields = [
+            'available',
+            'committed',
+            'unavailable_damaged',
+            'unavailable_quality_control',
+            'unavailable_safety',
+            'unavailable_other',
+            'to_receive',
+            'total'
+        ];
+
+        $data = [];
+
+        foreach ($fields as $field) {
+            $data[$field] = isset($inventory) ? $inventory->$field : 0;
+        }
+
+        return $data;
     }
 
     public function tableSortByPrice(Builder $query, string $direction): Builder
@@ -84,44 +121,9 @@ class ProductVariantItemService
         return $query->orderByRaw("$orderByCase $direction", $bindings);
     }
 
-    public function mutateRecordDataToEditUsing(ProductVariantItem $variantItem, array $data): array
-    {
-        $data['price'] = $variantItem->display_price;
-        $data['compare_at_price'] = $variantItem->display_compare_at_price;
-        $data['unit_cost'] = $variantItem->display_unit_cost;
-        $data['profit'] = $variantItem->display_profit;
-        $data['profit_margin'] = $variantItem->display_profit_margin;
-
-        $data['inventory'] = $this->getInventoryData($variantItem->inventory);
-
-        return $data;
-    }
-
     public function ignoreDefaultVariantOption(Builder $query): Builder
     {
         return $query->where('name', '<>', 'Default Variant');
-    }
-
-    public static function getInventoryData(?ProductInventory $inventory): array
-    {
-        $fields = [
-            'available',
-            'committed',
-            'unavailable_damaged',
-            'unavailable_quality_control',
-            'unavailable_safety',
-            'unavailable_other',
-            'to_receive',
-            'total'
-        ];
-
-        $data = [];
-
-        foreach ($fields as $field) {
-            $data[$field] = isset($inventory) ? $inventory->$field : 0;
-        }
-
-        return $data;
     }
 
     public function getProfitAndMargin(?string $price, ?string $cost): array

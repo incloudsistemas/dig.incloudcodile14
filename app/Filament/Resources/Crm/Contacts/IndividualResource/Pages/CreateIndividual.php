@@ -22,7 +22,7 @@ class CreateIndividual extends CreateRecord
         // Force contact create
         if (!$contact) {
             $contact = $this->record->contact()
-                ->create([]);
+                ->create();
         }
 
         $rolesToSync = array_keys(array_filter($this->data['roles']));

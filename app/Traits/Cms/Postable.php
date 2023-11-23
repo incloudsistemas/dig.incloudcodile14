@@ -105,10 +105,17 @@ trait Postable
             : 'Não';
     }
 
+    public function getDisplayPublishAtAttribute(): ?string
+    {
+        // return $this->publish_at?->format('d/m/Y');
+        return isset($this->publish_at)
+            ? ConvertEnToPtBrDate(date: $this->publish_at)
+            : null;
+    }
+
     public function getFeaturedImageAttribute(): ?Media
     {
-        $featuredImage = $this->getMedia('image')
-            ->first();
+        $featuredImage = $this->getFirstMedia('image');
 
         return $featuredImage ?? null;
     }
@@ -125,6 +132,36 @@ trait Postable
         return isset($this->featured_image)
             ? CreateThumb(src: $this->featured_image->getUrl(), width: $width, height: $height)
             : PlaceholderImg(width: $width, height: $height);
+    }
+
+    public function getGalleryImagesAttribute(): ?Collection
+    {
+        $galleryImages = $this->getMedia('images');
+
+        return $galleryImages ?? null;
+    }
+
+    public function getFeaturedVideoAttribute(): ?Media
+    {
+        $featuredVideo = $this->getFirstMedia('video');
+
+        return $featuredVideo ?? null;
+    }
+
+    public function getGalleryVideosAttribute(): ?Collection
+    {
+        $galleryImages = $this->getMedia('videos');
+
+        return $galleryImages ?? null;
+    }
+
+    public function getGalleryItemsAttribute(): ?Collection
+    {
+        $galleryItems = $this->media()
+            ->whereIn('collection_name', ['images', 'videos'])
+            ->get();
+
+        return $galleryItems->isEmpty() ? null : $galleryItems;
     }
 
     /**
@@ -285,7 +322,7 @@ trait Postable
             direction: $direction,
             publishAtDirection: $publishAtDirection
         )
-            ->whereHas('cmsPost.categories', function (Builder $query) use ($categorySlug): Builder {
+            ->whereHas('cmsPost.postCategories', function (Builder $query) use ($categorySlug): Builder {
                 return $query->where('slug', $categorySlug);
             });
     }
@@ -311,19 +348,26 @@ trait Postable
     public function getWebByRelatedCategories(
         array $categoryIds,
         array $statuses = [1,],
+        ?int $idToAvoid = null,
         string $orderBy = 'order',
         string $direction = 'desc',
         string $publishAtDirection = 'desc'
     ): Builder {
-        return $this->getWeb(
+        $query = $this->getWeb(
             statuses: $statuses,
             orderBy: $orderBy,
             direction: $direction,
             publishAtDirection: $publishAtDirection
         )
-            ->whereHas('cmsPost.categories', function (Builder $query) use ($categoryIds): Builder {
+            ->whereHas('cmsPost.postCategories', function (Builder $query) use ($categoryIds): Builder {
                 return $query->whereIn('id', $categoryIds);
             });
+
+        if ($idToAvoid) {
+            $query->where('id', '<>', $idToAvoid);
+        }
+
+        return $query;
     }
 
     public function getWebByRelatedCategoriesAndRoles(

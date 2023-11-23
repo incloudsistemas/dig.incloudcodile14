@@ -148,7 +148,18 @@ class ProductVariantItem extends Model implements HasMedia
     {
         $displayName = $this->product->name;
 
-        if ($this->name !== "Default Variant") {
+        if ($this->name !== 'Default Variant') {
+            $displayName .= " - {$this->name}";
+        }
+
+        return "{$displayName}";
+    }
+
+    public function getDisplayNameWithSkuAttribute(): string
+    {
+        $displayName = $this->product->name;
+
+        if ($this->name !== 'Default Variant') {
             $displayName .= " - {$this->name}";
         }
 

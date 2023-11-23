@@ -62,15 +62,15 @@ trait Contactable
         return $this->phones[0]['number'] ?? null;
     }
 
-    public function getFeaturedImageAttribute(): ?Media
+    public function getAvatarAttribute(): ?Media
     {
-        $featuredImage = $this->getMedia('image')
+        $avatar = $this->getMedia('image')
             ->first();
 
-        return $featuredImage ?? null;
+        return $avatar ?? null;
     }
 
-    public function getDisplayFeaturedImageAttribute(): string
+    public function getDisplayAvatarAttribute(): string
     {
         return isset($this->featured_image)
             ? $this->featured_image->getUrl()

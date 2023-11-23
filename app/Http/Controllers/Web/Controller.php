@@ -22,6 +22,7 @@ class Controller extends BaseController
         $this->page = $page;
 
         $webSettings =  [
+            'cnpj'           => '24.283.162/0001-42',
             'mail'           => 'contato@incloudsistemas.com.br',
             'phone'          => null,
             'phone_link'     => null,

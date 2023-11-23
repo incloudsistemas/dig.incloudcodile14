@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('crm_contact_legal_entities', function (Blueprint $table) {
             $table->id();
-            // Nome
+            // Nome/Razão Social
             $table->string('name');
             // $table->string('slug')->unique();
             // Email
@@ -27,9 +27,12 @@ return new class extends Migration
             // CNPJ
             $table->string('cnpj')->nullable();
             // Inscrição municipal
+            // É o número de identificação municipal da sua empresa cadastrado na prefeitura.
             $table->string('municipal_registration')->nullable();
             // Inscrição estadual
             $table->string('state_registration')->nullable();
+            // Regime de tributação
+            $table->char('tax_regime', 1)->nullable();
             // Url do site
             $table->string('url')->nullable();
             // Setor

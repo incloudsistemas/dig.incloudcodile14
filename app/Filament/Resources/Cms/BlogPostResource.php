@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use AmidEsfahani\FilamentTinyEditor\TinyEditor;
 
 class BlogPostResource extends Resource
 {
@@ -104,26 +105,37 @@ class BlogPostResource extends Resource
                             ->minLength(2)
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                        Forms\Components\RichEditor::make('body')
+                        // Forms\Components\RichEditor::make('body')
+                        //     ->label(__('Conteúdo'))
+                        //     ->toolbarButtons([
+                        //         'attachFiles',
+                        //         'blockquote',
+                        //         'bold',
+                        //         'bulletList',
+                        //         'codeBlock',
+                        //         'h2',
+                        //         'h3',
+                        //         'italic',
+                        //         'link',
+                        //         'orderedList',
+                        //         'redo',
+                        //         'strike',
+                        //         'undo',
+                        //     ])
+                        //     ->fileAttachmentsDisk('public')
+                        //     ->fileAttachmentsDirectory('pages')
+                        //     ->fileAttachmentsVisibility('public')
+                        //     ->hidden(
+                        //         fn (callable $get): bool =>
+                        //         !in_array($get('role'), [1, 3, 4])
+                        //     )
+                        //     ->columnSpanFull(),
+                        TinyEditor::make('body')
                             ->label(__('Conteúdo'))
-                            ->toolbarButtons([
-                                'attachFiles',
-                                'blockquote',
-                                'bold',
-                                'bulletList',
-                                'codeBlock',
-                                'h2',
-                                'h3',
-                                'italic',
-                                'link',
-                                'orderedList',
-                                'redo',
-                                'strike',
-                                'undo',
-                            ])
                             ->fileAttachmentsDisk('public')
                             ->fileAttachmentsDirectory('pages')
                             ->fileAttachmentsVisibility('public')
+                            ->profile('full') // default|simple|full|minimal|none|custom
                             ->hidden(
                                 fn (callable $get): bool =>
                                 !in_array($get('role'), [1, 3, 4])

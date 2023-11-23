@@ -24,6 +24,10 @@
     cursor: pointer !important;
 }
 
+a.no-cursor {
+    cursor: auto;
+}
+
 /* FORM
 -----------------------------------------------------------------*/
 
@@ -50,8 +54,8 @@
     --cnvs-whatsapp-btn-icon-size: 1.5rem;
     --cnvs-whatsapp-btn-icon-color: #fff;
     --cnvs-whatsapp-btn-position-boxed-top: auto;
-    --cnvs-whatsapp-btn-position-boxed-left: auto;
-    --cnvs-whatsapp-btn-position-boxed-right: 25px;
+    --cnvs-whatsapp-btn-position-boxed-left: 25px;
+    --cnvs-whatsapp-btn-position-boxed-right: auto;
     --cnvs-whatsapp-btn-position-boxed-bottom: 45px;
     --cnvs-whatsapp-btn-position-botom: 30px;
     --cnvs-whatsapp-btn-border-radius: 100px;

@@ -1,13 +1,13 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\Relation;
+
 if (!function_exists('ConvertPtBrFloatStringToInt')) {
     /**
      * Transforms the float string value into a int.
      *
-     * @param
-     * @return
      */
-    function ConvertPtBrFloatStringToInt(mixed $value)
+    function ConvertPtBrFloatStringToInt(mixed $value): int
     {
         $value = str_replace(".", "", $value);
         $value = str_replace(",", ".", $value);
@@ -20,10 +20,8 @@ if (!function_exists('ConvertPtBrToEnDate')) {
     /**
      * Convert date from pt-br format to en.
      *
-     * @param
-     * @return
      */
-    function ConvertPtBrToEnDate($date)
+    function ConvertPtBrToEnDate(string $date): string
     {
         return date("Y-m-d", strtotime(str_replace('/', '-', $date)));
     }
@@ -33,10 +31,8 @@ if (!function_exists('ConvertPtBrToEnDateTime')) {
     /**
      * Convert date from pt-br format to en.
      *
-     * @param
-     * @return
      */
-    function ConvertPtBrToEnDateTime($date)
+    function ConvertPtBrToEnDateTime(string $date): string
     {
         return date("Y-m-d H:i:s", strtotime(str_replace('/', '-', $date)));
     }
@@ -46,10 +42,8 @@ if (!function_exists('ConvertPtBrToLongDate')) {
     /**
      * Convert date from pt-br format to long/full.
      *
-     * @param
-     * @return
      */
-    function ConvertPtBrToLongDate($date)
+    function ConvertPtBrToLongDate(string $date): string
     {
         $weekday = [
             'Sunday'    => 'Domingo',
@@ -94,10 +88,8 @@ if (!function_exists('ConvertEnToPtBrDate')) {
     /**
      * Convert date from en format to pt-br.
      *
-     * @param
-     * @return
      */
-    function ConvertEnToPtBrDate($date)
+    function ConvertEnToPtBrDate(string $date): string
     {
         return date("d/m/Y", strtotime($date));
     }
@@ -107,10 +99,8 @@ if (!function_exists('ConvertEnToPtBrDateTime')) {
     /**
      * Convert date from en format to pt-br.
      *
-     * @param
-     * @return
      */
-    function ConvertEnToPtBrDateTime($date, $showSeconds = null)
+    function ConvertEnToPtBrDateTime(string $date, bool $showSeconds = false): string
     {
         if ($showSeconds) {
             return date("d/m/Y H:i:s", strtotime($date));
@@ -124,10 +114,8 @@ if (!function_exists('LimitCharsFromString')) {
     /**
      * Limita a string em relação aos caracteres.
      *
-     * @param
-     * @return
      */
-    function LimitCharsFromString($string, $numChars = 280)
+    function LimitCharsFromString(string $string, int $numChars = 280): string
     {
         if (strlen($string) <= $numChars) {
             return $string;
@@ -142,10 +130,8 @@ if (!function_exists('SanitizeVar')) {
     /**
      * Clear the variable, removing special characters, spaces, etc...
      *
-     * @param
-     * @return
      */
-    function SanitizeVar($value)
+    function SanitizeVar(string $string): string
     {
         $search = [
             '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
@@ -161,7 +147,19 @@ if (!function_exists('SanitizeVar')) {
             ''
         ];
 
-        $value = preg_replace($search, $replace, $value);
-        return $value;
+        $string = preg_replace($search, $replace, $string);
+        return $string;
+    }
+}
+
+if (!function_exists('MorphMapByClass')) {
+    /**
+     * Get the model type from morphMap
+     *
+     */
+    function MorphMapByClass(string $model): string
+    {
+        $morphMap = Relation::morphMap();
+        return array_search($model, $morphMap, true) ?: $model;
     }
 }

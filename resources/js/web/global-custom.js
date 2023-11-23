@@ -5,9 +5,12 @@ class WebGlobalCustom {
     constructor() {
         this.displaySliderArrows();
         this.displaySidebarIcons();
+        this.gdprAlert();
         this.displayWhatsappButton();
         this.customLink();
         this.openAjaxModal();
+
+        console.log('gogogo i2c');
     }
 
     // Return base href
@@ -64,6 +67,35 @@ class WebGlobalCustom {
             } else {
                 sidebarIcons.style.display = 'none';
             }
+        });
+    }
+
+    gdprAlert() {
+        const gdprAlertElement = document.querySelector('#gdpr-alert');
+        const acceptBtn = document.querySelector('#gdpr-accept');
+
+        if (!gdprAlertElement || !acceptBtn) {
+            // console.error('Elementos do GDPR não foram encontrados!');
+            return;
+        }
+
+        const gdprAccepted = localStorage.getItem('gdprAccepted');
+        // console.log('GDPR Accepted:', gdprAccepted);
+
+        if (gdprAccepted === 'true') {
+            // gdprAlertElement.style.display = 'none';
+            gdprAlertElement.classList.add('d-none');
+        } else {
+            // gdprAlertElement.style.display = 'block';
+            gdprAlertElement.classList.remove('d-none');
+        }
+
+        acceptBtn.addEventListener('click', function() {
+            // console.log('Aceitando GDPR e salvando no Local Storage');
+            localStorage.setItem('gdprAccepted', 'true');
+
+            // gdprAlertElement.style.display = 'none';
+            gdprAlertElement.classList.add('d-none');
         });
     }
 
@@ -376,6 +408,12 @@ class WebGlobalCustom {
     }
 }
 
-export const webCustom = new WebGlobalCustom();
+// export const webCustom = new WebGlobalCustom();
+
+if (!window.webCustom) {
+    window.webCustom = new WebGlobalCustom();
+}
+
+export const webCustom = window.webCustom;
 
 // const baseHref = webCustom.getBaseHref();

@@ -6,7 +6,6 @@ use App\Enums\DefaultStatus;
 use App\Filament\Resources\Crm\Funnels\BusinessFunnelResource\Pages;
 use App\Filament\Resources\Crm\Funnels\BusinessFunnelResource\RelationManagers;
 use App\Models\Crm\Funnels\BusinessFunnel;
-use App\Models\Crm\Funnels\Funnel;
 use App\Services\Crm\Funnels\FunnelService;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,7 +17,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
 
 class BusinessFunnelResource extends Resource
 {
@@ -163,6 +161,7 @@ class BusinessFunnelResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Funil'))

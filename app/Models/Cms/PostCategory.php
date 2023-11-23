@@ -60,13 +60,25 @@ class PostCategory extends Model
      *
      */
 
-     public function getDisplayStatusAttribute(): string
-     {
-         return DefaultStatus::getDescription(value: (int) $this->status);
-     }
+    public function getDisplayStatusAttribute(): string
+    {
+        return DefaultStatus::getDescription(value: (int) $this->status);
+    }
 
-     public function getDisplayStatusColorAttribute(): string
-     {
-         return DefaultStatus::getColorByValue(status: (int) $this->status);
-     }
+    public function getDisplayStatusColorAttribute(): string
+    {
+        return DefaultStatus::getColorByValue(status: (int) $this->status);
+    }
+
+    public function getWebPostCategoriesByTypes(
+        array $postableTypes,
+        array $statuses = [1,],
+        string $orderBy = 'name',
+        string $direction = 'asc'
+    ): Builder {
+        return $this->newQuery()
+            ->whereHas('cmsPosts', fn (Builder $query): Builder => $query->whereIn('postable_type', $postableTypes))
+            ->whereIn('status', $statuses)
+            ->orderBy($orderBy, $direction);
+    }
 }

@@ -14,7 +14,7 @@ InCloudCodile14 - i2C is a powerful solution encompassing Marketing Automation, 
 Clone the repository and cd into it:
 
 ```bash
-git clone git@github.com:incloudsistemas/dig.incloudcodile14.git
+git clone https://github.com/incloudsistemas/dig.incloudcodile14.git
 
 cd incloudcodile14
 ```
@@ -48,7 +48,7 @@ php artisan migrate --seed
 Install the frontend dependencies and build the assets:
 
 ```bash
-npm instal && npm run dev or npm run watch or npm run prod
+npm install && npm run dev or npm run watch or npm run prod
 ```
 
 ## Testing

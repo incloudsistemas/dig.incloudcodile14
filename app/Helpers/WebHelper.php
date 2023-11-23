@@ -1,20 +1,21 @@
 <?php
 
-if (!function_exists('getPhotoGalleryDimensions')) {
+if (!function_exists('GetGalleryItemsDimensions')) {
     /**
-     * PV Photo Loop Dimensions
+     * Mansory Loop Dimensions
      *
-     * @param
-     * @return
      */
-    function getPhotoGalleryDimensions(int $key, int $width, int $height, int $bigWidth, int $bigHeight): array
-    {
-        $width = 370;
-        $height = 464;
-
-        if (in_array($key + 1, [2, 7, 17])) {
-            $width = 743;
-            $height = 931;
+    function GetGalleryItemsDimensions(
+        int $key,
+        array $dataBig = [2, 7, 17],
+        int $width = 370,
+        int $height = 464,
+        int $bigWidth = 743,
+        int $bigHeight = 931
+    ): array {
+        if (in_array($key + 1, $dataBig)) {
+            $width = $bigWidth;
+            $height = $bigHeight;
         }
 
         return ['width' => $width, 'height' => $height];

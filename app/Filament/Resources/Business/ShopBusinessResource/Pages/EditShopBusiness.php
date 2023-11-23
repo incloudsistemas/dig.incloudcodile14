@@ -4,9 +4,11 @@ namespace App\Filament\Resources\Business\ShopBusinessResource\Pages;
 
 use App\Filament\Resources\Business\ShopBusinessResource;
 use App\Models\Business\Business;
+use App\Models\Business\ShopBusiness;
 use App\Models\Business\TradedItem;
 use App\Models\Shop\ProductInventory;
 use App\Models\Shop\ProductVariantItem;
+use App\Services\Business\ShopBusinessService;
 use App\Services\Shop\ProductVariantItemService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -20,7 +22,11 @@ class EditShopBusiness extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->before(
+                    fn (ShopBusinessService $service, ShopBusiness $business) =>
+                    $service->retrieveInventory(business: $business)
+                ),
         ];
     }
 

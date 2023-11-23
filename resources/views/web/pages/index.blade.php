@@ -7,7 +7,7 @@
 {{-- Content --}}
 @section('content')
     <!-- Slider
-        ============================================= -->
+    ============================================= -->
     <section id="slider" class="slider-element slider-parallax min-vh-100 include-header">
         <div class="slider-inner">
             <div class="row align-items-stretch text-center dark w-100 h-100 mx-0 position-absolute">
@@ -86,7 +86,7 @@
     <!-- #slider end -->
 
     <!-- Content
-        ============================================= -->
+    ============================================= -->
     <section id="content">
         <div class="content-wrap">
             <div id="about" class="section dark m-0 header-stick lazy"
@@ -163,7 +163,7 @@
                             <div class="feature-box fbox-sm fbox-plain">
                                 <div class="fbox-icon">
                                     <a href="{{ $webSettings['gmaps_link'] }}" target="_blank">
-                                        <i class="bi-broadcast-pin text-muted"></i>
+                                        <i class="bi-geo-alt text-muted"></i>
                                     </a>
                                 </div>
                                 <div class="fbox-content custom-link" data-href="{{ $webSettings['gmaps_link'] }}"

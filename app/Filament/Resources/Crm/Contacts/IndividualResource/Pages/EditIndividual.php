@@ -28,7 +28,7 @@ class EditIndividual extends EditRecord
 
         $data['roles'] = isset($contact->roles)
             ? $contact->roles->pluck('id', 'id')
-                ->toArray()
+            ->toArray()
             : [];
 
         return $data;

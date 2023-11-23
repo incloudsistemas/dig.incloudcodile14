@@ -132,14 +132,16 @@ class EditProduct extends EditRecord
         if ($variantItem) {
             $variantItem->update($defaultVariant);
 
-            $data['activity']['changed_from'] = ProductVariantItemService::getInventoryData(inventory: $variantItem->inventory);
-            $data['activity']['changed_to'] = $defaultVariant['inventory'];
+            if (isset($defaultVariant['inventory'])) {
+                $data['activity']['changed_from'] = ProductVariantItemService::getInventoryData(inventory: $variantItem->inventory);
+                $data['activity']['changed_to'] = $defaultVariant['inventory'];
 
-            // Update variant inventory
-            $variantItem->inventory()
-                ->update($defaultVariant['inventory']);
+                // Update variant inventory
+                $variantItem->inventory()
+                    ->update($defaultVariant['inventory']);
 
-            ProductVariantItemService::createInventoryActivity(data: $data['activity'], inventory: $variantItem->inventory);
+                ProductVariantItemService::createInventoryActivity(data: $data['activity'], inventory: $variantItem->inventory);
+            }
         }
     }
 }

@@ -79,7 +79,7 @@ class LegalEntityResource extends Resource
                             ->maxLength(255)
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('additional_emails')
-                            ->label(__('Email(s) adicionais'))
+                            ->label(__('Emails adicionais'))
                             ->schema([
                                 Forms\Components\TextInput::make('email')
                                     ->label(__('Email'))
@@ -207,6 +207,7 @@ class LegalEntityResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('avatar')
                     ->label('')
@@ -324,6 +325,12 @@ class LegalEntityResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with('contact');
+            ->with('contact')
+            ->whereHas('contact');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email', 'cnpj'];
     }
 }

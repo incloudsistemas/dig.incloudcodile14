@@ -28,7 +28,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('set null');
             // Papel da negociação
-            // 1 - [CRM] Padrão (Default), 1 - [Loja] Ponto de Venda (Point of Sale), 2 - [Loja] Loja Virtual
+            // 1 - [CRM] Padrão (Default), 2 - [Loja] Ponto de Venda (Point of Sale), 3 - [Loja] Loja Virtual
             $table->integer('role')->default(1);
             // Este negócio exige frete
             // 0 - Não, 1 - Sim

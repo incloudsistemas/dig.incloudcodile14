@@ -21,6 +21,13 @@ class ContactService
             ->byStatuses([1,]);
     }
 
+    public function tableSearchByPhone(Builder $query, string $search): Builder
+    {
+        // $query->whereRaw('JSON_SEARCH(phones, "one", ?) IS NOT NULL', [$search]);
+
+        return $query;
+    }
+
     public function tableSearchByStatus(Builder $query, string $search): Builder
     {
         $statuses = DefaultStatus::asSelectArray();

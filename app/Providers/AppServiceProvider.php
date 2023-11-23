@@ -57,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
             'shop_products'                => 'App\Models\Shop\Product',
             'shop_product_variant_options' => 'App\Models\Shop\ProductVariantOption',
             'shop_product_variant_items'   => 'App\Models\Shop\ProductVariantItem',
-            'shop_product_inventory_items' => 'App\Models\Shop\ProductInventoryItem',
+            'shop_product_inventory'       => 'App\Models\Shop\ProductInventory',
             'shop_inventory_activities'    => 'App\Models\Shop\InventoryActivity',
 
             'crm_funnels'                 => 'App\Models\Crm\Funnels\Funnel',

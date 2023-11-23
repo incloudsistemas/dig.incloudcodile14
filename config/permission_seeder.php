@@ -40,7 +40,7 @@ return [
             '[Shop] Produtos'         => 'c,r,u,d',
             '[Shop] Categorias'       => 'c,r,u,d',
             '[Shop] Marcas'           => 'c,r,u,d',
-            '[Shop] Estoque'          => 'c,r,u,d',
+            '[Shop] Estoques'         => 'c,r,u,d',
             '[Shop] Vendas / Pedidos' => 'c,r,u,d', // Business
 
             '[CRM] Funis de Negócios'     => 'c,r,u,d',

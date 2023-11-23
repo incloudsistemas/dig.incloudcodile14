@@ -66,7 +66,7 @@ class UserResource extends Resource
                             )
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('additional_emails')
-                            ->label(__('Email(s) adicionais'))
+                            ->label(__('Emails adicionais'))
                             ->schema([
                                 Forms\Components\TextInput::make('email')
                                     ->label(__('Email'))
@@ -388,33 +388,83 @@ class UserResource extends Resource
                 Infolists\Components\TextEntry::make('roles.name')
                     ->label(__('Nível de acesso')),
                 Infolists\Components\TextEntry::make('email'),
+                Infolists\Components\TextEntry::make('display_main_phone')
+                    ->label(__('Telefone'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('cpf')
-                    ->label(__('CPF')),
+                    ->label(__('CPF'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('rg')
-                    ->label(__('RG')),
+                    ->label(__('RG'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('display_gender')
-                    ->label(__('Sexo')),
+                    ->label(__('Sexo'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('display_birth_date')
-                    ->label(__('Dt. nascimento')),
+                    ->label(__('Dt. nascimento'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('display_marital_status')
-                    ->label(__('Estado civil')),
+                    ->label(__('Estado civil'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('display_educational_level')
-                    ->label(__('Escolaridade')),
+                    ->label(__('Escolaridade'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('nationality')
-                    ->label(__('Nacionalidade')),
+                    ->label(__('Nacionalidade'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('citizenship')
-                    ->label(__('Naturalidade')),
+                    ->label(__('Naturalidade'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    ),
                 Infolists\Components\TextEntry::make('complement')
                     ->label(__('Complemento'))
+                    ->visible(
+                        fn (?string $state): bool =>
+                        !empty($state),
+                    )
                     ->columnSpanFull(),
-                Infolists\Components\TextEntry::make('display_status')
-                    ->label(__('Status')),
-                Infolists\Components\TextEntry::make('created_at')
-                    ->label(__('Cadastro'))
-                    ->dateTime('d/m/Y H:i'),
-                Infolists\Components\TextEntry::make('updated_at')
-                    ->label(__('Últ. atualização'))
-                    ->dateTime('d/m/Y H:i'),
+                Infolists\Components\Grid::make(['default' => 3])
+                    ->schema([
+                        Infolists\Components\TextEntry::make('display_status')
+                            ->label(__('Status'))
+                            ->badge()
+                            ->color(
+                                fn (string $state): string =>
+                                UserStatus::getColorByDescription(statusDesc: $state)
+                            ),
+                        Infolists\Components\TextEntry::make('created_at')
+                            ->label(__('Cadastro'))
+                            ->dateTime('d/m/Y H:i'),
+                        Infolists\Components\TextEntry::make('updated_at')
+                            ->label(__('Últ. atualização'))
+                            ->dateTime('d/m/Y H:i'),
+                    ]),
             ])
             ->columns(3);
     }

@@ -32,9 +32,10 @@ class AuthServiceProvider extends ServiceProvider
         Models\Cms\PostSlider::class    => Policies\Cms\MainPostSliderPolicy::class,
         Models\Cms\PostCategory::class  => Policies\Cms\PostCategoryPolicy::class,
 
-        Models\Shop\ProductCategory::class => Policies\Shop\ProductCategoryPolicy::class,
-        Models\Shop\ProductBrand::class    => Policies\Shop\ProductBrandPolicy::class,
-        Models\Shop\Product::class         => Policies\Shop\ProductPolicy::class,
+        Models\Shop\ProductCategory::class  => Policies\Shop\ProductCategoryPolicy::class,
+        Models\Shop\ProductBrand::class     => Policies\Shop\ProductBrandPolicy::class,
+        Models\Shop\Product::class          => Policies\Shop\ProductPolicy::class,
+        Models\Shop\ProductInventory::class => Policies\Shop\ProductInventoryPolicy::class,
 
         Models\Crm\Funnels\BusinessFunnel::class => Policies\Crm\Funnels\BusinessFunnelPolicy::class,
         Models\Crm\Funnels\ContactFunnel::class  => Policies\Crm\Funnels\ContactFunnelPolicy::class,

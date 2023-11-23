@@ -31,12 +31,12 @@ class ShopBusinessService
                 return;
             }
 
-            $initialInventoryData = ProductVariantItemService::getInventoryData($variantItem->inventory);
+            $initialInventoryData = ProductVariantItemService::getInventoryData(inventory: $variantItem->inventory);
 
             $variantItem->inventory->increment('available', $item->quantity);
             $variantItem->inventory->refresh();
 
-            $updatedInventoryData = ProductVariantItemService::getInventoryData($variantItem->inventory);
+            $updatedInventoryData = ProductVariantItemService::getInventoryData(inventory: $variantItem->inventory);
 
             $activityData = [
                 'changed_from' => $initialInventoryData,
@@ -59,14 +59,14 @@ class ShopBusinessService
             ->limit(50)
             ->get()
             ->mapWithKeys(function ($item): array {
-                return [$item->id => $item->display_name];
+                return [$item->id => $item->display_name_with_sku];
             })
             ->toArray();
     }
 
     public function getProductVariantOptionLabel(?string $value): string
     {
-        return $this->variantItem->find($value)?->display_name;
+        return $this->variantItem->find($value)?->display_name_with_sku;
     }
 
     public function getProductVariantInfos(?int $variantItemId): array

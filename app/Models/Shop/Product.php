@@ -148,10 +148,48 @@ class Product extends Model implements HasMedia
         return $refPrice ? number_format($refPrice, 2, ',', '.') : null;
     }
 
+    public function getRefUnitCostAttribute(): ?string
+    {
+        $variantItem =  $this->variantItems->sortBy('price')
+            ->first();
+
+        return $variantItem->unit_cost ? number_format($variantItem->unit_cost, 2, ',', '.') : null;
+    }
+
+    public function getRefProfitAttribute(): ?string
+    {
+        $variantItem =  $this->variantItems->sortBy('price')
+            ->first();
+
+        if (!$variantItem->price || !$variantItem->unit_cost) {
+            return null;
+        }
+
+        $profit = $variantItem->price - $variantItem->unit_cost;
+
+        return number_format($profit, 2, ',', '.');
+    }
+
+    public function getRefProfitMarginAttribute(): ?string
+    {
+        $variantItem =  $this->variantItems->sortBy('price')
+            ->first();
+
+        if (!$variantItem->price || !$variantItem->unit_cost) {
+            return null;
+        }
+
+        $profit = $variantItem->price - $variantItem->unit_cost;
+        $profitMargin = ($profit / $variantItem->price) * 100;
+        $profitMargin = round(floatval($profitMargin), precision: 2);
+
+        return number_format($profitMargin, 2, ',', '.');
+    }
+
     public function getAvailableInventoryAttribute(): string
     {
         $availableInventory = $this->variantItems->sum(
-            fn($variantItem) => $variantItem->inventory->available ?? 0
+            fn ($variantItem) => $variantItem->inventory->available ?? 0
         );
 
         $variantsCount = $this->variantItems->count();
